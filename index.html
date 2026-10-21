@@ -1,0 +1,78 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Note Listener</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <main>
+    <h1>Note Listener</h1>
+    <p class="intro">A basic prototype. It plays a note through your speakers and listens for a note through your microphone.</p>
+
+    <section id="start-panel">
+      <button id="start" class="primary">Start (allow microphone)</button>
+      <p id="start-error" class="error" hidden></p>
+    </section>
+
+    <section id="app" hidden>
+      <div class="card">
+        <h2>Play a note</h2>
+        <p class="hint">Click a note to hear it. It also becomes the target to play back.</p>
+        <div id="keys" class="keys"></div>
+        <label class="inline">Sound
+          <select id="waveform">
+            <option value="triangle">Soft (triangle)</option>
+            <option value="sine">Pure (sine)</option>
+            <option value="square">Buzzy (square)</option>
+          </select>
+        </label>
+      </div>
+
+      <div class="card">
+        <h2>Hear a note</h2>
+        <div class="readout">
+          <div>
+            <span class="label">Detected</span>
+            <span id="note" class="big">–</span>
+          </div>
+          <div>
+            <span class="label">Frequency</span>
+            <span id="freq">–</span>
+          </div>
+          <div>
+            <span class="label">Tuning</span>
+            <span id="cents">–</span>
+          </div>
+          <div>
+            <span class="label">Clarity</span>
+            <span id="clarity">–</span>
+          </div>
+        </div>
+
+        <div class="target">
+          <span class="label">Target</span>
+          <span id="target">none: click a note above</span>
+          <span id="match" class="match"></span>
+        </div>
+
+        <div class="meter-row">
+          <span class="label">Loudness</span>
+          <div class="meter"><div id="meter-fill"></div></div>
+          <span id="db">– dB</span>
+        </div>
+
+        <label class="inline">Microphone
+          <select id="mic-select"></select>
+        </label>
+        <label class="inline">
+          <input type="checkbox" id="self-test">
+          Listen while the app is playing (self-test: the mic hears the app's own note)
+        </label>
+      </div>
+    </section>
+  </main>
+  <script type="module" src="main.js"></script>
+</body>
+</html>
