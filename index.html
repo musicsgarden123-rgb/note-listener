@@ -18,16 +18,37 @@
 
     <section id="app" hidden>
       <div class="card">
-        <h2>Play a note</h2>
-        <p class="hint">Click a note to hear it. It also becomes the target to play back.</p>
-        <div id="keys" class="keys"></div>
-        <label class="inline">Sound
-          <select id="waveform">
-            <option value="triangle">Soft (triangle)</option>
-            <option value="sine">Pure (sine)</option>
-            <option value="square">Buzzy (square)</option>
-          </select>
-        </label>
+        <div class="card-head">
+          <h2>Piano</h2>
+          <div class="legend">
+            <span><i class="swatch is-target"></i>Target</span>
+            <span><i class="swatch is-detected"></i>You're playing</span>
+            <span><i class="swatch is-match"></i>Match</span>
+          </div>
+        </div>
+        <p class="hint">All 88 keys, A0 to C8. Click a key to hear it; it also becomes the target to play back. Scroll sideways to see the rest of the keyboard.</p>
+
+        <div id="piano-scroll" class="piano-scroll">
+          <div id="piano" class="piano" role="group" aria-label="Piano keyboard"></div>
+        </div>
+
+        <div class="controls">
+          <label class="inline">Sound
+            <select id="waveform">
+              <option value="triangle">Soft (triangle)</option>
+              <option value="sine">Pure (sine)</option>
+              <option value="square">Buzzy (square)</option>
+            </select>
+          </label>
+          <label class="inline">Key size
+            <input type="range" id="key-size" min="14" max="44" value="26">
+          </label>
+          <label class="inline">
+            <input type="checkbox" id="follow" checked>
+            Scroll to the note I play
+          </label>
+          <button id="middle-c" type="button">Go to middle C</button>
+        </div>
       </div>
 
       <div class="card">
@@ -53,7 +74,7 @@
 
         <div class="target">
           <span class="label">Target</span>
-          <span id="target">none: click a note above</span>
+          <span id="target">none: click a key above</span>
           <span id="match" class="match"></span>
         </div>
 
@@ -70,6 +91,7 @@
           <input type="checkbox" id="self-test">
           Listen while the app is playing (self-test: the mic hears the app's own note)
         </label>
+        <p class="hint small">Laptop speakers can barely play the lowest octave, and laptop mics hear it poorly too. Use a real piano or headphones down there.</p>
       </div>
     </section>
   </main>

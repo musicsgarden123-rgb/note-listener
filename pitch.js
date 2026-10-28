@@ -22,8 +22,9 @@ export function rms(buf) {
 }
 
 // YIN pitch detection (de Cheveigné & Kawahara, 2002).
+// Default range covers the whole piano: A0 (27.5 Hz) to C8 (4186 Hz).
 // Returns { freq, clarity } or null when no clear pitch is found.
-export function detectPitch(buf, sampleRate, { minFreq = 60, maxFreq = 1500, threshold = 0.15 } = {}) {
+export function detectPitch(buf, sampleRate, { minFreq = 25, maxFreq = 4400, threshold = 0.15 } = {}) {
   const half = Math.floor(buf.length / 2);
   const minTau = Math.max(2, Math.floor(sampleRate / maxFreq));
   const maxTau = Math.min(half - 1, Math.floor(sampleRate / minFreq));
