@@ -1,4 +1,4 @@
-import { detectPitch, freqToMidi, midiToFreq, midiToName, rms } from './pitch.js';
+import { detectPitch, freqToMidi, midiToFreq, midiToName, rms } from './pitch.js?v=2';
 
 // Full 88-key piano: A0 (MIDI 21) to C8 (MIDI 108).
 const LOWEST = 21;
