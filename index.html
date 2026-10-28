@@ -9,8 +9,8 @@
 <body>
   <section id="start-panel" class="start">
     <h1>Note Listener</h1>
-    <p class="intro">A note appears on the grand staff. Play it on the piano below, on screen or on your real piano. Get it right to move on.</p>
-    <button id="start" class="primary">Start (allow microphone)</button>
+    <p class="intro">A note appears on the grand staff. Play it on the piano below, on screen or on your real piano. Get it right to move on. The browser will ask to use your microphone so the app can hear a real piano.</p>
+    <button id="start" class="primary">Start</button>
     <p id="start-error" class="error" hidden></p>
   </section>
 
@@ -31,6 +31,7 @@
           </div>
         </div>
       </div>
+      <p id="mic-status" class="mic-status" hidden></p>
       <div class="detail-controls">
         <label>Microphone <select id="mic-select"></select></label>
         <label><input type="checkbox" id="self-test"> Listen while the app is playing (self-test)</label>

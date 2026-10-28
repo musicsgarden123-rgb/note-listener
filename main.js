@@ -62,8 +62,13 @@ async function start() {
     analyser.fftSize = 4096;
     buffer = new Float32Array(analyser.fftSize);
 
-    await connectMic();
-    await listMics();
+    // If the mic isn't allowed, keep going: the quiz still works by tapping keys.
+    try {
+      await connectMic();
+      await listMics();
+    } catch (err) {
+      setMicUnavailable(err);
+    }
     buildPiano();
     buildMinimap();
 
@@ -79,6 +84,20 @@ async function start() {
 }
 
 // ---------- Microphone ----------
+
+function setMicUnavailable(err) {
+  listening = false;
+  stopMic();
+  const why = err && err.name === 'NotAllowedError'
+    ? 'The microphone is blocked here, so the app can\'t hear a real piano. Tap the keys to answer.'
+    : 'No microphone is available here, so the app can\'t hear a real piano. Tap the keys to answer.';
+  $('mic-status').textContent = why;
+  $('mic-status').hidden = false;
+  $('listen-toggle').hidden = true;
+  $('follow').closest('label').hidden = true;
+  document.querySelector('.sound-details').open = false;
+  document.querySelector('.sound-details summary .muted').textContent = '(mic not available here)';
+}
 
 async function connectMic(deviceId) {
   stopMic();
@@ -131,7 +150,7 @@ async function toggleListening() {
       listening = true;
       btn.textContent = 'Pause listening';
     } catch (err) {
-      showError(err);
+      setMicUnavailable(err);
     }
   }
 }

@@ -71,6 +71,7 @@ button.primary {
 select { font: inherit; }
 .muted { color: var(--muted); font-weight: 400; }
 .error { color: var(--bad); }
+.mic-status { margin: 0 0 6px; color: var(--warn); font-size: 0.9rem; }
 
 /* ---------- Start screen ---------- */
 
