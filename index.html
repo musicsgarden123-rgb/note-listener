@@ -2,99 +2,89 @@
 <html lang="en">
 <head>
   <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
   <title>Note Listener</title>
-  <link rel="stylesheet" href="style.css?v=2">
+  <link rel="stylesheet" href="style.css?v=3">
 </head>
 <body>
-  <main>
+  <section id="start-panel" class="start">
     <h1>Note Listener</h1>
-    <p class="intro">A basic prototype. It plays a note through your speakers and listens for a note through your microphone.</p>
+    <p class="intro">A note appears on the grand staff. Play it on the piano below, on screen or on your real piano. Get it right to move on.</p>
+    <button id="start" class="primary">Start (allow microphone)</button>
+    <p id="start-error" class="error" hidden></p>
+  </section>
 
-    <section id="start-panel">
-      <button id="start" class="primary">Start (allow microphone)</button>
-      <p id="start-error" class="error" hidden></p>
-    </section>
-
-    <section id="app" hidden>
-      <div class="card">
-        <div class="card-head">
-          <h2>Piano</h2>
-          <div class="legend">
-            <span><i class="swatch is-target"></i>Target</span>
-            <span><i class="swatch is-detected"></i>You're playing</span>
-            <span><i class="swatch is-match"></i>Match</span>
+  <div id="app" class="app" hidden>
+    <details class="sound-details" open>
+      <summary>Sound details <span class="muted">(for testing; will be hidden later)</span></summary>
+      <div class="details-body">
+      <div class="readout">
+        <div><span class="label">Detected</span><span id="note" class="big">–</span></div>
+        <div><span class="label">Frequency</span><span id="freq">–</span></div>
+        <div><span class="label">Tuning</span><span id="cents">–</span></div>
+        <div><span class="label">Clarity</span><span id="clarity">–</span></div>
+        <div class="loudness">
+          <span class="label">Loudness</span>
+          <div class="meter-row">
+            <div class="meter"><div id="meter-fill"></div></div>
+            <span id="db">– dB</span>
           </div>
         </div>
-        <p class="hint">All 88 keys, A0 to C8. Click a key to hear it; it also becomes the target to play back. Scroll sideways to see the rest of the keyboard.</p>
+      </div>
+      <div class="detail-controls">
+        <label>Microphone <select id="mic-select"></select></label>
+        <label><input type="checkbox" id="self-test"> Listen while the app is playing (self-test)</label>
+        <button id="listen-toggle" type="button">Pause listening</button>
+      </div>
+      </div>
+    </details>
 
-        <div id="piano-scroll" class="piano-scroll">
-          <div id="piano" class="piano" role="group" aria-label="Piano keyboard"></div>
+    <section class="quiz">
+      <div class="quiz-bar">
+        <span id="score" class="score">Correct: 0</span>
+        <div class="quiz-actions">
+          <button id="hint" type="button" class="hint-btn">💡 Hint</button>
+          <span id="feedback" class="feedback"></span>
         </div>
-
-        <div class="controls">
-          <label class="inline">Sound
+        <div class="quiz-settings">
+          <label>Notes
+            <select id="range">
+              <option value="21-108">Full piano (A0 to C8)</option>
+              <option value="36-84">C2 to C6</option>
+              <option value="48-72">C3 to C5 (around middle C)</option>
+            </select>
+          </label>
+          <label>Sound
             <select id="waveform">
               <option value="triangle">Soft (triangle)</option>
               <option value="sine">Pure (sine)</option>
               <option value="square">Buzzy (square)</option>
             </select>
           </label>
-          <label class="inline">Key size
-            <input type="range" id="key-size" min="14" max="44" value="26">
-          </label>
-          <label class="inline">
-            <input type="checkbox" id="follow" checked>
-            Scroll to the note I play
-          </label>
-          <button id="middle-c" type="button">Go to middle C</button>
         </div>
       </div>
-
-      <div class="card">
-        <h2>Hear a note</h2>
-        <div class="readout">
-          <div>
-            <span class="label">Detected</span>
-            <span id="note" class="big">–</span>
-          </div>
-          <div>
-            <span class="label">Frequency</span>
-            <span id="freq">–</span>
-          </div>
-          <div>
-            <span class="label">Tuning</span>
-            <span id="cents">–</span>
-          </div>
-          <div>
-            <span class="label">Clarity</span>
-            <span id="clarity">–</span>
-          </div>
-        </div>
-
-        <div class="target">
-          <span class="label">Target</span>
-          <span id="target">none: click a key above</span>
-          <span id="match" class="match"></span>
-        </div>
-
-        <div class="meter-row">
-          <span class="label">Loudness</span>
-          <div class="meter"><div id="meter-fill"></div></div>
-          <span id="db">– dB</span>
-        </div>
-
-        <label class="inline">Microphone
-          <select id="mic-select"></select>
-        </label>
-        <label class="inline">
-          <input type="checkbox" id="self-test">
-          Listen while the app is playing (self-test: the mic hears the app's own note)
-        </label>
-        <p class="hint small">Laptop speakers can barely play the lowest octave, and laptop mics hear it poorly too. Use a real piano or headphones down there.</p>
-      </div>
+      <div id="staff" class="staff" aria-live="polite"></div>
     </section>
-  </main>
-  <script type="module" src="main.js?v=2"></script>
+
+    <footer class="dock">
+      <div class="dock-bar">
+        <div id="minimap" class="minimap" title="Drag to move along the keyboard">
+          <div id="minimap-keys" class="minimap-keys"></div>
+          <div id="minimap-window" class="minimap-window"></div>
+        </div>
+        <div class="dock-controls">
+          <button id="middle-c" type="button" title="Go to middle C">★ Middle C</button>
+          <label title="Key size">Keys <input type="range" id="key-size" min="30" max="72" value="46"></label>
+          <label title="Scroll the keyboard to the note you play"><input type="checkbox" id="follow" checked> Follow</label>
+        </div>
+      </div>
+      <div id="piano-scroll" class="piano-scroll">
+        <div id="piano" class="piano" role="group" aria-label="Piano keyboard"></div>
+      </div>
+    </footer>
+  </div>
+
+  <script src="vendor/vexflow-4.2.5-bravura.js"></script>
+  <script type="module" src="main.js?v=3"></script>
 </body>
 </html>
