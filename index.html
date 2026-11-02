@@ -4,7 +4,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
   <title>Note Listener</title>
-  <link rel="stylesheet" href="style.css?v=4">
+  <link rel="stylesheet" href="style.css?v=5">
 </head>
 <body>
   <!--APP-START-->
@@ -65,7 +65,10 @@
     <section id="editor" class="quiz editor" hidden>
       <div class="editor-top">
         <button id="ed-cancel" type="button" class="icon-btn" aria-label="Cancel">✕</button>
-        <input id="ed-name" type="text" maxlength="40" placeholder="Drill name, e.g. A3 to E4" autocomplete="off">
+        <label class="name-field" for="ed-name">
+          <span class="label">Drill name</span>
+          <input id="ed-name" type="text" maxlength="40" placeholder="Tap keys to start" autocomplete="off">
+        </label>
         <button id="ed-save" type="button" class="primary">Save</button>
       </div>
       <div class="editor-row">
@@ -100,7 +103,8 @@
           <label class="size-label">Keys <input type="range" id="key-size" min="0" max="100" value="50" aria-label="Key size"> <span id="key-size-val" class="pct">50%</span></label>
           <label>Sound
             <select id="waveform">
-              <option value="piano">Grand piano</option>
+              <option value="piano">Grand piano (warm)</option>
+              <option value="piano-bright">Grand piano (bright)</option>
               <option value="triangle">Soft (triangle)</option>
               <option value="sine">Pure (sine)</option>
               <option value="square">Buzzy (square)</option>
@@ -117,6 +121,6 @@
   <!--APP-END-->
 
   <script src="vendor/vexflow-4.2.5-bravura.js"></script>
-  <script type="module" src="main.js?v=4"></script>
+  <script type="module" src="main.js?v=5"></script>
 </body>
 </html>

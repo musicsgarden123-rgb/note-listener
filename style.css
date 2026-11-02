@@ -426,7 +426,7 @@ button.danger.confirm { background: var(--bad); color: #fff; border-color: var(-
   align-items: center;
   gap: 10px;
 }
-.editor-top input {
+.name-field input {
   flex: 1;
   min-width: 0;
   font: inherit;
@@ -438,7 +438,7 @@ button.danger.confirm { background: var(--bad); color: #fff; border-color: var(-
   background: var(--card);
   color: var(--text);
 }
-.editor-top input:focus-visible, .drill-pick select:focus-visible { outline: 2px solid var(--accent); outline-offset: 1px; }
+.name-field input:focus-visible, .drill-pick select:focus-visible { outline: 2px solid var(--accent); outline-offset: 1px; }
 
 .editor-row {
   flex: none;
@@ -523,3 +523,11 @@ button.danger.confirm { background: var(--bad); color: #fff; border-color: var(-
 
 .credit { margin: 4px 0 0; font-size: 0.75rem; color: var(--muted); }
 .credit a { color: inherit; }
+
+/* Drill name: a labelled, obviously editable field */
+.name-field { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 2px; }
+.name-field input { width: 100%; }
+.editor-top { align-items: flex-end; }
+
+/* Black keys can show both names (A♯ over B♭) */
+.key.black .key-label { white-space: pre-line; text-align: center; line-height: 1.15; }

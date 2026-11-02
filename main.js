@@ -30,12 +30,18 @@ const SIZE_SMALL_DRILL = 70;
 // Grand piano samples (Salamander Grand Piano, every minor third).
 const SAMPLE_MIDIS = [];
 for (let m = 21; m <= 108; m += 3) SAMPLE_MIDIS.push(m);
-const SAMPLE_URL = (m) => `samples/piano/${m}.mp3`;
+const PIANOS = {
+  piano: { dir: 'samples/piano', label: 'Grand piano (warm)', warm: true },
+  'piano-bright': { dir: 'samples/piano-bright', label: 'Grand piano (bright)', warm: false },
+};
 
+// A drill is a list of notes. Each note is written as its MIDI number, plus
+// '#' or 'b' for a black key, so A♯3 ("58#") and B♭3 ("58b") are different notes.
 const PRESETS = [
-  { id: 'preset-full', name: 'Full piano (A0 to C8)', notes: whiteKeys(21, 108), spelling: 'sharp', preset: true },
-  { id: 'preset-c2c6', name: 'C2 to C6', notes: whiteKeys(36, 84), spelling: 'sharp', preset: true },
-  { id: 'preset-c3c5', name: 'C3 to C5 (around middle C)', notes: whiteKeys(48, 72), spelling: 'sharp', preset: true },
+  { id: 'preset-full', name: 'Full piano (A0 to C8)', items: whiteItems(21, 108), preset: true },
+  { id: 'preset-g3e4', name: 'G3 to E4', items: whiteItems(55, 64), preset: true },
+  { id: 'preset-g3f5', name: 'G3 to F5', items: whiteItems(55, 77), preset: true },
+  { id: 'preset-e2e4', name: 'E2 to E4', items: whiteItems(40, 64), preset: true },
 ];
 
 const $ = (id) => document.getElementById(id);
@@ -67,10 +73,11 @@ let micMatchFrames = 0;
 let score = 0;
 
 let mode = 'practice';      // 'practice' or 'edit'
-let editing = null;         // { id|null, name, notes:Set, spelling }
+let editing = null;         // { id|null, name, nameTouched, items:Set, mode:'sharp'|'flat' }
 
-const samples = new Map();  // midi -> AudioBuffer
-let samplesReady = false;
+const sampleSets = {};      // piano kind -> { buffers: Map(midi -> AudioBuffer), ready, loading }
+let warmChain = null;       // EQ + compressor that makes the warm piano fuller
+let plainChain = null;
 
 let store = null;           // where drills are saved (account or this device)
 let pendingDrillId = null;  // last-used drill, waiting for saved drills to load
@@ -79,10 +86,40 @@ let pendingDrillId = null;  // last-used drill, waiting for saved drills to load
 // Helpers
 // ======================================================================
 
-function whiteKeys(lo, hi) {
+function whiteItems(lo, hi) {
   const out = [];
-  for (let m = lo; m <= hi; m++) if (!BLACK.has(m % 12)) out.push(m);
+  for (let m = lo; m <= hi; m++) if (!BLACK.has(m % 12)) out.push(String(m));
   return out;
+}
+
+// "58#" -> { midi: 58, acc: '#', spelling: 'sharp' }
+function parseItem(item) {
+  const midi = parseInt(item, 10);
+  const acc = item.endsWith('#') ? '#' : item.endsWith('b') ? 'b' : '';
+  return { midi, acc, spelling: acc === 'b' ? 'flat' : 'sharp' };
+}
+function itemSpell(item) {
+  const p = parseItem(item);
+  return spell(p.midi, p.spelling);
+}
+function itemMidi(item) { return parseInt(item, 10); }
+function itemFor(midi, mode) {
+  return BLACK.has(midi % 12) ? `${midi}${mode === 'flat' ? 'b' : '#'}` : String(midi);
+}
+function sortItems(items) {
+  return [...items].sort((a, b) => itemMidi(a) - itemMidi(b) || a.localeCompare(b));
+}
+// Older saved drills stored { notes: [midi...], spelling }; convert them.
+function normDrill(d) {
+  if (Array.isArray(d.items)) return { ...d, items: sortItems(d.items) };
+  const items = (d.notes || []).map((m) => itemFor(m, d.spelling));
+  return { ...d, items: sortItems(items) };
+}
+// How black keys are labelled for a drill: as sharps, flats, or both.
+function labelModeFor(items) {
+  const sharp = items.some((i) => i.endsWith('#'));
+  const flat = items.some((i) => i.endsWith('b'));
+  return sharp && flat ? 'both' : flat ? 'flat' : 'sharp';
 }
 
 // Name a note, spelling black keys as sharps or flats: { letter, acc, octave, text }
@@ -150,7 +187,11 @@ async function start() {
     analyser.fftSize = 4096; // big enough for the lowest piano notes (A0 = 27.5 Hz)
     buffer = new Float32Array(analyser.fftSize);
 
-    loadPianoSamples();
+    buildSoundChains();
+    const savedSound = recall('sr-sound');
+    if (savedSound && $('waveform').querySelector(`option[value="${savedSound}"]`)) $('waveform').value = savedSound;
+    loadPiano('piano');
+    if (PIANOS[$('waveform').value]) loadPiano($('waveform').value);
 
     // If the mic isn't allowed, keep going: the quiz still works by tapping keys.
     try {
@@ -183,49 +224,90 @@ async function start() {
 // Sound: grand piano samples, with simple synth sounds as alternatives
 // ======================================================================
 
-async function loadPianoSamples() {
-  const opt = $('waveform').querySelector('option[value="piano"]');
-  opt.textContent = 'Grand piano (loading…)';
-  let loaded = 0;
+function buildSoundChains() {
+  // Warm piano: a little more body in the lows, softer highs, and gentle
+  // compression so every note sounds full and even (a singing, cantabile tone).
+  const low = ctx.createBiquadFilter();
+  low.type = 'lowshelf';
+  low.frequency.value = 220;
+  low.gain.value = 4;
+  const high = ctx.createBiquadFilter();
+  high.type = 'highshelf';
+  high.frequency.value = 4500;
+  high.gain.value = -4;
+  const comp = ctx.createDynamicsCompressor();
+  comp.threshold.value = -24;
+  comp.ratio.value = 3;
+  comp.attack.value = 0.01;
+  comp.release.value = 0.25;
+  const makeup = ctx.createGain();
+  makeup.gain.value = 1.5;
+  low.connect(high).connect(comp).connect(makeup).connect(ctx.destination);
+  warmChain = low;
+
+  const plainComp = ctx.createDynamicsCompressor();
+  plainComp.threshold.value = -18;
+  plainComp.ratio.value = 2;
+  plainComp.connect(ctx.destination);
+  plainChain = plainComp;
+}
+
+async function loadPiano(kind) {
+  const info = PIANOS[kind];
+  if (!info || sampleSets[kind]) return;
+  const set = { buffers: new Map(), ready: false, loading: true };
+  sampleSets[kind] = set;
+  const opt = $('waveform').querySelector(`option[value="${kind}"]`);
+  opt.textContent = `${info.label} (loading…)`;
   await Promise.all(SAMPLE_MIDIS.map(async (m) => {
     try {
-      const res = await fetch(SAMPLE_URL(m));
+      const res = await fetch(`${info.dir}/${m}.mp3`);
       if (!res.ok) throw new Error(res.status);
-      const data = await res.arrayBuffer();
-      samples.set(m, await ctx.decodeAudioData(data));
-      loaded++;
+      set.buffers.set(m, await ctx.decodeAudioData(await res.arrayBuffer()));
     } catch { /* a missing sample falls back to a neighbour */ }
   }));
-  samplesReady = loaded > 0;
-  opt.textContent = samplesReady ? 'Grand piano' : 'Grand piano (unavailable)';
+  set.loading = false;
+  set.ready = set.buffers.size > 0;
+  opt.textContent = set.ready ? info.label : `${info.label} (unavailable)`;
 }
+
+$('waveform').addEventListener('change', (e) => {
+  remember('sr-sound', e.target.value);
+  if (PIANOS[e.target.value] && ctx) loadPiano(e.target.value);
+});
 
 function playNote(midi) {
   const kind = $('waveform').value;
-  if (kind === 'piano' && samplesReady) playPiano(midi);
-  else playSynth(midi, kind === 'piano' ? 'triangle' : kind);
+  const set = sampleSets[kind];
+  if (PIANOS[kind] && set && set.ready) playPiano(midi, kind);
+  else playSynth(midi, PIANOS[kind] ? 'triangle' : kind);
 }
 
-function playPiano(midi) {
+function playPiano(midi, kind) {
+  const buffers = sampleSets[kind].buffers;
   // Use the nearest recorded note and retune it.
   let nearest = null;
-  for (const m of samples.keys()) {
+  for (const m of buffers.keys()) {
     if (nearest === null || Math.abs(m - midi) < Math.abs(nearest - midi)) nearest = m;
   }
   const t = ctx.currentTime;
   const src = ctx.createBufferSource();
-  src.buffer = samples.get(nearest);
+  src.buffer = buffers.get(nearest);
   src.playbackRate.value = Math.pow(2, (midi - nearest) / 12);
   const gain = ctx.createGain();
-  // Let it ring, then fade so quick answers don't blur together.
-  const hold = 1.6;
-  gain.gain.setValueAtTime(0.9, t);
-  gain.gain.setValueAtTime(0.9, t + hold);
-  gain.gain.exponentialRampToValueAtTime(0.001, t + hold + 0.6);
-  src.connect(gain).connect(ctx.destination);
+  // Soft recordings get quieter towards the top, so lift the high notes a little.
+  const lift = 1 + (Math.max(0, midi - 72) / 36) * 1.2;
+  const level = (PIANOS[kind].warm ? 0.85 : 0.75) * lift;
+  // About 2 seconds, then a quick damper-like stop (no pedal).
+  const hold = 1.5;
+  const release = 0.35;
+  gain.gain.setValueAtTime(level, t);
+  gain.gain.setValueAtTime(level, t + hold);
+  gain.gain.exponentialRampToValueAtTime(0.001, t + hold + release);
+  src.connect(gain).connect(PIANOS[kind].warm ? warmChain : plainChain);
   src.start(t);
-  src.stop(t + hold + 0.7);
-  playingUntil = performance.now() + (hold + 0.4) * 1000;
+  src.stop(t + hold + release + 0.05);
+  playingUntil = performance.now() + (hold + 0.3) * 1000;
 }
 
 function playSynth(midi, type, duration = 1.2) {
@@ -372,14 +454,19 @@ function buildPiano() {
 }
 
 // White keys show their letter (C keys with the octave); black keys show
-// their name as a sharp or a flat.
-function labelKeys(spelling) {
+// their name as a sharp, a flat, or both.
+function labelKeys(mode) {
   for (const [midi, key] of keyEls) {
-    const s = spell(midi, spelling);
     const label = key.querySelector('.key-label');
-    if (BLACK.has(midi % 12)) label.textContent = s.pretty;
-    else label.textContent = s.letter === 'C' ? s.text : s.letter;
-    key.setAttribute('aria-label', s.pretty);
+    const sharp = spell(midi, 'sharp');
+    const flat = spell(midi, 'flat');
+    if (BLACK.has(midi % 12)) {
+      label.textContent = mode === 'both' ? `${sharp.pretty}\n${flat.pretty}` : (mode === 'flat' ? flat : sharp).pretty;
+      key.setAttribute('aria-label', `${sharp.pretty} / ${flat.pretty}`);
+    } else {
+      label.textContent = sharp.letter === 'C' ? sharp.text : sharp.letter;
+      key.setAttribute('aria-label', sharp.pretty);
+    }
   }
 }
 
@@ -498,13 +585,14 @@ async function initStore() {
         const col = db.collection(`data/users/${uid}`);
         store = {
           kind: 'account',
-          async save(d) { await col.doc(d.id).set({ kind: 'drill', name: d.name, notes: d.notes, spelling: d.spelling, updatedAt: Date.now() }); },
+          async save(d) { await col.doc(d.id).set({ kind: 'drill', name: d.name, items: d.items, updatedAt: Date.now() }); },
           async remove(id) { await col.doc(id).delete(); },
         };
         col.onSnapshot((snap) => {
           drills = snap.docs
             .filter((doc) => doc.exists && doc.data().kind === 'drill')
-            .map((doc) => ({ id: doc.id, ...doc.data() }));
+            .map((doc) => normDrill({ id: doc.id, ...doc.data() }))
+            .filter((d) => d.items.length);
           drillsChanged();
         }, () => { /* the page keeps working with what it has */ });
         return;
@@ -516,13 +604,13 @@ async function initStore() {
     async save(d) { saveLocal([...drills.filter((x) => x.id !== d.id), d]); },
     async remove(id) { saveLocal(drills.filter((x) => x.id !== id)); },
   };
-  try { drills = JSON.parse(recall('sr-drills') || '[]'); } catch { drills = []; }
+  try { drills = JSON.parse(recall('sr-drills') || '[]').map(normDrill).filter((d) => d.items.length); } catch { drills = []; }
   drillsChanged();
 }
 
 function saveLocal(list) {
   drills = list;
-  remember('sr-drills', JSON.stringify(list));
+  remember('sr-drills', JSON.stringify(list.map(({ id, name, items }) => ({ id, name, items }))));
   drillsChanged();
 }
 
@@ -565,14 +653,16 @@ function selectDrill(id, { keepSize = false, save = true } = {}) {
   $('drill-select').value = drill.id;
   $('edit-drill').textContent = drill.preset ? 'Copy & edit' : 'Edit';
   if (save) { remember('sr-drill', drill.id); pendingDrillId = null; }
-  labelKeys(drill.spelling);
+  labelKeys(labelModeFor(drill.items));
+  const midis = drill.items.map(itemMidi);
   if (!keepSize) {
-    const span = Math.max(...drill.notes) - Math.min(...drill.notes);
+    const span = Math.max(...midis) - Math.min(...midis);
     setKeySize(span <= 12 ? SIZE_SMALL_DRILL : SIZE_DEFAULT, true);
   }
-  requestAnimationFrame(() => scrollToNotes(drill.notes, 'instant'));
+  requestAnimationFrame(() => scrollToNotes(midis, 'instant'));
   score = 0;
   $('score').textContent = 'Correct: 0';
+  clearHint();
   question = null;
   nextQuestion();
 }
@@ -583,8 +673,9 @@ function selectDrill(id, { keepSize = false, save = true } = {}) {
 
 function nextQuestion() {
   clearHint();
-  const pool = currentDrill.notes.filter((m) => m !== question);
-  question = pool.length ? pool[Math.floor(Math.random() * pool.length)] : currentDrill.notes[0];
+  const items = currentDrill.items;
+  const pool = items.filter((i) => i !== question);
+  question = pool.length ? pool[Math.floor(Math.random() * pool.length)] : items[0];
   answered = false;
   micMatchFrames = 0;
   $('feedback').textContent = '';
@@ -594,29 +685,29 @@ function nextQuestion() {
 
 function answer(midi) {
   // A wrong note does nothing at all. Only the right one moves on.
-  if (answered || midi !== question) return;
+  // A♯ and B♭ are the same key, so either spelling is answered by that key.
+  if (answered || question === null || midi !== itemMidi(question)) return;
   answered = true;
   score++;
   $('score').textContent = `Correct: ${score}`;
   $('feedback').textContent = '✓ Correct';
   $('feedback').className = 'feedback good';
-  keyEls.get(question).classList.add('is-correct');
+  keyEls.get(midi).classList.add('is-correct');
   renderQuestion(true);
-  const done = question;
   setTimeout(() => {
-    keyEls.get(done).classList.remove('is-correct');
+    keyEls.get(midi).classList.remove('is-correct');
     if (mode === 'practice') nextQuestion();
   }, NEXT_DELAY_MS);
 }
 
 function showHint() {
   if (question === null || answered) return;
-  keyEls.get(question).classList.add('is-hint');
-  scrollToKey(question, 'smooth');
+  keyEls.get(itemMidi(question)).classList.add('is-hint');
+  scrollToKey(itemMidi(question), 'smooth');
 }
 
 function clearHint() {
-  if (question !== null) keyEls.get(question)?.classList.remove('is-hint');
+  if (question !== null) keyEls.get(itemMidi(question))?.classList.remove('is-hint');
 }
 
 // ======================================================================
@@ -625,12 +716,16 @@ function clearHint() {
 
 $('ed-cancel').addEventListener('click', closeEditor);
 $('ed-save').addEventListener('click', saveEditor);
-$('ed-sharp').addEventListener('click', () => setEditSpelling('sharp'));
-$('ed-flat').addEventListener('click', () => setEditSpelling('flat'));
+$('ed-sharp').addEventListener('click', () => setEditMode('sharp'));
+$('ed-flat').addEventListener('click', () => setEditMode('flat'));
 $('ed-add').addEventListener('click', addEditRange);
-$('ed-clear').addEventListener('click', () => { editing.notes.clear(); editorChanged(); });
+$('ed-clear').addEventListener('click', () => { editing.items.clear(); editorChanged(); });
 $('ed-delete').addEventListener('click', deleteEditing);
-$('ed-name').addEventListener('input', () => { editing.name = $('ed-name').value; });
+$('ed-name').addEventListener('input', () => {
+  editing.name = $('ed-name').value;
+  // Once the person types a name, stop filling it in for them.
+  editing.nameTouched = editing.name.trim() !== '';
+});
 
 function buildRangeSelects() {
   for (const id of ['ed-from', 'ed-to']) {
@@ -638,13 +733,13 @@ function buildRangeSelects() {
     if (sel.options.length) continue;
     for (let m = LOWEST; m <= HIGHEST; m++) sel.append(new Option(spell(m).text, m));
   }
-  $('ed-from').value = 57; // A3
+  $('ed-from').value = 55; // G3
   $('ed-to').value = 64;   // E4
 }
 
-function relabelRangeSelects(spelling) {
+function relabelRangeSelects(mode) {
   for (const id of ['ed-from', 'ed-to']) {
-    for (const opt of $(id).options) opt.textContent = spell(Number(opt.value), spelling).pretty;
+    for (const opt of $(id).options) opt.textContent = spell(Number(opt.value), mode).pretty;
   }
 }
 
@@ -652,9 +747,10 @@ function openEditor(drill) {
   const copying = drill && drill.preset;
   editing = {
     id: drill && !copying ? drill.id : null,
-    name: drill ? (copying ? `My ${drill.name}` : drill.name) : '',
-    notes: new Set(drill ? drill.notes : []),
-    spelling: drill ? drill.spelling : 'sharp',
+    name: drill && !copying ? drill.name : '',
+    nameTouched: Boolean(drill && !copying),
+    items: new Set(drill ? drill.items : []),
+    mode: drill && labelModeFor(drill.items) === 'flat' ? 'flat' : 'sharp',
   };
   mode = 'edit';
   clearHint();
@@ -664,8 +760,8 @@ function openEditor(drill) {
   $('ed-delete').hidden = !editing.id;
   $('ed-delete').textContent = 'Delete drill';
   $('ed-delete').classList.remove('confirm');
-  setEditSpelling(editing.spelling);
-  if (editing.notes.size) scrollToNotes([...editing.notes], 'smooth');
+  setEditMode(editing.mode);
+  if (editing.items.size) scrollToNotes([...editing.items].map(itemMidi), 'smooth');
 }
 
 function closeEditor() {
@@ -674,22 +770,25 @@ function closeEditor() {
   editing = null;
   $('editor').hidden = true;
   $('practice').hidden = false;
-  labelKeys(currentDrill.spelling);
+  labelKeys(labelModeFor(currentDrill.items));
   renderQuestion();
 }
 
-function setEditSpelling(spelling) {
-  editing.spelling = spelling;
-  $('ed-sharp').setAttribute('aria-checked', String(spelling === 'sharp'));
-  $('ed-flat').setAttribute('aria-checked', String(spelling === 'flat'));
-  labelKeys(spelling);
-  relabelRangeSelects(spelling);
+// Sharp and Flat are two separate pages of black keys: in Sharp you see and
+// pick sharps, in Flat you see and pick flats. White keys are the same in both.
+function setEditMode(m) {
+  editing.mode = m;
+  $('ed-sharp').setAttribute('aria-checked', String(m === 'sharp'));
+  $('ed-flat').setAttribute('aria-checked', String(m === 'flat'));
+  labelKeys(m);
+  relabelRangeSelects(m);
   editorChanged();
 }
 
 function toggleEditNote(midi) {
-  if (editing.notes.has(midi)) editing.notes.delete(midi);
-  else editing.notes.add(midi);
+  const item = itemFor(midi, editing.mode);
+  if (editing.items.has(item)) editing.items.delete(item);
+  else editing.items.add(item);
   editorChanged();
 }
 
@@ -699,38 +798,50 @@ function addEditRange() {
   if (a > b) [a, b] = [b, a];
   const withBlack = $('ed-black').checked;
   for (let m = a; m <= b; m++) {
-    if (withBlack || !BLACK.has(m % 12)) editing.notes.add(m);
+    if (withBlack || !BLACK.has(m % 12)) editing.items.add(itemFor(m, editing.mode));
   }
   editorChanged();
   scrollToNotes([a, b], 'smooth');
 }
 
 function editorChanged() {
-  for (const [midi, key] of keyEls) key.classList.toggle('is-selected', editing.notes.has(midi));
-  const n = editing.notes.size;
+  for (const [midi, key] of keyEls) key.classList.toggle('is-selected', editing.items.has(itemFor(midi, editing.mode)));
+  const items = sortItems(editing.items);
+  const n = items.length;
   $('ed-count').textContent = n === 1 ? '1 note' : `${n} notes`;
   $('ed-save').disabled = n === 0;
-  $('ed-msg').textContent = n === 0
-    ? 'Tap keys on the piano to add notes, or add a range above.'
-    : 'Tap a key again to remove it.';
+
+  // Fill in the name from the range until the person types their own.
+  if (!editing.nameTouched) {
+    editing.name = n ? defaultName(items) : '';
+    $('ed-name').value = editing.name;
+  }
+
+  // Black keys picked on the other page aren't dotted here, so list them.
+  const otherAcc = editing.mode === 'sharp' ? 'b' : '#';
+  const others = items.filter((i) => i.endsWith(otherAcc)).map((i) => itemSpell(i).pretty);
+  let msg = n === 0 ? 'Tap keys on the piano to add notes, or add a range above.' : 'Tap a key again to remove it.';
+  if (others.length) {
+    msg += ` Also in this drill: ${others.join(', ')} (switch to ${editing.mode === 'sharp' ? 'Flat' : 'Sharp'} to change ${others.length === 1 ? 'it' : 'them'}).`;
+  }
+  $('ed-msg').textContent = msg;
   $('ed-msg').className = 'ed-msg';
   renderEditorStaff();
 }
 
-function defaultName(notes, spelling) {
-  const lo = Math.min(...notes);
-  const hi = Math.max(...notes);
-  return lo === hi ? spell(lo, spelling).pretty : `${spell(lo, spelling).pretty} to ${spell(hi, spelling).pretty}`;
+function defaultName(items) {
+  const lo = items[0];
+  const hi = items[items.length - 1];
+  return lo === hi ? itemSpell(lo).pretty : `${itemSpell(lo).pretty} to ${itemSpell(hi).pretty}`;
 }
 
 async function saveEditor() {
-  if (!editing.notes.size) return;
-  const notes = [...editing.notes].sort((a, b) => a - b);
+  if (!editing.items.size) return;
+  const items = sortItems(editing.items);
   const drill = {
     id: editing.id || `d${Date.now().toString(36)}${Math.random().toString(36).slice(2, 6)}`,
-    name: editing.name.trim() || defaultName(notes, editing.spelling),
-    notes,
-    spelling: editing.spelling,
+    name: editing.name.trim() || defaultName(items),
+    items,
   };
   $('ed-save').disabled = true;
   try {
@@ -783,6 +894,11 @@ async function deleteEditing() {
 const TREBLE_TOP = 38;  // F5, top line of the treble staff
 const BASS_BOTTOM = 18; // G2, bottom line of the bass staff
 
+function itemStep(item) {
+  const s = itemSpell(item);
+  return s.octave * 7 + LETTER_STEP[s.letter];
+}
+
 function redrawStaff() {
   if (mode === 'edit') renderEditorStaff();
   else renderQuestion();
@@ -790,30 +906,26 @@ function redrawStaff() {
 
 function renderQuestion(correct = false) {
   if (question === null) return;
-  const spelling = currentDrill.spelling;
-  const steps = currentDrill.notes.map((m) => step(m, spelling));
+  const steps = currentDrill.items.map(itemStep);
   drawGrandStaff($('staff'), {
-    notes: [question],
-    spelling,
+    items: [question],
     lowStep: Math.min(...steps),
     highStep: Math.max(...steps),
     color: correct ? cssVar('--good', '#1f9d55') : null,
-    label: correct ? `${spell(question, spelling).pretty}, correct` : 'Which note is this?',
+    label: correct ? `${itemSpell(question).pretty}, correct` : 'Which note is this?',
   });
 }
 
 function renderEditorStaff() {
-  const el = $('ed-staff');
-  const notes = [...editing.notes].sort((a, b) => a - b);
-  const steps = notes.map((m) => step(m, editing.spelling));
-  drawGrandStaff(el, {
-    notes,
-    spelling: editing.spelling,
+  const items = sortItems(editing.items);
+  const steps = items.map(itemStep);
+  drawGrandStaff($('ed-staff'), {
+    items,
     lowStep: steps.length ? Math.min(...steps) : BASS_BOTTOM,
     highStep: steps.length ? Math.max(...steps) : TREBLE_TOP,
     color: cssVar('--pick', '#d93a3a'),
     wide: true,
-    label: notes.length ? `Notes in this drill: ${notes.map((m) => spell(m, editing.spelling).pretty).join(', ')}` : 'No notes yet',
+    label: items.length ? `Notes in this drill: ${items.map((i) => itemSpell(i).pretty).join(', ')}` : 'No notes yet',
   });
 }
 
@@ -821,7 +933,7 @@ function cssVar(name, fallback) {
   return getComputedStyle(document.documentElement).getPropertyValue(name).trim() || fallback;
 }
 
-function drawGrandStaff(el, { notes, spelling, lowStep, highStep, color, wide = false, label }) {
+function drawGrandStaff(el, { items, lowStep, highStep, color, wide = false, label }) {
   if (!window.Vex) return;
   const VF = Vex.Flow;
   el.innerHTML = '';
@@ -836,7 +948,7 @@ function drawGrandStaff(el, { notes, spelling, lowStep, highStep, color, wide = 
   const x = 46;
   const clefRoom = 46;
   const spacing = 46;
-  const width = wide ? Math.max(340, x + clefRoom + 24 + notes.length * spacing) : 340;
+  const width = wide ? Math.max(340, x + clefRoom + 24 + items.length * spacing) : 340;
   const trebleY = topRoom;
   const bassY = trebleY + staffH + gap;
   const height = bassY + staffH + bottomRoom;
@@ -854,11 +966,12 @@ function drawGrandStaff(el, { notes, spelling, lowStep, highStep, color, wide = 
   new VF.StaveConnector(treble, bass).setType('singleRight').setContext(context).draw();
 
   const room = treble.getNoteEndX() - treble.getNoteStartX();
-  notes.forEach((midi, i) => {
+  items.forEach((item, i) => {
     // Middle C and above go on the treble staff; below it, the bass staff.
+    const midi = itemMidi(item);
     const onTreble = midi >= MIDDLE_C;
     const stave = onTreble ? treble : bass;
-    const s = spell(midi, spelling);
+    const s = itemSpell(item);
     const note = new VF.StaveNote({
       clef: onTreble ? 'treble' : 'bass',
       keys: [`${s.letter.toLowerCase()}${s.acc}/${s.octave}`],
@@ -874,8 +987,7 @@ function drawGrandStaff(el, { notes, spelling, lowStep, highStep, color, wide = 
     note.addToModifierContext(mc);
     const tick = new VF.TickContext();
     tick.addTickable(note).preFormat();
-    const xPos = wide ? 18 + i * spacing : room / 2 - 10;
-    tick.setX(xPos);
+    tick.setX(wide ? 18 + i * spacing : room / 2 - 10);
     note.setContext(context).draw();
   });
 
@@ -945,7 +1057,7 @@ function showPitch({ freq, clarity }, level) {
   const midi = Math.round(exact);
   const cents = Math.round((exact - midi) * 100);
 
-  $('note').textContent = spell(midi, currentDrill.spelling).pretty;
+  $('note').textContent = spell(midi, labelModeFor(currentDrill.items) === 'flat' ? 'flat' : 'sharp').pretty;
   $('freq').textContent = `${freq.toFixed(1)} Hz`;
   $('cents').textContent = cents === 0 ? 'in tune' : `${cents > 0 ? '+' : ''}${cents} cents`;
   $('clarity').textContent = `${Math.round(clarity * 100)}%`;
@@ -953,9 +1065,9 @@ function showPitch({ freq, clarity }, level) {
 
   // Playing the right note on a real piano answers the question too.
   if (mode === 'practice' && question !== null && !answered) {
-    const off = Math.abs(exact - question) * 100;
+    const off = Math.abs(exact - itemMidi(question)) * 100;
     micMatchFrames = off <= MATCH_CENTS ? micMatchFrames + 1 : 0;
-    if (micMatchFrames >= MATCH_FRAMES) answer(question);
+    if (micMatchFrames >= MATCH_FRAMES) answer(itemMidi(question));
   }
 }
 
