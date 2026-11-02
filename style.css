@@ -15,7 +15,7 @@
   --ivory-edge: #c4b9a8;
   --ebony: #2a2622;
   --dock: #e2dbcf;
-  --pick: #b0574d;
+  --pick: #c98a3c;
   --on-accent: #ffffff;
 }
 
@@ -37,7 +37,7 @@
     --ivory-edge: #8f877b;
     --ebony: #151311;
     --dock: #161412;
-    --pick: #c7766c;
+    --pick: #d7a35e;
     --on-accent: #151311;
     color-scheme: dark;
   }
@@ -59,7 +59,7 @@
   --ivory-edge: #8f877b;
   --ebony: #151311;
   --dock: #161412;
-  --pick: #c7766c;
+  --pick: #d7a35e;
   --on-accent: #151311;
   color-scheme: dark;
 }
@@ -478,7 +478,7 @@ button.danger.confirm { background: var(--bad); color: var(--on-accent); border-
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.15);
 }
 
-.staff-wide { overflow-x: auto; overflow-y: hidden; justify-content: flex-start; align-items: center; }
+.staff-wide { overflow: auto; justify-content: flex-start; align-items: safe center; }
 .staff-wide svg { max-width: none; flex: none; }
 
 /* Selected notes in the editor: a red dot on the key */
@@ -545,3 +545,6 @@ select {
   min-height: 36px;
   padding: 0 6px;
 }
+
+/* A key stays slightly pressed in while it's held down */
+.key.is-down { filter: brightness(0.9); }

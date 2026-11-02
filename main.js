@@ -33,8 +33,7 @@ const SIZE_SMALL_DRILL = 70;
 const SAMPLE_MIDIS = [];
 for (let m = 21; m <= 108; m += 3) SAMPLE_MIDIS.push(m);
 const PIANOS = {
-  piano: { dir: 'samples/piano', label: 'Grand piano (warm)', warm: true },
-  'piano-bright': { dir: 'samples/piano-bright', label: 'Grand piano (bright)', warm: false },
+  piano: { dir: 'samples/piano', label: 'Grand piano', warm: true },
 };
 
 // A drill is a list of notes. Each note is written as its MIDI number, plus
@@ -278,14 +277,35 @@ $('waveform').addEventListener('change', (e) => {
   if (PIANOS[e.target.value] && ctx) loadPiano(e.target.value);
 });
 
-function playNote(midi) {
+// Notes behave like a real piano key: the sound starts when the key goes down
+// and stops when it comes back up. A quick tap still lasts half a second.
+const voices = new Set();
+
+function startNote(midi) {
   const kind = $('waveform').value;
   const set = sampleSets[kind];
-  if (PIANOS[kind] && set && set.ready) playPiano(midi, kind);
-  else playSynth(midi, PIANOS[kind] ? 'triangle' : kind);
+  const voice = PIANOS[kind] && set && set.ready
+    ? startPiano(midi, kind)
+    : startSynth(midi, PIANOS[kind] ? 'triangle' : kind);
+  voices.add(voice);
+  playingUntil = Infinity; // the mic ignores the app while it's playing
+  return voice;
 }
 
-function playPiano(midi, kind) {
+function releaseNote(voice) {
+  if (!voice || voice.released) return;
+  voice.released = true;
+  const now = ctx.currentTime;
+  // Let a quick tap ring for the minimum length, then damp it quickly.
+  const at = Math.max(now, voice.start + NOTE_HOLD);
+  voice.gain.gain.cancelScheduledValues(at);
+  voice.gain.gain.setTargetAtTime(0, at, NOTE_RELEASE / 4);
+  voice.source.stop(at + NOTE_RELEASE + 0.1);
+  voices.delete(voice);
+  if (!voices.size) playingUntil = performance.now() + (at - now + NOTE_RELEASE + 0.1) * 1000;
+}
+
+function startPiano(midi, kind) {
   const buffers = sampleSets[kind].buffers;
   // Use the nearest recorded note and retune it.
   let nearest = null;
@@ -299,35 +319,29 @@ function playPiano(midi, kind) {
   const gain = ctx.createGain();
   // Soft recordings get quieter towards the top, so lift the high notes a little.
   const lift = 1 + (Math.max(0, midi - 72) / 36) * 1.2;
-  const level = (PIANOS[kind].warm ? 0.85 : 0.75) * lift;
-  // Half a second, then a quick damper-like stop (no pedal).
-  const hold = NOTE_HOLD;
-  const release = NOTE_RELEASE;
-  gain.gain.setValueAtTime(level, t);
-  gain.gain.setValueAtTime(level, t + hold);
-  gain.gain.exponentialRampToValueAtTime(0.001, t + hold + release);
+  gain.gain.setValueAtTime(0.85 * lift, t);
   src.connect(gain).connect(PIANOS[kind].warm ? warmChain : plainChain);
   src.start(t);
-  src.stop(t + hold + release + 0.05);
-  playingUntil = performance.now() + (hold + release + 0.1) * 1000;
+  // While held, the recording fades away naturally, as a real piano does.
+  return { source: src, gain, start: t, released: false };
 }
 
-function playSynth(midi, type, duration = NOTE_HOLD + NOTE_RELEASE) {
+function startSynth(midi, type) {
   const t = ctx.currentTime;
   const osc = ctx.createOscillator();
   const gain = ctx.createGain();
   osc.type = type;
   osc.frequency.value = midiToFreq(midi);
-  // Short attack and a gentle decay, so the note doesn't click.
+  // Short attack, then a slow piano-like fade while the key is held.
   // Very high notes sound piercing, so they're played a little softer.
   const peak = midi > 96 ? 0.18 : 0.3;
   gain.gain.setValueAtTime(0, t);
   gain.gain.linearRampToValueAtTime(peak, t + 0.02);
-  gain.gain.exponentialRampToValueAtTime(0.001, t + duration);
+  gain.gain.setTargetAtTime(0, t + 0.02, 1.2);
   osc.connect(gain).connect(ctx.destination);
   osc.start(t);
-  osc.stop(t + duration + 0.05);
-  playingUntil = performance.now() + (duration + 0.15) * 1000;
+  osc.stop(t + 8); // a held synth note dies away on its own
+  return { source: osc, gain, start: t, released: false };
 }
 
 // ======================================================================
@@ -435,10 +449,22 @@ function buildPiano() {
     label.className = 'key-label';
     key.append(label);
 
+    // Press and hold: the note sounds until the finger or mouse button lifts.
     key.addEventListener('pointerdown', (e) => {
       e.preventDefault();
-      pressKey(midi);
+      try { key.setPointerCapture(e.pointerId); } catch { /* not all pointers can be captured */ }
+      releaseNote(key._voice);
+      key._voice = pressKey(midi);
+      key.classList.add('is-down');
     });
+    const lift = () => {
+      releaseNote(key._voice);
+      key._voice = null;
+      key.classList.remove('is-down');
+    };
+    key.addEventListener('pointerup', lift);
+    key.addEventListener('pointercancel', lift);
+    key.addEventListener('lostpointercapture', lift);
     keyEls.set(midi, key);
     piano.append(key);
   }
@@ -519,10 +545,11 @@ function flashKey(midi) {
 }
 
 function pressKey(midi) {
-  playNote(midi);
+  const voice = startNote(midi);
   flashKey(midi);
   if (mode === 'edit') toggleEditNote(midi);
   else answer(midi);
+  return voice;
 }
 
 // ======================================================================
