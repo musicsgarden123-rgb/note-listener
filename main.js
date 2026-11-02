@@ -954,7 +954,7 @@ function renderEditorStaff() {
     items,
     lowStep: steps.length ? Math.min(...steps) : BASS_BOTTOM,
     highStep: steps.length ? Math.max(...steps) : TREBLE_TOP,
-    color: cssVar('--pick', '#d93a3a'),
+    color: null, // notes stay black; the amber dots on the keys show what is picked
     wide: true,
     label: items.length ? `Notes in this drill: ${items.map((i) => itemSpell(i).pretty).join(', ')}` : 'No notes yet',
   });
