@@ -4,67 +4,89 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
   <title>Note Listener</title>
-  <link rel="stylesheet" href="style.css?v=3">
+  <link rel="stylesheet" href="style.css?v=4">
 </head>
 <body>
+  <!--APP-START-->
   <section id="start-panel" class="start">
     <h1>Note Listener</h1>
-    <p class="intro">A note appears on the grand staff. Play it on the piano below, on screen or on your real piano. Get it right to move on. The browser will ask to use your microphone so the app can hear a real piano.</p>
+    <p class="intro">A note appears on the grand staff. Play it on the piano below, on screen or on your real piano. Get it right to move on.</p>
     <button id="start" class="primary">Start</button>
     <p id="start-error" class="error" hidden></p>
   </section>
 
   <div id="app" class="app" hidden>
-    <details class="sound-details" open>
+    <details class="sound-details">
       <summary>Sound details <span class="muted">(for testing; will be hidden later)</span></summary>
       <div class="details-body">
-      <div class="readout">
-        <div><span class="label">Detected</span><span id="note" class="big">–</span></div>
-        <div><span class="label">Frequency</span><span id="freq">–</span></div>
-        <div><span class="label">Tuning</span><span id="cents">–</span></div>
-        <div><span class="label">Clarity</span><span id="clarity">–</span></div>
-        <div class="loudness">
-          <span class="label">Loudness</span>
-          <div class="meter-row">
-            <div class="meter"><div id="meter-fill"></div></div>
-            <span id="db">– dB</span>
+        <div class="readout">
+          <div><span class="label">Detected</span><span id="note" class="big">–</span></div>
+          <div><span class="label">Frequency</span><span id="freq">–</span></div>
+          <div><span class="label">Tuning</span><span id="cents">–</span></div>
+          <div><span class="label">Clarity</span><span id="clarity">–</span></div>
+          <div class="loudness">
+            <span class="label">Loudness</span>
+            <div class="meter-row">
+              <div class="meter"><div id="meter-fill"></div></div>
+              <span id="db">– dB</span>
+            </div>
           </div>
         </div>
-      </div>
-      <p id="mic-status" class="mic-status" hidden></p>
-      <div class="detail-controls">
-        <label>Microphone <select id="mic-select"></select></label>
-        <label><input type="checkbox" id="self-test"> Listen while the app is playing (self-test)</label>
-        <button id="listen-toggle" type="button">Pause listening</button>
-      </div>
+        <p id="mic-status" class="mic-status" hidden></p>
+        <div class="detail-controls">
+          <label>Microphone <select id="mic-select"></select></label>
+          <label><input type="checkbox" id="self-test"> Listen while the app is playing (self-test)</label>
+          <button id="listen-toggle" type="button">Pause listening</button>
+        </div>
+        <p class="credit">Piano sound: <a href="https://archive.org/details/SalamanderGrandPianoV3" target="_blank" rel="noopener">Salamander Grand Piano</a> by Alexander Holm, CC BY 3.0. Notation: VexFlow.</p>
       </div>
     </details>
 
-    <section class="quiz">
+    <!-- Practice view -->
+    <section id="practice" class="quiz">
       <div class="quiz-bar">
         <span id="score" class="score">Correct: 0</span>
         <div class="quiz-actions">
           <button id="hint" type="button" class="hint-btn">💡 Hint</button>
           <span id="feedback" class="feedback"></span>
         </div>
-        <div class="quiz-settings">
-          <label>Notes
-            <select id="range">
-              <option value="21-108">Full piano (A0 to C8)</option>
-              <option value="36-84">C2 to C6</option>
-              <option value="48-72">C3 to C5 (around middle C)</option>
-            </select>
-          </label>
-          <label>Sound
-            <select id="waveform">
-              <option value="triangle">Soft (triangle)</option>
-              <option value="sine">Pure (sine)</option>
-              <option value="square">Buzzy (square)</option>
-            </select>
-          </label>
-        </div>
+      </div>
+      <div class="drill-bar">
+        <label class="drill-pick">Drill
+          <select id="drill-select"></select>
+        </label>
+        <button id="edit-drill" type="button">Edit</button>
+        <button id="new-drill" type="button" class="accent">＋ New drill</button>
       </div>
       <div id="staff" class="staff" aria-live="polite"></div>
+    </section>
+
+    <!-- Drill editor view -->
+    <section id="editor" class="quiz editor" hidden>
+      <div class="editor-top">
+        <button id="ed-cancel" type="button" class="icon-btn" aria-label="Cancel">✕</button>
+        <input id="ed-name" type="text" maxlength="40" placeholder="Drill name, e.g. A3 to E4" autocomplete="off">
+        <button id="ed-save" type="button" class="primary">Save</button>
+      </div>
+      <div class="editor-row">
+        <div class="segmented" role="radiogroup" aria-label="Black keys are written as">
+          <button type="button" id="ed-sharp" role="radio" aria-checked="true">Sharp ♯</button>
+          <button type="button" id="ed-flat" role="radio" aria-checked="false">Flat ♭</button>
+        </div>
+        <span id="ed-count" class="ed-count">0 notes</span>
+      </div>
+      <div class="editor-row range-row">
+        <span class="muted">Add a range</span>
+        <select id="ed-from" aria-label="From"></select>
+        <span class="muted">to</span>
+        <select id="ed-to" aria-label="To"></select>
+        <label><input type="checkbox" id="ed-black"> black keys too</label>
+        <button id="ed-add" type="button">Add</button>
+        <button id="ed-clear" type="button">Clear all</button>
+        <button id="ed-delete" type="button" class="danger" hidden>Delete drill</button>
+      </div>
+      <p id="ed-msg" class="ed-msg">Tap keys on the piano to add or remove notes.</p>
+      <div id="ed-staff" class="staff staff-wide"></div>
     </section>
 
     <footer class="dock">
@@ -75,8 +97,16 @@
         </div>
         <div class="dock-controls">
           <button id="middle-c" type="button" title="Go to middle C">★ Middle C</button>
-          <label title="Key size">Keys <input type="range" id="key-size" min="30" max="72" value="46"></label>
-          <label title="Scroll the keyboard to the note you play"><input type="checkbox" id="follow" checked> Follow</label>
+          <label class="size-label">Keys <input type="range" id="key-size" min="0" max="100" value="50" aria-label="Key size"> <span id="key-size-val" class="pct">50%</span></label>
+          <label>Sound
+            <select id="waveform">
+              <option value="piano">Grand piano</option>
+              <option value="triangle">Soft (triangle)</option>
+              <option value="sine">Pure (sine)</option>
+              <option value="square">Buzzy (square)</option>
+            </select>
+          </label>
+          <label id="follow-label" title="Scroll the keyboard to the note you play"><input type="checkbox" id="follow" checked> Follow</label>
         </div>
       </div>
       <div id="piano-scroll" class="piano-scroll">
@@ -84,8 +114,9 @@
       </div>
     </footer>
   </div>
+  <!--APP-END-->
 
   <script src="vendor/vexflow-4.2.5-bravura.js"></script>
-  <script type="module" src="main.js?v=3"></script>
+  <script type="module" src="main.js?v=4"></script>
 </body>
 </html>

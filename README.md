@@ -6,6 +6,8 @@ A note-reading drill with a full piano.
 - **Piano (bottom):** all 88 keys, sized for fingers on a tablet. Middle C has a gold star.
 - **Answer** by pressing the right key on screen, or by playing it on a real piano near the mic. A wrong note does nothing; the right one turns green and the next note appears.
 - **💡 Hint** lights up the right key (blue, pulsing) and scrolls the piano to it.
+- **Drills:** pick a drill to practise only its notes. **＋ New drill** opens the editor: tap keys to add or remove notes (red dots), or add a from–to range; the **Sharp ♯ / Flat ♭** switch sets how every black key is written. Drills of an octave or less open with bigger keys (70%); wider ones at 50%. Built-in drills can be copied and edited.
+- **Sound:** a real grand piano by default (Salamander Grand Piano samples in `samples/piano/`), or the soft, pure and buzzy synth sounds.
 - **Sound details (top):** the live readout (detected note, frequency, tuning, clarity, loudness). It's for testing and will be hidden later; click its title to fold it away.
 
 It's plain HTML and JavaScript with no build step. The grand staff is drawn by [VexFlow](https://www.vexflow.com) 4.2.5 (MIT licence), saved in `vendor/` so the app works offline. Audio is processed only in your browser; nothing is recorded or uploaded.
@@ -26,6 +28,9 @@ Then open http://localhost:8000 in **one** browser (Opera, Chrome, Edge, Firefox
 - **Keys** slider makes the keys bigger or smaller.
 - **Follow** scrolls the piano to whatever note you play on a real piano.
 
+## Saving drills
+When you run the app from this folder, drills are saved in that browser. On the published page, drills are saved to your Claude account.
+
 ## Settings
 - **Notes:** full piano (A0 to C8), C2 to C6, or C3 to C5. Smaller ranges make the staff bigger.
 - **Sound:** soft (triangle), pure (sine) or buzzy (square).
@@ -39,3 +44,4 @@ Then open http://localhost:8000 in **one** browser (Opera, Chrome, Edge, Firefox
 | `main.js` | Audio, mic, piano, the note quiz, and drawing the grand staff |
 | `pitch.js` | YIN pitch detection (A0 to C8) and note/frequency helpers |
 | `vendor/` | VexFlow (music notation library) and its licence |
+| `samples/piano/` | Grand piano recordings, one every three notes (Salamander Grand Piano by Alexander Holm, CC BY 3.0) |
