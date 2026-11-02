@@ -18,7 +18,9 @@ const MIN_CLARITY = 0.85;    // ignore pitch readings less certain than this
 const MATCH_CENTS = 50;      // within this many cents of the question note counts as correct
 const MATCH_FRAMES = 3;      // steady correct readings before the mic answer counts
 const FOLLOW_FRAMES = 4;     // steady readings before the keyboard scrolls to a note
-const NEXT_DELAY_MS = 700;   // pause on a correct answer before the next note
+const CORRECT_FLASH_MS = 250; // how long the key stays green after a correct answer
+const NOTE_HOLD = 0.35;       // each note sounds for half a second: hold, then a quick stop
+const NOTE_RELEASE = 0.15;
 
 // Key size: the slider runs 0-100%. 50% is the normal size; drills of an octave
 // or less open at 70% so the keys are easier to hit.
@@ -298,19 +300,19 @@ function playPiano(midi, kind) {
   // Soft recordings get quieter towards the top, so lift the high notes a little.
   const lift = 1 + (Math.max(0, midi - 72) / 36) * 1.2;
   const level = (PIANOS[kind].warm ? 0.85 : 0.75) * lift;
-  // About 2 seconds, then a quick damper-like stop (no pedal).
-  const hold = 1.5;
-  const release = 0.35;
+  // Half a second, then a quick damper-like stop (no pedal).
+  const hold = NOTE_HOLD;
+  const release = NOTE_RELEASE;
   gain.gain.setValueAtTime(level, t);
   gain.gain.setValueAtTime(level, t + hold);
   gain.gain.exponentialRampToValueAtTime(0.001, t + hold + release);
   src.connect(gain).connect(PIANOS[kind].warm ? warmChain : plainChain);
   src.start(t);
   src.stop(t + hold + release + 0.05);
-  playingUntil = performance.now() + (hold + 0.3) * 1000;
+  playingUntil = performance.now() + (hold + release + 0.1) * 1000;
 }
 
-function playSynth(midi, type, duration = 1.2) {
+function playSynth(midi, type, duration = NOTE_HOLD + NOTE_RELEASE) {
   const t = ctx.currentTime;
   const osc = ctx.createOscillator();
   const gain = ctx.createGain();
@@ -678,8 +680,6 @@ function nextQuestion() {
   question = pool.length ? pool[Math.floor(Math.random() * pool.length)] : items[0];
   answered = false;
   micMatchFrames = 0;
-  $('feedback').textContent = '';
-  $('feedback').className = 'feedback';
   renderQuestion();
 }
 
@@ -690,14 +690,18 @@ function answer(midi) {
   answered = true;
   score++;
   $('score').textContent = `Correct: ${score}`;
-  $('feedback').textContent = '✓ Correct';
+  // Flash the key green and go straight to the next note.
+  const key = keyEls.get(midi);
+  key.classList.remove('is-correct');
+  void key.offsetWidth; // restart the flash if the same key is right twice in a row
+  key.classList.add('is-correct');
+  clearTimeout(key._flash);
+  key._flash = setTimeout(() => key.classList.remove('is-correct'), CORRECT_FLASH_MS);
+  $('feedback').textContent = '✓';
   $('feedback').className = 'feedback good';
-  keyEls.get(midi).classList.add('is-correct');
-  renderQuestion(true);
-  setTimeout(() => {
-    keyEls.get(midi).classList.remove('is-correct');
-    if (mode === 'practice') nextQuestion();
-  }, NEXT_DELAY_MS);
+  clearTimeout(answer._fb);
+  answer._fb = setTimeout(() => { $('feedback').textContent = ''; }, 600);
+  if (mode === 'practice') nextQuestion();
 }
 
 function showHint() {

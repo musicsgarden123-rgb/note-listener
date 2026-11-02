@@ -1,63 +1,66 @@
 :root {
-  --bg: #f7f7f5;
-  --card: #ffffff;
-  --text: #1d1d1f;
-  --muted: #6b6b70;
-  --border: #e2e2e0;
-  --accent: #2f6fde;
-  --good: #1f9d55;
-  --warn: #d97706;
-  --bad: #c0392b;
-  --detect: #f59e0b;
-  --gold: #f5b301;
-  --paper: #fffdf7;
-  --ivory: #fbfaf6;
-  --ivory-edge: #c9c7bf;
-  --ebony: #1f1f22;
-  --dock: #e9e8e3;
-  --pick: #d93a3a;
+  --bg: #ece6dc;
+  --card: #f7f2ea;
+  --text: #2c2824;
+  --muted: #6e665c;
+  --border: #d9d0c3;
+  --accent: #4f6f8f;
+  --good: #5b8a63;
+  --warn: #b7792f;
+  --bad: #a8473f;
+  --detect: #d29b45;
+  --gold: #d8a93a;
+  --paper: #f8f3e9;
+  --ivory: #f6f1e7;
+  --ivory-edge: #c4b9a8;
+  --ebony: #2a2622;
+  --dock: #e2dbcf;
+  --pick: #b0574d;
+  --on-accent: #ffffff;
 }
 
 @media (prefers-color-scheme: dark) {
   :root:not([data-theme="light"]) {
-    --bg: #161618;
-    --card: #222225;
-    --text: #ececef;
-    --muted: #9a9aa2;
-    --border: #36363a;
-    --accent: #5b8ff0;
-    --good: #2fb36b;
-    --warn: #f0a33a;
-    --bad: #e5604f;
-    --detect: #f5a524;
-    --gold: #ffc21a;
-    --paper: #f6f3ea;
-    --ivory: #ecebe6;
-    --ivory-edge: #8d8b85;
-    --ebony: #0e0e10;
-    --dock: #0f0f11;
-    --pick: #ff5a52;
+    --bg: #1d1b19;
+    --card: #282522;
+    --text: #e8e2d8;
+    --muted: #a39a8e;
+    --border: #3a3631;
+    --accent: #7d9bb8;
+    --good: #7fa886;
+    --warn: #d2a05a;
+    --bad: #c9736a;
+    --detect: #d9a85c;
+    --gold: #d9b04d;
+    --paper: #ece5d8;
+    --ivory: #e6dfd2;
+    --ivory-edge: #8f877b;
+    --ebony: #151311;
+    --dock: #161412;
+    --pick: #c7766c;
+    --on-accent: #151311;
     color-scheme: dark;
   }
 }
 :root[data-theme="dark"] {
-    --bg: #161618;
-    --card: #222225;
-    --text: #ececef;
-    --muted: #9a9aa2;
-    --border: #36363a;
-    --accent: #5b8ff0;
-    --good: #2fb36b;
-    --warn: #f0a33a;
-    --bad: #e5604f;
-    --detect: #f5a524;
-    --gold: #ffc21a;
-    --paper: #f6f3ea;
-    --ivory: #ecebe6;
-    --ivory-edge: #8d8b85;
-    --ebony: #0e0e10;
-    --dock: #0f0f11;
-    --pick: #ff5a52;
+  --bg: #1d1b19;
+  --card: #282522;
+  --text: #e8e2d8;
+  --muted: #a39a8e;
+  --border: #3a3631;
+  --accent: #7d9bb8;
+  --good: #7fa886;
+  --warn: #d2a05a;
+  --bad: #c9736a;
+  --detect: #d9a85c;
+  --gold: #d9b04d;
+  --paper: #ece5d8;
+  --ivory: #e6dfd2;
+  --ivory-edge: #8f877b;
+  --ebony: #151311;
+  --dock: #161412;
+  --pick: #c7766c;
+  --on-accent: #151311;
   color-scheme: dark;
 }
 
@@ -87,7 +90,7 @@ button {
 button.primary {
   background: var(--accent);
   border-color: var(--accent);
-  color: #fff;
+  color: var(--on-accent);
   padding: 12px 20px;
   font-weight: 600;
 }
@@ -388,7 +391,7 @@ select { font: inherit; }
   background: var(--good);
   box-shadow: 0 0 22px 4px color-mix(in srgb, var(--good) 70%, transparent);
 }
-.key.is-correct .key-label { color: #fff; }
+.key.is-correct .key-label { color: var(--on-accent); }
 
 /* ---------- Small screens ---------- */
 
@@ -405,9 +408,9 @@ select { font: inherit; }
 /* ---------- Drills ---------- */
 
 button:disabled { opacity: 0.45; cursor: default; }
-button.accent { background: var(--accent); border-color: var(--accent); color: #fff; font-weight: 600; }
+button.accent { background: var(--accent); border-color: var(--accent); color: var(--on-accent); font-weight: 600; }
 button.danger { color: var(--bad); border-color: color-mix(in srgb, var(--bad) 45%, var(--border)); }
-button.danger.confirm { background: var(--bad); color: #fff; border-color: var(--bad); }
+button.danger.confirm { background: var(--bad); color: var(--on-accent); border-color: var(--bad); }
 .icon-btn { width: 44px; padding: 0; font-size: 1.15rem; border-radius: 50%; }
 
 .drill-bar {
@@ -531,3 +534,14 @@ button.danger.confirm { background: var(--bad); color: #fff; border-color: var(-
 
 /* Black keys can show both names (A♯ over B♭) */
 .key.black .key-label { white-space: pre-line; text-align: center; line-height: 1.15; }
+
+/* Native controls follow the warm palette instead of the browser's bright defaults */
+:root { accent-color: var(--accent); }
+select {
+  background: var(--card);
+  color: var(--text);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  min-height: 36px;
+  padding: 0 6px;
+}
