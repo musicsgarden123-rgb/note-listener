@@ -3,61 +3,214 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-  <title>Note Listener</title>
-  <link rel="stylesheet" href="style.css?v=9">
+  <title>Sight Reader</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fredoka:wght@500;600;700&family=Nunito:wght@500;700;800&display=swap">
+  <link rel="stylesheet" href="style.css?v=10">
 </head>
 <body>
   <!--APP-START-->
-  <section id="start-panel" class="start">
-    <h1>Note Listener</h1>
-    <p class="intro">A note appears on the grand staff. Play it on your real piano with the microphone on, or tap it on the on-screen keyboard. Get it right to move on.</p>
-    <button id="start" class="primary">Start</button>
-    <p id="start-error" class="error" hidden></p>
+
+  <!-- ===== Splash ===== -->
+  <section id="splash" class="screen splash" aria-label="Sight Reader">
+    <div class="splash-rays" aria-hidden="true"></div>
+    <div id="splash-crowd" class="splash-crowd" aria-hidden="true"></div>
+    <h1 class="splash-title">Sight <span>Reader</span></h1>
+    <p class="splash-tap">Tap to start</p>
   </section>
 
+  <!-- ===== Intro ===== -->
+  <section id="intro" class="screen intro" hidden>
+    <div class="intro-body">
+      <div id="intro-mascot" class="mascot wave" aria-hidden="true"></div>
+      <div class="mascot-shadow" aria-hidden="true"></div>
+      <h1 class="brand">Sight <span>Reader</span></h1>
+      <p class="tagline">Read music, one note at a time</p>
+    </div>
+    <div class="screen-actions">
+      <button id="get-started" type="button" class="btn btn-green">Get started</button>
+    </div>
+  </section>
+
+  <!-- ===== Onboarding ===== -->
+  <section id="onboard" class="screen onboard" hidden>
+    <div class="ob-top">
+      <button id="ob-back" type="button" class="ob-back" aria-label="Back">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M15 5l-7 7 7 7" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      </button>
+      <div class="ob-progress" role="progressbar" aria-label="Setup progress"><div id="ob-bar"></div></div>
+    </div>
+
+    <div class="ob-step" data-step="heard">
+      <h2>How did you hear about Sight Reader?</h2>
+      <div class="choice-list" id="heard-list" role="radiogroup" aria-label="How did you hear about us">
+        <button type="button" role="radio" aria-checked="false" data-v="teacher">My piano teacher</button>
+        <button type="button" role="radio" aria-checked="false" data-v="family">Friends or family</button>
+        <button type="button" role="radio" aria-checked="false" data-v="youtube">YouTube</button>
+        <button type="button" role="radio" aria-checked="false" data-v="instagram">Instagram or Facebook</button>
+        <button type="button" role="radio" aria-checked="false" data-v="tiktok">TikTok</button>
+        <button type="button" role="radio" aria-checked="false" data-v="other">Other</button>
+      </div>
+    </div>
+
+    <div class="ob-step" data-step="name" hidden>
+      <h2>What's your name?</h2>
+      <p class="ob-sub">We'll use it to cheer you on.</p>
+      <input id="ob-name" class="big-input" type="text" maxlength="24" autocomplete="given-name" placeholder="Your name">
+    </div>
+
+    <div class="ob-step" data-step="character" hidden>
+      <h2 id="pick-title">Choose a character</h2>
+      <div class="segmented center" role="radiogroup" aria-label="Character style">
+        <button type="button" role="radio" aria-checked="true" data-variant="plain">Classic</button>
+        <button type="button" role="radio" aria-checked="false" data-variant="musical">Musical</button>
+      </div>
+      <div id="ob-grid" class="char-grid" role="radiogroup" aria-label="Characters"></div>
+    </div>
+
+    <div class="ob-step welcome-step" data-step="welcome" hidden>
+      <div id="welcome-char" class="mascot pop" aria-hidden="true"></div>
+      <h2 id="welcome-title">Welcome!</h2>
+      <p class="ob-sub">Let's learn to read music together.</p>
+    </div>
+
+    <div class="screen-actions">
+      <button id="ob-next" type="button" class="btn btn-blue" disabled>Continue</button>
+    </div>
+  </section>
+
+  <!-- ===== Home ===== -->
+  <section id="home" class="screen home with-nav" hidden>
+    <div class="home-hero">
+      <div class="home-hero-top">
+        <span class="home-brand">Sight <span>Reader</span></span>
+        <button id="home-avatar" type="button" class="avatar-btn" aria-label="Your profile"></button>
+      </div>
+      <h1 id="home-hello" class="home-hello">Hi!</h1>
+      <p class="home-sub">Ready to practise?</p>
+    </div>
+    <div class="home-cards">
+      <button id="card-practice" type="button" class="home-card">
+        <svg viewBox="0 0 80 56" aria-hidden="true" class="card-art">
+          <g stroke="#cfc7ba" stroke-width="2"><path d="M4 12h72M4 20h72M4 28h72M4 36h72M4 44h72"/></g>
+          <ellipse cx="34" cy="40" rx="7" ry="5" transform="rotate(-20 34 40)" fill="#3fa66a"/><path d="M40 39V12" stroke="#3fa66a" stroke-width="3"/>
+          <ellipse cx="56" cy="32" rx="7" ry="5" transform="rotate(-20 56 32)" fill="#3fa66a"/><path d="M62 31V6" stroke="#3fa66a" stroke-width="3"/><path d="M40 12L62 6" stroke="#3fa66a" stroke-width="5"/>
+        </svg>
+        <span>Sight reading</span>
+      </button>
+      <button id="card-drills" type="button" class="home-card">
+        <svg viewBox="0 0 80 56" aria-hidden="true" class="card-art">
+          <rect x="10" y="6" width="60" height="44" rx="8" fill="#fbe7d2"/>
+          <g fill="#ef8f3b"><circle cx="22" cy="18" r="4"/><circle cx="22" cy="28" r="4"/><circle cx="22" cy="38" r="4"/></g>
+          <g stroke="#e0c3a3" stroke-width="4" stroke-linecap="round"><path d="M32 18h28M32 28h22M32 38h26"/></g>
+        </svg>
+        <span>Drills</span>
+      </button>
+    </div>
+  </section>
+
+  <!-- ===== Drills list ===== -->
+  <section id="drills-page" class="screen page with-nav" hidden>
+    <header class="page-head">
+      <h1>Drills</h1>
+      <button id="drills-new" type="button" class="btn btn-orange small">＋ New drill</button>
+    </header>
+    <div id="drills-list" class="drills-list"></div>
+  </section>
+
+  <!-- ===== Profile ===== -->
+  <section id="profile-page" class="screen page with-nav" hidden>
+    <header class="page-head"><h1>Profile</h1></header>
+    <div class="profile-body">
+      <div id="profile-char" class="profile-char" aria-hidden="true"></div>
+      <label class="field-label" for="profile-name">Name</label>
+      <input id="profile-name" class="big-input" type="text" maxlength="24" autocomplete="given-name">
+      <h2 class="section-title">Character</h2>
+      <div class="segmented center" role="radiogroup" aria-label="Character style">
+        <button type="button" role="radio" aria-checked="true" data-variant="plain">Classic</button>
+        <button type="button" role="radio" aria-checked="false" data-variant="musical">Musical</button>
+      </div>
+      <div id="profile-grid" class="char-grid" role="radiogroup" aria-label="Characters"></div>
+      <button id="profile-reset" type="button" class="link-btn">Start again from the welcome screen</button>
+    </div>
+  </section>
+
+  <!-- ===== Theme ===== -->
+  <section id="theme-page" class="screen page with-nav" hidden>
+    <header class="page-head"><h1>Theme</h1></header>
+    <div class="theme-soon">
+      <div id="theme-mascot" class="mascot small" aria-hidden="true"></div>
+      <h2>Themes are coming soon</h2>
+      <p>Seasonal backgrounds for the staff, and the option to use your own picture.</p>
+      <div class="theme-tiles" aria-hidden="true">
+        <div class="tile spring">Spring</div><div class="tile summer">Summer</div>
+        <div class="tile autumn">Autumn</div><div class="tile winter">Winter</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== Settings ===== -->
+  <section id="settings-page" class="screen page with-nav" hidden>
+    <header class="page-head">
+      <button id="settings-back" type="button" class="ob-back" aria-label="Back to practice" hidden>
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M15 5l-7 7 7 7" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      </button>
+      <h1>Settings</h1>
+    </header>
+    <div class="settings-body">
+      <label class="setting-row">Sound
+        <select id="waveform">
+          <option value="piano">Grand piano</option>
+          <option value="triangle">Soft (triangle)</option>
+          <option value="sine">Pure (sine)</option>
+          <option value="square">Buzzy (square)</option>
+        </select>
+      </label>
+      <label class="setting-row">Key size <span class="slider-wrap"><input type="range" id="key-size" min="0" max="100" value="50"> <span id="key-size-val" class="pct">50%</span></span></label>
+      <label class="setting-row">Show accuracy <input type="checkbox" id="show-accuracy" checked></label>
+      <label class="setting-row">Scroll the keyboard to the note I play <input type="checkbox" id="follow" checked></label>
+      <label class="setting-row">Microphone <select id="mic-select"><option value="">Default</option></select></label>
+      <label class="setting-row">Listen while the app is playing (self-test) <input type="checkbox" id="self-test"></label>
+      <h2 class="section-title">What the microphone hears</h2>
+      <div class="readout">
+        <div><span class="label">Detected</span><span id="note" class="big">–</span></div>
+        <div><span class="label">Frequency</span><span id="freq">–</span></div>
+        <div><span class="label">Tuning</span><span id="cents">–</span></div>
+        <div><span class="label">Clarity</span><span id="clarity">–</span></div>
+        <div class="loudness">
+          <span class="label">Loudness</span>
+          <div class="meter-row"><div class="meter"><div id="meter-fill"></div></div><span id="db">– dB</span></div>
+        </div>
+      </div>
+      <p class="credit">Piano sound: <a href="https://archive.org/details/SalamanderGrandPianoV3" target="_blank" rel="noopener">Salamander Grand Piano</a> by Alexander Holm, CC BY 3.0. Notation: VexFlow.</p>
+    </div>
+  </section>
+
+  <!-- ===== Bottom menu ===== -->
+  <nav id="bottom-nav" class="bottom-nav" hidden aria-label="Main menu">
+    <button type="button" data-go="home"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 11l9-7 9 7v9a1 1 0 0 1-1 1h-5v-6H9v6H4a1 1 0 0 1-1-1z" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/></svg><span>Home</span></button>
+    <button type="button" data-go="drills-page"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M8 6h12M8 12h12M8 18h12" stroke="currentColor" stroke-width="2" stroke-linecap="round"/><circle cx="4" cy="6" r="1.6" fill="currentColor"/><circle cx="4" cy="12" r="1.6" fill="currentColor"/><circle cx="4" cy="18" r="1.6" fill="currentColor"/></svg><span>Drills</span></button>
+    <button type="button" data-go="settings-page"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="3.2" fill="none" stroke="currentColor" stroke-width="2"/><path d="M12 2.8v3M12 18.2v3M2.8 12h3M18.2 12h3M5.5 5.5l2.1 2.1M16.4 16.4l2.1 2.1M5.5 18.5l2.1-2.1M16.4 7.6l2.1-2.1" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg><span>Settings</span></button>
+    <button type="button" data-go="profile-page"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="8.5" r="4" fill="none" stroke="currentColor" stroke-width="2"/><path d="M4 21c1.2-4.2 4.3-6 8-6s6.8 1.8 8 6" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg><span>Profile</span></button>
+    <button type="button" data-go="theme-page"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="4" width="18" height="16" rx="3" fill="none" stroke="currentColor" stroke-width="2"/><circle cx="9" cy="10" r="2" fill="currentColor"/><path d="M4 18l5-5 4 4 3-3 4 4" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/></svg><span>Theme</span></button>
+  </nav>
+
+  <!-- ===== Practice (sight reading) and drill editor ===== -->
   <div id="app" class="app" hidden>
     <header class="topbar">
       <div class="drill-bar">
+        <button id="practice-back" type="button" class="icon-btn" aria-label="Back to home">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M15 5l-7 7 7 7" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        </button>
         <select id="drill-select" aria-label="Drill"></select>
         <button id="edit-drill" type="button">Edit</button>
-        <button id="new-drill" type="button" class="accent">＋ New</button>
-        <button id="settings-btn" type="button" class="icon-btn" aria-label="Settings" aria-expanded="false" aria-controls="settings">⚙</button>
-      </div>
-
-      <div id="settings" class="settings" hidden>
-        <div class="settings-grid">
-          <label>Sound
-            <select id="waveform">
-              <option value="piano">Grand piano</option>
-              <option value="triangle">Soft (triangle)</option>
-              <option value="sine">Pure (sine)</option>
-              <option value="square">Buzzy (square)</option>
-            </select>
-          </label>
-          <label class="size-label">Key size <input type="range" id="key-size" min="0" max="100" value="50"> <span id="key-size-val" class="pct">50%</span></label>
-          <label><input type="checkbox" id="show-accuracy" checked> Show accuracy</label>
-          <label><input type="checkbox" id="follow" checked> Scroll the keyboard to the note I play</label>
-          <label>Microphone <select id="mic-select"><option value="">Default</option></select></label>
-          <label><input type="checkbox" id="self-test"> Listen while the app is playing (self-test)</label>
-        </div>
-        <div class="readout" aria-label="What the microphone hears">
-          <div><span class="label">Detected</span><span id="note" class="big">–</span></div>
-          <div><span class="label">Frequency</span><span id="freq">–</span></div>
-          <div><span class="label">Tuning</span><span id="cents">–</span></div>
-          <div><span class="label">Clarity</span><span id="clarity">–</span></div>
-          <div class="loudness">
-            <span class="label">Loudness</span>
-            <div class="meter-row">
-              <div class="meter"><div id="meter-fill"></div></div>
-              <span id="db">– dB</span>
-            </div>
-          </div>
-        </div>
-        <p class="credit">Piano sound: <a href="https://archive.org/details/SalamanderGrandPianoV3" target="_blank" rel="noopener">Salamander Grand Piano</a> by Alexander Holm, CC BY 3.0. Notation: VexFlow.</p>
+        <button id="settings-btn" type="button" class="icon-btn" aria-label="Settings">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="3.2" fill="none" stroke="currentColor" stroke-width="2"/><path d="M12 2.8v3M12 18.2v3M2.8 12h3M18.2 12h3M5.5 5.5l2.1 2.1M16.4 16.4l2.1 2.1M5.5 18.5l2.1-2.1M16.4 7.6l2.1-2.1" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+        </button>
       </div>
     </header>
 
-    <!-- Practice view -->
     <section id="practice" class="quiz">
       <div class="quiz-bar">
         <div class="scoreboard">
@@ -73,7 +226,6 @@
       <div id="staff" class="staff" aria-live="polite"></div>
     </section>
 
-    <!-- Drill editor view -->
     <section id="editor" class="quiz editor" hidden>
       <div class="editor-top">
         <button id="ed-cancel" type="button" class="icon-btn" aria-label="Cancel">✕</button>
@@ -105,10 +257,8 @@
     </section>
 
     <footer id="dock" class="dock">
-      <div class="dock-bar">
-        <button id="oct-down" type="button" class="arrow-btn" aria-label="Move the keyboard down an octave">◀</button>
-        <button id="middle-c" type="button" title="Go to middle C">★ Middle C</button>
-        <button id="oct-up" type="button" class="arrow-btn" aria-label="Move the keyboard up an octave">▶</button>
+      <div id="kb-slider" class="kb-slider" role="slider" aria-label="Move along the keyboard" aria-valuemin="0" aria-valuemax="100" aria-valuenow="50" tabindex="0">
+        <div class="kb-track"><span id="kb-c4" class="kb-c4" title="Middle C"></span><div id="kb-thumb" class="kb-thumb"></div></div>
       </div>
       <div id="piano-scroll" class="piano-scroll">
         <div id="piano" class="piano" role="group" aria-label="Piano keyboard"></div>
@@ -118,6 +268,6 @@
   <!--APP-END-->
 
   <script src="vendor/vexflow-4.2.5-bravura.js"></script>
-  <script type="module" src="main.js?v=9"></script>
+  <script type="module" src="main.js?v=10"></script>
 </body>
 </html>

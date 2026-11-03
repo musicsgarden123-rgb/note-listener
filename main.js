@@ -1,4 +1,5 @@
 import { detectPitch, freqToMidi, midiToFreq, rms } from './pitch.js?v=4';
+import { initScreens, showScreen } from './screens.js?v=1';
 
 // ======================================================================
 // Constants
@@ -163,24 +164,19 @@ function recall(key) {
 // Start-up
 // ======================================================================
 
-$('start').addEventListener('click', start);
 $('mic-select').addEventListener('change', () => { if (micMode) setMicMode(true); });
 $('mic-toggle').addEventListener('click', () => setMicMode(!micMode));
-$('settings-btn').addEventListener('click', () => {
-  const open = $('settings').hidden;
-  $('settings').hidden = !open;
-  $('settings-btn').setAttribute('aria-expanded', String(open));
-  requestAnimationFrame(redrawStaff);
+$('settings-btn').addEventListener('click', () => showScreen('settings-page', { from: 'app' }));
+$('practice-back').addEventListener('click', () => {
+  if (mode === 'edit') closeEditor();
+  leavePractice();
+  showScreen('home');
 });
-$('middle-c').addEventListener('click', () => scrollToKey(MIDDLE_C, 'smooth'));
-$('oct-down').addEventListener('click', () => scrollOctave(-1));
-$('oct-up').addEventListener('click', () => scrollOctave(1));
 $('hint').addEventListener('click', showHint);
 $('restart').addEventListener('click', () => { resetScore(); nextQuestion(); });
 $('show-accuracy').addEventListener('change', (e) => { remember('sr-accuracy', e.target.checked ? '1' : '0'); showScore(); });
 $('drill-select').addEventListener('change', (e) => selectDrill(e.target.value));
 $('edit-drill').addEventListener('click', () => openEditor(currentDrill));
-$('new-drill').addEventListener('click', () => openEditor(null));
 window.addEventListener('resize', () => redrawStaff());
 
 // The key-size slider updates the piano on every movement, batched to the screen's refresh.
@@ -196,43 +192,75 @@ $('key-size').addEventListener('input', (e) => {
 });
 $('key-size').addEventListener('change', (e) => remember('sr-key-size', e.target.value));
 
-async function start() {
-  $('start-error').hidden = true;
-  try {
-    if (!window.Vex) throw new Error('The music notation library did not load. Check your internet connection and reload.');
-    // The audio engine can only start after a user gesture such as this click.
-    ctx = new AudioContext();
-    analyser = ctx.createAnalyser();
-    analyser.fftSize = 4096; // big enough for the lowest piano notes (A0 = 27.5 Hz)
-    buffer = new Float32Array(analyser.fftSize);
-
-    buildSoundChains();
-    const savedSound = recall('sr-sound');
-    if (savedSound && $('waveform').querySelector(`option[value="${savedSound}"]`)) $('waveform').value = savedSound;
-    loadPiano('piano');
-    if (PIANOS[$('waveform').value]) loadPiano($('waveform').value);
-
-    buildPiano();
-    buildRangeSelects();
-
-    $('start-panel').hidden = true;
-    $('app').hidden = false;
-
-    // Microphone mode is remembered; this tap on Start lets the browser ask for the mic.
-    if (recall('sr-mic') === '1') await setMicMode(true, { quiet: true });
-    else updateDock();
-
-    $('show-accuracy').checked = recall('sr-accuracy') !== '0';
-    const savedSize = recall('sr-key-size');
-    setKeySize(savedSize !== null ? Number(savedSize) : SIZE_DEFAULT, true);
-    renderDrillSelect();
-    pendingDrillId = recall('sr-drill');
-    selectDrill(pendingDrillId || PRESETS[0].id, { keepSize: savedSize !== null, save: false });
-    initStore();
-    requestAnimationFrame(tick);
-  } catch (err) {
-    showError(err);
+// Set up everything that doesn't need sound straight away.
+function init() {
+  if (!window.Vex) {
+    document.body.insertAdjacentHTML('afterbegin', '<p class="load-error">The music notation library didn\'t load. Check your internet connection and reload.</p>');
+    return;
   }
+  const savedSound = recall('sr-sound');
+  if (savedSound && $('waveform').querySelector(`option[value="${savedSound}"]`)) $('waveform').value = savedSound;
+  buildPiano();
+  buildRangeSelects();
+  buildKeyboardSlider();
+  $('show-accuracy').checked = recall('sr-accuracy') !== '0';
+  const savedSize = recall('sr-key-size');
+  setKeySize(savedSize !== null ? Number(savedSize) : SIZE_DEFAULT, true);
+  renderDrillSelect();
+  pendingDrillId = recall('sr-drill');
+  selectDrill(pendingDrillId || PRESETS[0].id, { keepSize: savedSize !== null, save: false });
+  initStore();
+  requestAnimationFrame(tick);
+  initScreens({
+    openPractice, openEditorFor, selectDrill, allDrills, myDrills: () => drills, ensureAudio,
+    leavePractice,
+  });
+  // Browsers only allow sound after the first tap, so unlock audio then.
+  document.addEventListener('pointerdown', ensureAudio, { once: true, capture: true });
+}
+
+// Create the audio engine (needs a tap first) and load the piano sound.
+function ensureAudio() {
+  if (ctx) {
+    if (ctx.state === 'suspended') ctx.resume();
+    return;
+  }
+  ctx = new AudioContext();
+  analyser = ctx.createAnalyser();
+  analyser.fftSize = 4096; // big enough for the lowest piano notes (A0 = 27.5 Hz)
+  buffer = new Float32Array(analyser.fftSize);
+  buildSoundChains();
+  loadPiano('piano');
+  if (PIANOS[$('waveform').value]) loadPiano($('waveform').value);
+}
+
+// Open the sight-reading screen (or the drill editor) from the home pages.
+let practiceOpen = false;
+async function openPractice() {
+  ensureAudio();
+  practiceOpen = true;
+  $('app').hidden = false;
+  if (mode === 'edit') closeEditor();
+  // Microphone mode is remembered; this tap lets the browser ask for the mic.
+  if (recall('sr-mic') === '1' && !micMode) await setMicMode(true, { quiet: true });
+  else updateDock(true);
+  requestAnimationFrame(() => {
+    redrawStaff();
+    scrollToNotes(currentDrill.items.map(itemMidi), 'instant');
+  });
+}
+
+function leavePractice() {
+  practiceOpen = false;
+  // Stop listening while the student is on other pages.
+  if (micMode) { stopMic(); listening = false; micMode = false; $('mic-toggle').setAttribute('aria-pressed', 'false'); $('mic-toggle').textContent = '🎤 Mic off'; }
+  $('app').hidden = true;
+}
+
+let editorReturn = null;
+function openEditorFor(drill, returnTo) {
+  editorReturn = returnTo || null;
+  openPractice().then(() => openEditor(drill));
 }
 
 // ======================================================================
@@ -296,6 +324,7 @@ $('waveform').addEventListener('change', (e) => {
 const voices = new Set();
 
 function startNote(midi) {
+  ensureAudio();
   const kind = $('waveform').value;
   const set = sampleSets[kind];
   const voice = PIANOS[kind] && set && set.ready
@@ -368,6 +397,7 @@ function startSynth(midi, type) {
 let micMode = false;
 
 async function setMicMode(on, { quiet = false } = {}) {
+  ensureAudio();
   const status = $('mic-status');
   status.hidden = true;
   if (on) {
@@ -399,14 +429,15 @@ async function setMicMode(on, { quiet = false } = {}) {
 }
 
 // The keyboard shows when the mic is off, and always while making a drill.
-function updateDock() {
+function updateDock(force = false) {
   const show = !micMode || mode === 'edit';
-  const changed = $('dock').hidden === show;
+  const changed = force || $('dock').hidden === show;
   $('dock').hidden = !show;
   if (changed) {
     requestAnimationFrame(() => {
       redrawStaff();
       if (show && currentDrill) scrollToNotes(currentDrill.items.map(itemMidi), 'instant');
+      updateKeyboardSlider();
     });
   }
 }
@@ -539,12 +570,65 @@ function setKeySize(pct, instant = false) {
     : 0.5;
   $('piano').style.setProperty('--white-w', `${sizeToPx(pct).toFixed(1)}px`);
   if (!instant) scroller.scrollLeft = centre * scroller.scrollWidth - scroller.clientWidth / 2;
+  updateKeyboardSlider();
 }
 
-// Move the keyboard one octave (7 white keys) left or right.
-function scrollOctave(dir) {
-  const w = keyEls.get(MIDDLE_C).offsetWidth;
-  $('piano-scroll').scrollBy({ left: dir * 7 * w, behavior: 'smooth' });
+// ---------- Keyboard slider: drag to move along the keys ----------
+
+function buildKeyboardSlider() {
+  const slider = $('kb-slider');
+  const scroller = $('piano-scroll');
+  let dragging = false;
+  let grabOffset = 0;
+  let pending = null;
+
+  const moveTo = (clientX) => {
+    const track = slider.getBoundingClientRect();
+    const thumb = $('kb-thumb').getBoundingClientRect();
+    const usable = track.width - thumb.width;
+    const frac = usable > 0 ? Math.min(1, Math.max(0, (clientX - track.left - grabOffset) / usable)) : 0;
+    pending = frac * (scroller.scrollWidth - scroller.clientWidth);
+    requestAnimationFrame(() => {
+      if (pending === null) return;
+      scroller.scrollLeft = pending;
+      pending = null;
+    });
+  };
+
+  slider.addEventListener('pointerdown', (e) => {
+    dragging = true;
+    slider.setPointerCapture(e.pointerId);
+    const thumb = $('kb-thumb').getBoundingClientRect();
+    // Grab the thumb where it was touched; a tap on the track centres it there.
+    grabOffset = e.clientX >= thumb.left && e.clientX <= thumb.right ? e.clientX - thumb.left : thumb.width / 2;
+    moveTo(e.clientX);
+  });
+  slider.addEventListener('pointermove', (e) => { if (dragging) moveTo(e.clientX); });
+  const stop = () => { dragging = false; };
+  slider.addEventListener('pointerup', stop);
+  slider.addEventListener('pointercancel', stop);
+  slider.addEventListener('keydown', (e) => {
+    const w = keyEls.get(MIDDLE_C).offsetWidth * 7;
+    if (e.key === 'ArrowLeft') { scroller.scrollBy({ left: -w, behavior: 'smooth' }); e.preventDefault(); }
+    if (e.key === 'ArrowRight') { scroller.scrollBy({ left: w, behavior: 'smooth' }); e.preventDefault(); }
+  });
+  scroller.addEventListener('scroll', updateKeyboardSlider, { passive: true });
+  window.addEventListener('resize', updateKeyboardSlider);
+}
+
+function updateKeyboardSlider() {
+  const scroller = $('piano-scroll');
+  if (!scroller.scrollWidth || !scroller.clientWidth) return;
+  const visible = Math.min(1, scroller.clientWidth / scroller.scrollWidth);
+  const thumbPct = Math.max(visible * 100, 14);
+  const maxScroll = scroller.scrollWidth - scroller.clientWidth;
+  const frac = maxScroll > 0 ? scroller.scrollLeft / maxScroll : 0;
+  const thumb = $('kb-thumb');
+  thumb.style.width = `${thumbPct}%`;
+  thumb.style.left = `${frac * (100 - thumbPct)}%`;
+  const c4 = keyEls.get(MIDDLE_C);
+  $('kb-c4').style.left = `${((c4.offsetLeft + c4.offsetWidth / 2) / scroller.scrollWidth) * 100}%`;
+  $('kb-slider').setAttribute('aria-valuenow', String(Math.round(frac * 100)));
 }
 
 function scrollToKey(midi, behavior = 'smooth') {
@@ -824,6 +908,8 @@ function openEditor(drill) {
 
 function closeEditor() {
   for (const key of keyEls.values()) key.classList.remove('is-selected');
+  const back = editorReturn;
+  editorReturn = null;
   mode = 'practice';
   editing = null;
   $('editor').hidden = true;
@@ -831,6 +917,7 @@ function closeEditor() {
   updateDock();
   labelKeys(labelModeFor(currentDrill.items));
   renderQuestion();
+  if (back) { leavePractice(); showScreen(back); }
 }
 
 // Sharp and Flat are two separate pages of black keys: in Sharp you see and
@@ -1052,7 +1139,15 @@ function drawGrandStaff(el, { items, lowStep, highStep, color, wide = false, lab
 
   // Make the drawing scale to fit its box.
   const svg = el.querySelector('svg');
-  svg.setAttribute('viewBox', `0 0 ${width} ${height}`);
+  if (wide) {
+    svg.setAttribute('viewBox', `0 0 ${width} ${height}`);
+  } else {
+    // The brace starts a little left of the staff; crop so both sides have the same margin.
+    const left = x - 16;
+    const right = width - 10;
+    const pad = 10;
+    svg.setAttribute('viewBox', `${left - pad} 0 ${right - left + pad * 2} ${height}`);
+  }
   svg.setAttribute('preserveAspectRatio', wide ? 'xMinYMid meet' : 'xMidYMid meet');
   svg.removeAttribute('width');
   svg.removeAttribute('height');
@@ -1174,10 +1269,4 @@ function lightKey(midi, level = 0) {
   }
 }
 
-function showError(err) {
-  const msg = err.name === 'NotAllowedError'
-    ? 'Microphone access was blocked. Allow it in your browser\'s address bar, then try again.'
-    : `Couldn't start: ${err.message}`;
-  $('start-error').textContent = msg;
-  $('start-error').hidden = false;
-}
+init();
