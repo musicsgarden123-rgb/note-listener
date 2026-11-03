@@ -207,7 +207,7 @@ select { font: inherit; }
   display: flex;
   justify-content: center;
 }
-.staff svg { display: block; max-width: 640px; color: #1d1d1f; }
+.staff svg { display: block; max-width: 900px; color: #1d1d1f; }
 
 .quiz-actions { display: flex; align-items: center; gap: 12px; }
 .hint-btn { min-width: 120px; font-weight: 600; }
@@ -557,3 +557,48 @@ select {
 .accuracy.low { color: var(--bad); }
 .practice-options { flex: none; display: flex; flex-wrap: wrap; align-items: center; gap: 4px 16px; font-size: 0.9rem; color: var(--muted); }
 .link-btn { border: none; background: none; padding: 4px 0; min-height: 32px; color: var(--accent); }
+
+/* ---------- Compact top bar, settings panel, mic toggle (v9) ---------- */
+
+.topbar { flex: none; margin: 8px 12px 0; display: flex; flex-direction: column; gap: 8px; }
+.topbar .drill-bar { flex-wrap: nowrap; }
+#drill-select { flex: 1; min-width: 0; min-height: 42px; font-weight: 600; }
+.icon-btn.small { width: 36px; min-height: 36px; font-size: 1rem; }
+
+.settings {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 10px 14px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  font-size: 0.9rem;
+  color: var(--muted);
+  max-height: 55vh;
+  overflow-y: auto;
+}
+.settings-grid { display: flex; flex-wrap: wrap; gap: 8px 20px; align-items: center; }
+.settings-grid select { margin-left: 4px; max-width: 200px; }
+.settings .readout { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+.settings .readout .loudness { grid-column: span 2; }
+
+.quiz { margin: 8px 12px; gap: 8px; }
+.quiz-bar { flex-wrap: nowrap; gap: 8px; justify-content: flex-start; }
+.quiz-bar .scoreboard { flex: 1 1 auto; }
+.quiz-bar .feedback { min-width: 0; flex: 0 1 auto; white-space: nowrap; }
+.feedback.hint { color: var(--accent); font-size: 1.1rem; }
+.hint-btn { min-width: 0; padding: 8px 12px; white-space: nowrap; }
+
+.mic-toggle { white-space: nowrap; font-weight: 600; padding: 8px 12px; }
+.mic-toggle[aria-pressed="true"] { background: var(--good); border-color: var(--good); color: var(--on-accent); }
+.mic-status { margin: 0; }
+
+/* The staff gets every bit of free height */
+#practice .staff { min-height: 200px; padding: 4px; }
+
+/* Keyboard dock: arrows and middle C, then the keys */
+.dock-bar { justify-content: center; gap: 10px; padding: 0 12px 8px; flex-wrap: nowrap; }
+.arrow-btn { min-width: 64px; font-size: 1.1rem; }
+.piano-scroll { scrollbar-width: none; }
+.piano-scroll::-webkit-scrollbar { display: none; }

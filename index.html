@@ -4,22 +4,43 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
   <title>Note Listener</title>
-  <link rel="stylesheet" href="style.css?v=8">
+  <link rel="stylesheet" href="style.css?v=9">
 </head>
 <body>
   <!--APP-START-->
   <section id="start-panel" class="start">
     <h1>Note Listener</h1>
-    <p class="intro">A note appears on the grand staff. Play it on the piano below, on screen or on your real piano. Get it right to move on.</p>
+    <p class="intro">A note appears on the grand staff. Play it on your real piano with the microphone on, or tap it on the on-screen keyboard. Get it right to move on.</p>
     <button id="start" class="primary">Start</button>
     <p id="start-error" class="error" hidden></p>
   </section>
 
   <div id="app" class="app" hidden>
-    <details class="sound-details">
-      <summary>Sound details <span class="muted">(for testing; will be hidden later)</span></summary>
-      <div class="details-body">
-        <div class="readout">
+    <header class="topbar">
+      <div class="drill-bar">
+        <select id="drill-select" aria-label="Drill"></select>
+        <button id="edit-drill" type="button">Edit</button>
+        <button id="new-drill" type="button" class="accent">＋ New</button>
+        <button id="settings-btn" type="button" class="icon-btn" aria-label="Settings" aria-expanded="false" aria-controls="settings">⚙</button>
+      </div>
+
+      <div id="settings" class="settings" hidden>
+        <div class="settings-grid">
+          <label>Sound
+            <select id="waveform">
+              <option value="piano">Grand piano</option>
+              <option value="triangle">Soft (triangle)</option>
+              <option value="sine">Pure (sine)</option>
+              <option value="square">Buzzy (square)</option>
+            </select>
+          </label>
+          <label class="size-label">Key size <input type="range" id="key-size" min="0" max="100" value="50"> <span id="key-size-val" class="pct">50%</span></label>
+          <label><input type="checkbox" id="show-accuracy" checked> Show accuracy</label>
+          <label><input type="checkbox" id="follow" checked> Scroll the keyboard to the note I play</label>
+          <label>Microphone <select id="mic-select"><option value="">Default</option></select></label>
+          <label><input type="checkbox" id="self-test"> Listen while the app is playing (self-test)</label>
+        </div>
+        <div class="readout" aria-label="What the microphone hears">
           <div><span class="label">Detected</span><span id="note" class="big">–</span></div>
           <div><span class="label">Frequency</span><span id="freq">–</span></div>
           <div><span class="label">Tuning</span><span id="cents">–</span></div>
@@ -32,15 +53,9 @@
             </div>
           </div>
         </div>
-        <p id="mic-status" class="mic-status" hidden></p>
-        <div class="detail-controls">
-          <label>Microphone <select id="mic-select"></select></label>
-          <label><input type="checkbox" id="self-test"> Listen while the app is playing (self-test)</label>
-          <button id="listen-toggle" type="button">Pause listening</button>
-        </div>
         <p class="credit">Piano sound: <a href="https://archive.org/details/SalamanderGrandPianoV3" target="_blank" rel="noopener">Salamander Grand Piano</a> by Alexander Holm, CC BY 3.0. Notation: VexFlow.</p>
       </div>
-    </details>
+    </header>
 
     <!-- Practice view -->
     <section id="practice" class="quiz">
@@ -49,22 +64,12 @@
           <span id="score" class="score">Correct: 0</span>
           <span id="accuracy" class="accuracy">Accuracy –</span>
         </div>
-        <div class="quiz-actions">
-          <button id="hint" type="button" class="hint-btn">💡 Hint</button>
-          <span id="feedback" class="feedback"></span>
-        </div>
+        <button id="restart" type="button" class="icon-btn small" aria-label="Restart score" title="Restart score">↺</button>
+        <span id="feedback" class="feedback" aria-live="polite"></span>
+        <button id="hint" type="button" class="hint-btn">💡 Hint</button>
+        <button id="mic-toggle" type="button" class="mic-toggle" aria-pressed="false">🎤 Mic off</button>
       </div>
-      <div class="drill-bar">
-        <label class="drill-pick">Drill
-          <select id="drill-select"></select>
-        </label>
-        <button id="edit-drill" type="button">Edit</button>
-        <button id="new-drill" type="button" class="accent">＋ New drill</button>
-      </div>
-      <div class="practice-options">
-        <label><input type="checkbox" id="show-accuracy" checked> Show accuracy</label>
-        <button id="restart" type="button" class="link-btn">↺ Restart score</button>
-      </div>
+      <p id="mic-status" class="mic-status" hidden></p>
       <div id="staff" class="staff" aria-live="polite"></div>
     </section>
 
@@ -99,25 +104,11 @@
       <div id="ed-staff" class="staff staff-wide"></div>
     </section>
 
-    <footer class="dock">
+    <footer id="dock" class="dock">
       <div class="dock-bar">
-        <div id="minimap" class="minimap" title="Drag to move along the keyboard">
-          <div id="minimap-keys" class="minimap-keys"></div>
-          <div id="minimap-window" class="minimap-window"></div>
-        </div>
-        <div class="dock-controls">
-          <button id="middle-c" type="button" title="Go to middle C">★ Middle C</button>
-          <label class="size-label">Keys <input type="range" id="key-size" min="0" max="100" value="50" aria-label="Key size"> <span id="key-size-val" class="pct">50%</span></label>
-          <label>Sound
-            <select id="waveform">
-              <option value="piano">Grand piano</option>
-              <option value="triangle">Soft (triangle)</option>
-              <option value="sine">Pure (sine)</option>
-              <option value="square">Buzzy (square)</option>
-            </select>
-          </label>
-          <label id="follow-label" title="Scroll the keyboard to the note you play"><input type="checkbox" id="follow" checked> Follow</label>
-        </div>
+        <button id="oct-down" type="button" class="arrow-btn" aria-label="Move the keyboard down an octave">◀</button>
+        <button id="middle-c" type="button" title="Go to middle C">★ Middle C</button>
+        <button id="oct-up" type="button" class="arrow-btn" aria-label="Move the keyboard up an octave">▶</button>
       </div>
       <div id="piano-scroll" class="piano-scroll">
         <div id="piano" class="piano" role="group" aria-label="Piano keyboard"></div>
@@ -127,6 +118,6 @@
   <!--APP-END-->
 
   <script src="vendor/vexflow-4.2.5-bravura.js"></script>
-  <script type="module" src="main.js?v=8"></script>
+  <script type="module" src="main.js?v=9"></script>
 </body>
 </html>

@@ -164,16 +164,24 @@ function recall(key) {
 // ======================================================================
 
 $('start').addEventListener('click', start);
-$('mic-select').addEventListener('change', (e) => connectMic(e.target.value));
-$('listen-toggle').addEventListener('click', toggleListening);
+$('mic-select').addEventListener('change', () => { if (micMode) setMicMode(true); });
+$('mic-toggle').addEventListener('click', () => setMicMode(!micMode));
+$('settings-btn').addEventListener('click', () => {
+  const open = $('settings').hidden;
+  $('settings').hidden = !open;
+  $('settings-btn').setAttribute('aria-expanded', String(open));
+  requestAnimationFrame(redrawStaff);
+});
 $('middle-c').addEventListener('click', () => scrollToKey(MIDDLE_C, 'smooth'));
+$('oct-down').addEventListener('click', () => scrollOctave(-1));
+$('oct-up').addEventListener('click', () => scrollOctave(1));
 $('hint').addEventListener('click', showHint);
 $('restart').addEventListener('click', () => { resetScore(); nextQuestion(); });
 $('show-accuracy').addEventListener('change', (e) => { remember('sr-accuracy', e.target.checked ? '1' : '0'); showScore(); });
 $('drill-select').addEventListener('change', (e) => selectDrill(e.target.value));
 $('edit-drill').addEventListener('click', () => openEditor(currentDrill));
 $('new-drill').addEventListener('click', () => openEditor(null));
-window.addEventListener('resize', () => { updateMinimap(); redrawStaff(); });
+window.addEventListener('resize', () => redrawStaff());
 
 // The key-size slider updates the piano on every movement, batched to the screen's refresh.
 let pendingSize = null;
@@ -204,20 +212,15 @@ async function start() {
     loadPiano('piano');
     if (PIANOS[$('waveform').value]) loadPiano($('waveform').value);
 
-    // If the mic isn't allowed, keep going: the quiz still works by tapping keys.
-    try {
-      await connectMic();
-      await listMics();
-    } catch (err) {
-      setMicUnavailable(err);
-    }
-
     buildPiano();
-    buildMinimap();
     buildRangeSelects();
 
     $('start-panel').hidden = true;
     $('app').hidden = false;
+
+    // Microphone mode is remembered; this tap on Start lets the browser ask for the mic.
+    if (recall('sr-mic') === '1') await setMicMode(true, { quiet: true });
+    else updateDock();
 
     $('show-accuracy').checked = recall('sr-accuracy') !== '0';
     const savedSize = recall('sr-key-size');
@@ -360,17 +363,52 @@ function startSynth(midi, type) {
 // Microphone
 // ======================================================================
 
-function setMicUnavailable(err) {
-  listening = false;
-  stopMic();
-  const why = err && err.name === 'NotAllowedError'
-    ? 'The microphone is blocked here, so the app can\'t hear a real piano. Tap the keys to answer.'
-    : 'No microphone is available here, so the app can\'t hear a real piano. Tap the keys to answer.';
-  $('mic-status').textContent = why;
-  $('mic-status').hidden = false;
-  $('listen-toggle').hidden = true;
-  $('follow-label').hidden = true;
-  document.querySelector('.sound-details summary .muted').textContent = '(mic not available here)';
+// Microphone mode: the student plays a real piano and the app listens, so the
+// on-screen keyboard is hidden and the staff gets the room. Off: tap the keys.
+let micMode = false;
+
+async function setMicMode(on, { quiet = false } = {}) {
+  const status = $('mic-status');
+  status.hidden = true;
+  if (on) {
+    try {
+      await connectMic($('mic-select').value || undefined);
+      await listMics();
+      micMode = true;
+      listening = true;
+    } catch (err) {
+      micMode = false;
+      listening = false;
+      stopMic();
+      status.textContent = err && err.name === 'NotAllowedError'
+        ? 'The microphone is blocked. Allow it for this site in your browser settings, then tap 🎤 again.'
+        : 'No microphone was found, so the app can\'t hear a real piano. Tap the keys on screen instead.';
+      status.hidden = quiet && !(err && err.name === 'NotAllowedError') ? true : false;
+    }
+  } else {
+    micMode = false;
+    listening = false;
+    stopMic();
+    showNoPitch(false);
+    showLoudness(0);
+  }
+  remember('sr-mic', micMode ? '1' : '0');
+  $('mic-toggle').setAttribute('aria-pressed', String(micMode));
+  $('mic-toggle').textContent = micMode ? '🎤 Mic on' : '🎤 Mic off';
+  updateDock();
+}
+
+// The keyboard shows when the mic is off, and always while making a drill.
+function updateDock() {
+  const show = !micMode || mode === 'edit';
+  const changed = $('dock').hidden === show;
+  $('dock').hidden = !show;
+  if (changed) {
+    requestAnimationFrame(() => {
+      redrawStaff();
+      if (show && currentDrill) scrollToNotes(currentDrill.items.map(itemMidi), 'instant');
+    });
+  }
 }
 
 async function connectMic(deviceId) {
@@ -407,25 +445,6 @@ async function listMics() {
       opt.selected = d.deviceId === current;
       select.add(opt);
     });
-}
-
-async function toggleListening() {
-  const btn = $('listen-toggle');
-  if (listening) {
-    listening = false;
-    stopMic();
-    showNoPitch(false);
-    showLoudness(0);
-    btn.textContent = 'Resume listening';
-  } else {
-    try {
-      await connectMic($('mic-select').value || undefined);
-      listening = true;
-      btn.textContent = 'Pause listening';
-    } catch (err) {
-      setMicUnavailable(err);
-    }
-  }
 }
 
 // ======================================================================
@@ -490,7 +509,6 @@ function buildPiano() {
       e.preventDefault();
     }
   }, { passive: false });
-  $('piano-scroll').addEventListener('scroll', updateMinimap, { passive: true });
 }
 
 // White keys show their letter (C keys with the octave); black keys show
@@ -521,7 +539,12 @@ function setKeySize(pct, instant = false) {
     : 0.5;
   $('piano').style.setProperty('--white-w', `${sizeToPx(pct).toFixed(1)}px`);
   if (!instant) scroller.scrollLeft = centre * scroller.scrollWidth - scroller.clientWidth / 2;
-  updateMinimap();
+}
+
+// Move the keyboard one octave (7 white keys) left or right.
+function scrollOctave(dir) {
+  const w = keyEls.get(MIDDLE_C).offsetWidth;
+  $('piano-scroll').scrollBy({ left: dir * 7 * w, behavior: 'smooth' });
 }
 
 function scrollToKey(midi, behavior = 'smooth') {
@@ -562,54 +585,6 @@ function pressKey(midi) {
   if (mode === 'edit') toggleEditNote(midi);
   else answer(midi);
   return voice;
-}
-
-// ======================================================================
-// Minimap: the small whole-keyboard strip for moving along the piano
-// ======================================================================
-
-function buildMinimap() {
-  const strip = $('minimap-keys');
-  if (strip.childElementCount) return;
-  let whiteIndex = 0;
-  for (let midi = LOWEST; midi <= HIGHEST; midi++) {
-    if (BLACK.has(midi % 12)) {
-      const b = document.createElement('div');
-      b.className = 'mini-black';
-      b.style.left = `${(whiteIndex / 52) * 100}%`;
-      strip.append(b);
-    } else {
-      const w = document.createElement('div');
-      w.className = midi === MIDDLE_C ? 'mini-white mini-c4' : 'mini-white';
-      strip.append(w);
-      whiteIndex++;
-    }
-  }
-
-  const map = $('minimap');
-  let dragging = false;
-  const moveTo = (clientX) => {
-    const rect = map.getBoundingClientRect();
-    const frac = Math.min(1, Math.max(0, (clientX - rect.left) / rect.width));
-    const scroller = $('piano-scroll');
-    scroller.scrollLeft = frac * scroller.scrollWidth - scroller.clientWidth / 2;
-  };
-  map.addEventListener('pointerdown', (e) => {
-    dragging = true;
-    map.setPointerCapture(e.pointerId);
-    moveTo(e.clientX);
-  });
-  map.addEventListener('pointermove', (e) => { if (dragging) moveTo(e.clientX); });
-  map.addEventListener('pointerup', () => { dragging = false; });
-  map.addEventListener('pointercancel', () => { dragging = false; });
-}
-
-function updateMinimap() {
-  const scroller = $('piano-scroll');
-  const win = $('minimap-window');
-  if (!scroller.scrollWidth) return;
-  win.style.left = `${(scroller.scrollLeft / scroller.scrollWidth) * 100}%`;
-  win.style.width = `${Math.min(1, scroller.clientWidth / scroller.scrollWidth) * 100}%`;
 }
 
 // ======================================================================
@@ -692,7 +667,8 @@ function selectDrill(id, { keepSize = false, save = true } = {}) {
   const drill = allDrills().find((d) => d.id === id) || PRESETS[0];
   currentDrill = drill;
   $('drill-select').value = drill.id;
-  $('edit-drill').textContent = drill.preset ? 'Copy & edit' : 'Edit';
+  // Built-in drills can't be changed, so editing one starts a copy.
+  $('edit-drill').title = drill.preset ? 'Edit a copy of this drill' : 'Edit this drill';
   if (save) { remember('sr-drill', drill.id); pendingDrillId = null; }
   labelKeys(labelModeFor(drill.items));
   const midis = drill.items.map(itemMidi);
@@ -738,6 +714,7 @@ function nextQuestion() {
   question = pool.length ? pool[Math.floor(Math.random() * pool.length)] : items[0];
   answered = false;
   missedThis = false;
+  if ($('feedback').classList.contains('hint')) { $('feedback').textContent = ''; $('feedback').className = 'feedback'; }
   micMatchFrames = 0;
   micWrongFrames = 0;
   renderQuestion();
@@ -775,6 +752,13 @@ function answer(midi) {
 function showHint() {
   if (question === null || answered) return;
   missedThis = true; // using the hint means it wasn't read unaided
+  if ($('dock').hidden) {
+    // No keyboard on screen (mic mode): name the note instead.
+    clearTimeout(answer._fb);
+    $('feedback').textContent = `💡 ${itemSpell(question).pretty}`;
+    $('feedback').className = 'feedback hint';
+    return;
+  }
   keyEls.get(itemMidi(question)).classList.add('is-hint');
   scrollToKey(itemMidi(question), 'smooth');
 }
@@ -829,6 +813,7 @@ function openEditor(drill) {
   clearHint();
   $('practice').hidden = true;
   $('editor').hidden = false;
+  updateDock();
   $('ed-name').value = editing.name;
   $('ed-delete').hidden = !editing.id;
   $('ed-delete').textContent = 'Delete drill';
@@ -843,6 +828,7 @@ function closeEditor() {
   editing = null;
   $('editor').hidden = true;
   $('practice').hidden = false;
+  updateDock();
   labelKeys(labelModeFor(currentDrill.items));
   renderQuestion();
 }
@@ -1021,7 +1007,7 @@ function drawGrandStaff(el, { items, lowStep, highStep, color, wide = false, lab
   const x = 46;
   const clefRoom = 46;
   const spacing = 46;
-  const width = wide ? Math.max(340, x + clefRoom + 24 + items.length * spacing) : 340;
+  const width = wide ? Math.max(340, x + clefRoom + 24 + items.length * spacing) : 220;
   const trebleY = topRoom;
   const bassY = trebleY + staffH + gap;
   const height = bassY + staffH + bottomRoom;
