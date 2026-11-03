@@ -4,7 +4,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
   <title>Note Listener</title>
-  <link rel="stylesheet" href="style.css?v=7">
+  <link rel="stylesheet" href="style.css?v=8">
 </head>
 <body>
   <!--APP-START-->
@@ -45,7 +45,10 @@
     <!-- Practice view -->
     <section id="practice" class="quiz">
       <div class="quiz-bar">
-        <span id="score" class="score">Correct: 0</span>
+        <div class="scoreboard">
+          <span id="score" class="score">Correct: 0</span>
+          <span id="accuracy" class="accuracy">Accuracy –</span>
+        </div>
         <div class="quiz-actions">
           <button id="hint" type="button" class="hint-btn">💡 Hint</button>
           <span id="feedback" class="feedback"></span>
@@ -57,6 +60,10 @@
         </label>
         <button id="edit-drill" type="button">Edit</button>
         <button id="new-drill" type="button" class="accent">＋ New drill</button>
+      </div>
+      <div class="practice-options">
+        <label><input type="checkbox" id="show-accuracy" checked> Show accuracy</label>
+        <button id="restart" type="button" class="link-btn">↺ Restart score</button>
       </div>
       <div id="staff" class="staff" aria-live="polite"></div>
     </section>
@@ -120,6 +127,6 @@
   <!--APP-END-->
 
   <script src="vendor/vexflow-4.2.5-bravura.js"></script>
-  <script type="module" src="main.js?v=7"></script>
+  <script type="module" src="main.js?v=8"></script>
 </body>
 </html>

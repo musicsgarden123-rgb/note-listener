@@ -548,3 +548,12 @@ select {
 
 /* A key stays slightly pressed in while it's held down */
 .key.is-down { filter: brightness(0.9); }
+
+/* Score and accuracy */
+.scoreboard { display: flex; flex-direction: column; line-height: 1.25; min-width: 0; }
+.accuracy { font-size: 0.9rem; font-weight: 600; color: var(--muted); font-variant-numeric: tabular-nums; }
+.accuracy.high { color: var(--good); }
+.accuracy.mid { color: var(--warn); }
+.accuracy.low { color: var(--bad); }
+.practice-options { flex: none; display: flex; flex-wrap: wrap; align-items: center; gap: 4px 16px; font-size: 0.9rem; color: var(--muted); }
+.link-btn { border: none; background: none; padding: 4px 0; min-height: 32px; color: var(--accent); }

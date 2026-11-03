@@ -72,6 +72,14 @@ let question = null;        // MIDI number of the note on the staff
 let answered = false;
 let micMatchFrames = 0;
 let score = 0;
+// Accuracy: a note counts as right first time only if no wrong key and no hint came first.
+let firstTry = 0;
+let missedThis = false;     // a wrong key or the hint was used on the current note
+let lastAnsweredPc = null;  // pitch class of the last answer, which may still be ringing on a real piano
+let lastAnsweredAt = 0;
+let micWrongMidi = null;
+let micWrongFrames = 0;
+const MIC_WRONG_FRAMES = 8; // a wrong note must be heard steadily (~0.25 s) to count
 
 let mode = 'practice';      // 'practice' or 'edit'
 let editing = null;         // { id|null, name, nameTouched, items:Set, mode:'sharp'|'flat' }
@@ -160,6 +168,8 @@ $('mic-select').addEventListener('change', (e) => connectMic(e.target.value));
 $('listen-toggle').addEventListener('click', toggleListening);
 $('middle-c').addEventListener('click', () => scrollToKey(MIDDLE_C, 'smooth'));
 $('hint').addEventListener('click', showHint);
+$('restart').addEventListener('click', () => { resetScore(); nextQuestion(); });
+$('show-accuracy').addEventListener('change', (e) => { remember('sr-accuracy', e.target.checked ? '1' : '0'); showScore(); });
 $('drill-select').addEventListener('change', (e) => selectDrill(e.target.value));
 $('edit-drill').addEventListener('click', () => openEditor(currentDrill));
 $('new-drill').addEventListener('click', () => openEditor(null));
@@ -209,6 +219,7 @@ async function start() {
     $('start-panel').hidden = true;
     $('app').hidden = false;
 
+    $('show-accuracy').checked = recall('sr-accuracy') !== '0';
     const savedSize = recall('sr-key-size');
     setKeySize(savedSize !== null ? Number(savedSize) : SIZE_DEFAULT, true);
     renderDrillSelect();
@@ -288,7 +299,8 @@ function startNote(midi) {
     ? startPiano(midi, kind)
     : startSynth(midi, PIANOS[kind] ? 'triangle' : kind);
   voices.add(voice);
-  playingUntil = Infinity; // the mic ignores the app while it's playing
+  // The mic ignores the app while it's playing; a held note fades out within about 6 seconds.
+  playingUntil = performance.now() + 6500;
   return voice;
 }
 
@@ -689,11 +701,30 @@ function selectDrill(id, { keepSize = false, save = true } = {}) {
     setKeySize(span <= 12 ? SIZE_SMALL_DRILL : SIZE_DEFAULT, true);
   }
   requestAnimationFrame(() => scrollToNotes(midis, 'instant'));
-  score = 0;
-  $('score').textContent = 'Correct: 0';
+  resetScore();
   clearHint();
   question = null;
   nextQuestion();
+}
+
+function resetScore() {
+  score = 0;
+  firstTry = 0;
+  showScore();
+}
+
+function showScore() {
+  $('score').textContent = `Correct: ${score}`;
+  const acc = $('accuracy');
+  acc.hidden = !$('show-accuracy').checked;
+  if (!score) {
+    acc.textContent = 'Accuracy –';
+    acc.className = 'accuracy';
+    return;
+  }
+  const pct = Math.round((firstTry / score) * 100);
+  acc.textContent = `Accuracy ${pct}% (${firstTry}/${score})`;
+  acc.className = `accuracy ${pct >= 90 ? 'high' : pct >= 70 ? 'mid' : 'low'}`;
 }
 
 // ======================================================================
@@ -706,17 +737,27 @@ function nextQuestion() {
   const pool = items.filter((i) => i !== question);
   question = pool.length ? pool[Math.floor(Math.random() * pool.length)] : items[0];
   answered = false;
+  missedThis = false;
   micMatchFrames = 0;
+  micWrongFrames = 0;
   renderQuestion();
 }
 
 function answer(midi) {
   // A wrong note does nothing at all. Only the right one moves on.
   // A♯ and B♭ are the same key, so either spelling is answered by that key.
-  if (answered || question === null || midi !== itemMidi(question)) return;
+  if (answered || question === null) return;
+  if (midi !== itemMidi(question)) {
+    // Nothing shows, but this note no longer counts as right first time.
+    if (mode === 'practice') missedThis = true;
+    return;
+  }
   answered = true;
   score++;
-  $('score').textContent = `Correct: ${score}`;
+  if (!missedThis) firstTry++;
+  lastAnsweredPc = midi % 12;
+  lastAnsweredAt = performance.now();
+  showScore();
   // Flash the key green and go straight to the next note.
   const key = keyEls.get(midi);
   key.classList.remove('is-correct');
@@ -733,6 +774,7 @@ function answer(midi) {
 
 function showHint() {
   if (question === null || answered) return;
+  missedThis = true; // using the hint means it wasn't read unaided
   keyEls.get(itemMidi(question)).classList.add('is-hint');
   scrollToKey(itemMidi(question), 'smooth');
 }
@@ -1098,7 +1140,17 @@ function showPitch({ freq, clarity }, level) {
   if (mode === 'practice' && question !== null && !answered) {
     const off = Math.abs(exact - itemMidi(question)) * 100;
     micMatchFrames = off <= MATCH_CENTS ? micMatchFrames + 1 : 0;
-    if (micMatchFrames >= MATCH_FRAMES) answer(itemMidi(question));
+    if (micMatchFrames >= MATCH_FRAMES) {
+      answer(itemMidi(question));
+      return;
+    }
+    // A steady wrong note on the real piano counts as a miss, but not the
+    // last answer still ringing (or its octaves).
+    const ringing = midi % 12 === lastAnsweredPc && performance.now() - lastAnsweredAt < 4000;
+    const wrong = off > 100 && !ringing;
+    if (wrong && midi === micWrongMidi) micWrongFrames++;
+    else { micWrongMidi = wrong ? midi : null; micWrongFrames = wrong ? 1 : 0; }
+    if (micWrongFrames >= MIC_WRONG_FRAMES) missedThis = true;
   }
 }
 
@@ -1108,6 +1160,7 @@ function showNoPitch(appPlaying) {
   $('cents').textContent = '–';
   $('clarity').textContent = '–';
   micMatchFrames = 0;
+  micWrongFrames = 0;
   lightKey(null);
 }
 
