@@ -229,6 +229,13 @@ function ensureAudio() {
   analyser = ctx.createAnalyser();
   analyser.fftSize = 4096; // big enough for the lowest piano notes (A0 = 27.5 Hz)
   buffer = new Float32Array(analyser.fftSize);
+  // Safari (and every browser on iPad and iPhone, which all use Safari's engine)
+  // only processes sound that eventually reaches the speakers. So the listener
+  // feeds a silent volume control that goes to the speakers: nothing is heard,
+  // but the microphone is actually analysed.
+  const silent = ctx.createGain();
+  silent.gain.value = 0;
+  analyser.connect(silent).connect(ctx.destination);
   buildSoundChains();
   loadPiano('piano');
   if (PIANOS[$('waveform').value]) loadPiano($('waveform').value);
@@ -454,7 +461,11 @@ async function connectMic(deviceId) {
     },
   });
   micSource = ctx.createMediaStreamSource(micStream);
-  micSource.connect(analyser); // to the analyser only, never the speakers
+  micSource.connect(analyser); // to the listener only; it reaches the speakers at zero volume
+  // iPads can pause the audio engine when the microphone starts; wake it up.
+  if (ctx.state !== 'running') {
+    try { await ctx.resume(); } catch { /* ignore */ }
+  }
 }
 
 function stopMic() {
