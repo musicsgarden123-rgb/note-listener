@@ -1,5 +1,5 @@
 import { detectPitch, freqToMidi, midiToFreq, rms } from './pitch.js?v=4';
-import { initScreens, showScreen } from './screens.js?v=1';
+import { initScreens, showScreen } from './screens.js?v=2';
 
 // ======================================================================
 // Constants
@@ -40,6 +40,7 @@ const PIANOS = {
 // A drill is a list of notes. Each note is written as its MIDI number, plus
 // '#' or 'b' for a black key, so A♯3 ("58#") and B♭3 ("58b") are different notes.
 const PRESETS = [
+  { id: 'preset-a3e5', name: 'A3 to E5', items: whiteItems(57, 76), preset: true },
   { id: 'preset-full', name: 'Full piano (A0 to C8)', items: whiteItems(21, 108), preset: true },
   { id: 'preset-g3e4', name: 'G3 to E4', items: whiteItems(55, 64), preset: true },
   { id: 'preset-g3f5', name: 'G3 to F5', items: whiteItems(55, 77), preset: true },
@@ -203,7 +204,7 @@ function init() {
   buildPiano();
   buildRangeSelects();
   buildKeyboardSlider();
-  $('show-accuracy').checked = recall('sr-accuracy') !== '0';
+  $('show-accuracy').checked = recall('sr-accuracy') === '1';
   const savedSize = recall('sr-key-size');
   setKeySize(savedSize !== null ? Number(savedSize) : SIZE_DEFAULT, true);
   renderDrillSelect();

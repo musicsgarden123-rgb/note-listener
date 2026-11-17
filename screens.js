@@ -1,11 +1,11 @@
-import { CHARACTER_IDS, characterSVG, characterName } from './characters.js?v=1';
+import { CHARACTER_IDS, characterSVG, characterName } from './characters.js?v=2';
 
 // The pages around the practice screen: splash, intro, the first-time setup
 // (onboarding), home, drills, profile, theme and settings.
 
 const $ = (id) => document.getElementById(id);
 const PROFILE_KEY = 'sr-profile';
-const MASCOT = 'rooster';
+const MASCOT = 'dragon';
 const SCREENS = ['splash', 'intro', 'onboard', 'home', 'drills-page', 'profile-page', 'theme-page', 'settings-page'];
 
 let api = null;
@@ -85,25 +85,17 @@ function fillGrid(container, variant, selected, onPick) {
   }
 }
 
-function wireVariantToggle(root, getVariant, onChange) {
-  const buttons = root.querySelectorAll('[data-variant]');
-  const sync = () => buttons.forEach((b) => b.setAttribute('aria-checked', String(b.dataset.variant === getVariant())));
-  buttons.forEach((b) => b.addEventListener('click', () => { onChange(b.dataset.variant); sync(); }));
-  sync();
-  return sync;
-}
-
 // ---------- Splash and intro ----------
 
 function buildSplash() {
   const crowd = $('splash-crowd');
   const cast = [
-    ['rabbit', 'musical'], ['tiger', 'plain'], ['rooster', 'musical'],
-    ['dog', 'plain'], ['dragon', 'musical'], ['pig', 'plain'],
+    ['rabbit', 'musical'], ['tiger', 'musical'], ['dragon', 'musical'],
+    ['dog', 'musical'], ['rooster', 'musical'], ['pig', 'musical'],
   ];
   crowd.innerHTML = cast.map(([id, v], i) => `<div class="crowd-char c${i}">${characterSVG(id, v)}</div>`).join('');
   $('intro-mascot').innerHTML = characterSVG(MASCOT, 'musical');
-  $('theme-mascot').innerHTML = characterSVG(MASCOT, 'plain');
+  $('theme-mascot').innerHTML = characterSVG(MASCOT, 'musical');
 }
 
 function leaveSplash() {
@@ -117,7 +109,7 @@ function leaveSplash() {
 const STEPS = ['heard', 'name', 'character', 'welcome'];
 const NEXT_LABEL = { heard: 'Continue', name: 'Next', character: 'Next', welcome: "Let's go" };
 let stepIndex = 0;
-let draft = { name: '', heard: null, character: null, variant: 'plain' };
+let draft = { name: '', heard: null, character: null, variant: 'musical' };
 
 function showStep(i) {
   stepIndex = i;
@@ -149,7 +141,7 @@ function updateNext() {
 
 function wireOnboarding() {
   $('get-started').addEventListener('click', () => {
-    draft = { name: '', heard: null, character: null, variant: 'plain' };
+    draft = { name: '', heard: null, character: null, variant: 'musical' };
     $('ob-name').value = '';
     for (const b of $('heard-list').children) b.setAttribute('aria-checked', 'false');
     showScreen('onboard');
@@ -165,10 +157,6 @@ function wireOnboarding() {
   }
   $('ob-name').addEventListener('input', () => { draft.name = $('ob-name').value; updateNext(); });
   $('ob-name').addEventListener('keydown', (e) => { if (e.key === 'Enter' && !$('ob-next').disabled) $('ob-next').click(); });
-  wireVariantToggle($('onboard'), () => draft.variant, (v) => {
-    draft.variant = v;
-    fillGrid($('ob-grid'), v, draft.character, (id) => { draft.character = id; updateNext(); });
-  });
   $('ob-back').addEventListener('click', () => {
     if (stepIndex === 0) showScreen('intro');
     else showStep(stepIndex - 1);
@@ -244,7 +232,6 @@ function renderProfile() {
   if (!profile) return;
   $('profile-char').innerHTML = characterSVG(profile.character, profile.variant);
   $('profile-name').value = profile.name;
-  syncProfileVariant();
   fillGrid($('profile-grid'), profile.variant, profile.character, (id) => {
     profile.character = id;
     saveProfile();
@@ -252,19 +239,12 @@ function renderProfile() {
   });
 }
 
-let syncProfileVariant = () => {};
-
 function wireProfile() {
   $('profile-name').addEventListener('input', () => {
     const v = $('profile-name').value.trim();
     if (!v) return;
     profile.name = v;
     saveProfile();
-  });
-  syncProfileVariant = wireVariantToggle($('profile-page'), () => profile?.variant || 'plain', (v) => {
-    profile.variant = v;
-    saveProfile();
-    renderProfile();
   });
   $('profile-reset').addEventListener('click', () => {
     profile = null;

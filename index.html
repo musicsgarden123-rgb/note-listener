@@ -62,10 +62,6 @@
 
     <div class="ob-step" data-step="character" hidden>
       <h2 id="pick-title">Choose a character</h2>
-      <div class="segmented center" role="radiogroup" aria-label="Character style">
-        <button type="button" role="radio" aria-checked="true" data-variant="plain">Classic</button>
-        <button type="button" role="radio" aria-checked="false" data-variant="musical">Musical</button>
-      </div>
       <div id="ob-grid" class="char-grid" role="radiogroup" aria-label="Characters"></div>
     </div>
 
@@ -127,10 +123,6 @@
       <label class="field-label" for="profile-name">Name</label>
       <input id="profile-name" class="big-input" type="text" maxlength="24" autocomplete="given-name">
       <h2 class="section-title">Character</h2>
-      <div class="segmented center" role="radiogroup" aria-label="Character style">
-        <button type="button" role="radio" aria-checked="true" data-variant="plain">Classic</button>
-        <button type="button" role="radio" aria-checked="false" data-variant="musical">Musical</button>
-      </div>
       <div id="profile-grid" class="char-grid" role="radiogroup" aria-label="Characters"></div>
       <button id="profile-reset" type="button" class="link-btn">Start again from the welcome screen</button>
     </div>
@@ -168,7 +160,7 @@
         </select>
       </label>
       <label class="setting-row">Key size <span class="slider-wrap"><input type="range" id="key-size" min="0" max="100" value="50"> <span id="key-size-val" class="pct">50%</span></span></label>
-      <label class="setting-row">Show accuracy <input type="checkbox" id="show-accuracy" checked></label>
+      <label class="setting-row">Show accuracy <input type="checkbox" id="show-accuracy"></label>
       <label class="setting-row">Scroll the keyboard to the note I play <input type="checkbox" id="follow" checked></label>
       <label class="setting-row">Microphone <select id="mic-select"><option value="">Default</option></select></label>
       <label class="setting-row">Listen while the app is playing (self-test) <input type="checkbox" id="self-test"></label>
@@ -268,6 +260,6 @@
   <!--APP-END-->
 
   <script src="vendor/vexflow-4.2.5-bravura.js"></script>
-  <script type="module" src="main.js?v=11"></script>
+  <script type="module" src="main.js?v=12"></script>
 </body>
 </html>

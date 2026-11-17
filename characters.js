@@ -1,180 +1,161 @@
-// The 12 zodiac characters, drawn as vector art in one consistent style:
-// a round badge with a white rim, and the animal peeking up from the bottom.
-// Each comes in two versions: plain, and "musical" (with a music accessory).
+// The 12 zodiac characters, drawn as flat vector art in one soft, pastel style:
+// a coloured circle, a big simple face, small dot eyes, a tiny nose and mouth.
+// Every character wears a small musical touch (headphones, a bow tie or a beret).
 
-const INK = '#2b2622';
+const INK = '#3b2a20';
 
-// Big friendly eyes: white ovals with dark pupils looking slightly inward.
-function eyes(y = 70, gap = 11, look = 1, size = 1) {
-  const eye = (x, dir) => `
-    <ellipse cx="${x}" cy="${y}" rx="${8.5 * size}" ry="${10.5 * size}" fill="#fff"/>
-    <ellipse cx="${x + dir * 2.2 * look}" cy="${y + 1.5}" rx="${4.6 * size}" ry="${6.2 * size}" fill="${INK}"/>
-    <circle cx="${x + dir * 2.2 * look + 1.6}" cy="${y - 1.6}" r="${1.5 * size}" fill="#fff"/>`;
-  return eye(60 - gap, 1) + eye(60 + gap, -1);
-}
+const PASTEL = {
+  green: '#d6e9a1', pink: '#f4c2d2', blue: '#9cc3e8',
+  teal: '#94d6d2', lilac: '#d2b8e3', yellow: '#f6dc8f', peach: '#f7c7a6',
+};
 
-function cheeks(y = 82, gap = 21, color = '#f6a3a3') {
-  return `<ellipse cx="${60 - gap}" cy="${y}" rx="5" ry="3.2" fill="${color}" opacity=".55"/>
-          <ellipse cx="${60 + gap}" cy="${y}" rx="5" ry="3.2" fill="${color}" opacity=".55"/>`;
-}
+const eyes = (y = 64, gap = 15, r = 4.6) => `
+  <circle cx="${60 - gap}" cy="${y}" r="${r}" fill="${INK}"/><circle cx="${60 - gap + 1.5}" cy="${y - 1.6}" r="1.4" fill="#fff"/>
+  <circle cx="${60 + gap}" cy="${y}" r="${r}" fill="${INK}"/><circle cx="${60 + gap + 1.5}" cy="${y - 1.6}" r="1.4" fill="#fff"/>`;
 
-const smile = (y = 86, w = 6) => `<path d="M${60 - w} ${y} Q60 ${y + w * 0.9} ${60 + w} ${y}" fill="none" stroke="${INK}" stroke-width="2.4" stroke-linecap="round"/>`;
-const shoulders = (fill, y = 118, rx = 40) => `<ellipse cx="60" cy="${y}" rx="${rx}" ry="24" fill="${fill}"/>`;
+const nose = (y = 74, w = 4.5, fill = INK) =>
+  `<path d="M${60 - w} ${y} Q60 ${y - 2.2} ${60 + w} ${y} Q61.5 ${y + 4} 60 ${y + 4.4} Q58.5 ${y + 4} ${60 - w} ${y} Z" fill="${fill}"/>`;
 
-// ---------- The animals ----------
+const mouth = (y = 81, w = 5) =>
+  `<path d="M60 ${y - 2.4} V${y} M${60 - w} ${y - 0.6} Q${60 - w / 2} ${y + 3.6} 60 ${y} Q${60 + w / 2} ${y + 3.6} ${60 + w} ${y - 0.6}" fill="none" stroke="${INK}" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"/>`;
+
+const blush = (y = 76, gap = 23, c = '#ef9a9a') =>
+  `<ellipse cx="${60 - gap}" cy="${y}" rx="5" ry="3" fill="${c}" opacity=".45"/><ellipse cx="${60 + gap}" cy="${y}" rx="5" ry="3" fill="${c}" opacity=".45"/>`;
+
+// ---------- The animals (head roughly from y 20 to y 100) ----------
 
 const ANIMALS = {
   rat: {
-    name: 'Rat', bg: '#f2a93b',
+    name: 'Rat', bg: PASTEL.lilac, acc: 'headphones',
     draw: () => `
-      ${shoulders('#9aa0a8')}
-      <circle cx="33" cy="50" r="15" fill="#9aa0a8"/><circle cx="33" cy="50" r="9" fill="#f4a7b9"/>
-      <circle cx="87" cy="50" r="15" fill="#9aa0a8"/><circle cx="87" cy="50" r="9" fill="#f4a7b9"/>
-      <ellipse cx="60" cy="76" rx="27" ry="26" fill="#9aa0a8"/>
-      <ellipse cx="60" cy="88" rx="13" ry="10" fill="#c9ccd1"/>
-      ${eyes(72, 11)}
-      <ellipse cx="60" cy="84" rx="4" ry="3" fill="#f08aa5"/>
-      <path d="M44 86 L30 83 M44 89 L31 91 M76 86 L90 83 M76 89 L89 91" stroke="${INK}" stroke-width="1.3" stroke-linecap="round" opacity=".6"/>`,
+      <circle cx="33" cy="40" r="16" fill="#a9abb4"/><circle cx="33" cy="40" r="9.5" fill="#f2b6c4"/>
+      <circle cx="87" cy="40" r="16" fill="#a9abb4"/><circle cx="87" cy="40" r="9.5" fill="#f2b6c4"/>
+      <ellipse cx="60" cy="68" rx="31" ry="28" fill="#a9abb4"/>
+      <ellipse cx="60" cy="81" rx="15" ry="11" fill="#e1e2e6"/>
+      ${eyes(64, 14)} ${nose(74, 4, '#e88aa3')} ${mouth(82, 4.5)}
+      <path d="M44 77 L31 74 M44 81 L32 83 M76 77 L89 74 M76 81 L88 83" stroke="${INK}" stroke-width="1.2" stroke-linecap="round" opacity=".45"/>`,
   },
   ox: {
-    name: 'Ox', bg: '#3fa66a',
+    name: 'Ox', bg: PASTEL.green, acc: 'bowtie',
     draw: () => `
-      ${shoulders('#8b5a3c')}
-      <path d="M36 52 Q22 44 24 30 Q32 42 44 46 Z" fill="#f3e3c3"/>
-      <path d="M84 52 Q98 44 96 30 Q88 42 76 46 Z" fill="#f3e3c3"/>
-      <ellipse cx="31" cy="64" rx="10" ry="6" fill="#8b5a3c" transform="rotate(-20 31 64)"/>
-      <ellipse cx="89" cy="64" rx="10" ry="6" fill="#8b5a3c" transform="rotate(20 89 64)"/>
-      <ellipse cx="60" cy="72" rx="28" ry="27" fill="#8b5a3c"/>
-      <ellipse cx="60" cy="90" rx="20" ry="12" fill="#e8b9a0"/>
-      <ellipse cx="53" cy="90" rx="2.6" ry="3.2" fill="#8b5a3c"/><ellipse cx="67" cy="90" rx="2.6" ry="3.2" fill="#8b5a3c"/>
-      ${eyes(68, 11)}`,
+      <path d="M40 40 Q26 36 24 20 Q34 30 46 32 Z" fill="#f2e4c8"/><path d="M80 40 Q94 36 96 20 Q86 30 74 32 Z" fill="#f2e4c8"/>
+      <ellipse cx="28" cy="56" rx="11" ry="6.5" fill="#a86c46" transform="rotate(-18 28 56)"/>
+      <ellipse cx="92" cy="56" rx="11" ry="6.5" fill="#a86c46" transform="rotate(18 92 56)"/>
+      <path d="M32 58 Q32 32 60 32 Q88 32 88 58 L86 80 Q60 92 34 80 Z" fill="#b97a50"/>
+      <ellipse cx="60" cy="84" rx="21" ry="13" fill="#f0c6ad"/>
+      <ellipse cx="53" cy="84" rx="2.4" ry="3.2" fill="#9c5c3e"/><ellipse cx="67" cy="84" rx="2.4" ry="3.2" fill="#9c5c3e"/>
+      ${eyes(60, 13)}`,
   },
   tiger: {
-    name: 'Tiger', bg: '#3d8bd9',
+    name: 'Tiger', bg: PASTEL.blue, acc: 'headphones',
     draw: () => `
-      ${shoulders('#f39a2e')}
-      <circle cx="36" cy="50" r="10" fill="#f39a2e"/><circle cx="36" cy="50" r="5" fill="#fff3e0"/>
-      <circle cx="84" cy="50" r="10" fill="#f39a2e"/><circle cx="84" cy="50" r="5" fill="#fff3e0"/>
-      <ellipse cx="60" cy="74" rx="30" ry="27" fill="#f39a2e"/>
-      <path d="M60 48 L56 58 L64 58 Z M33 70 L42 72 L33 76 Z M87 70 L78 72 L87 76 Z" fill="${INK}"/>
-      <ellipse cx="60" cy="88" rx="16" ry="11" fill="#fff3e0"/>
-      ${eyes(70, 11)}
-      <path d="M56 82 L64 82 L60 86 Z" fill="${INK}"/>
-      ${smile(89, 5)}`,
+      <path d="M30 46 L32 26 L48 36 Z" fill="#f0a24f"/><path d="M34 40 L35 31 L43 36 Z" fill="#fbe3c6"/>
+      <path d="M90 46 L88 26 L72 36 Z" fill="#f0a24f"/><path d="M86 40 L85 31 L77 36 Z" fill="#fbe3c6"/>
+      <ellipse cx="60" cy="66" rx="32" ry="29" fill="#f0a24f"/>
+      <path d="M30 72 Q44 70 60 82 Q76 70 90 72 Q86 96 60 96 Q34 96 30 72 Z" fill="#fff6ea"/>
+      <path d="M60 38 L56 48 L64 48 Z M30 58 L40 60 L31 64 Z M90 58 L80 60 L89 64 Z" fill="#8a5a3a"/>
+      ${eyes(62, 14)} ${nose(75)} ${mouth(83)}`,
   },
   rabbit: {
-    name: 'Rabbit', bg: '#7a5fd0',
+    name: 'Rabbit', bg: PASTEL.pink, acc: 'beret',
     draw: () => `
-      ${shoulders('#fbe9f0')}
-      <ellipse cx="46" cy="32" rx="8" ry="22" fill="#fbe9f0" transform="rotate(-8 46 32)"/>
-      <ellipse cx="46" cy="33" rx="4" ry="16" fill="#f4a7b9" transform="rotate(-8 46 33)"/>
-      <ellipse cx="74" cy="32" rx="8" ry="22" fill="#fbe9f0" transform="rotate(8 74 32)"/>
-      <ellipse cx="74" cy="33" rx="4" ry="16" fill="#f4a7b9" transform="rotate(8 74 33)"/>
-      <ellipse cx="60" cy="76" rx="27" ry="26" fill="#fbe9f0"/>
-      ${eyes(72, 11)}
-      ${cheeks(84, 19)}
-      <path d="M57 83 L63 83 L60 86.5 Z" fill="#f08aa5"/>
-      <rect x="56.5" y="89" width="7" height="6" rx="1.5" fill="#fff" stroke="${INK}" stroke-width="1.2"/>`,
+      <ellipse cx="45" cy="26" rx="9" ry="22" fill="#f8f1e8" transform="rotate(-10 45 26)"/>
+      <ellipse cx="45" cy="27" rx="4.5" ry="15" fill="#f2b6c4" transform="rotate(-10 45 27)"/>
+      <ellipse cx="75" cy="26" rx="9" ry="22" fill="#f8f1e8" transform="rotate(10 75 26)"/>
+      <ellipse cx="75" cy="27" rx="4.5" ry="15" fill="#f2b6c4" transform="rotate(10 75 27)"/>
+      <ellipse cx="60" cy="70" rx="30" ry="27" fill="#f8f1e8"/>
+      ${eyes(66, 13)} ${blush(77, 21)} ${nose(75, 3.8, '#e88aa3')} ${mouth(83, 4.5)}`,
   },
   dragon: {
-    name: 'Dragon', bg: '#ef6f5e',
+    name: 'Dragon', bg: PASTEL.teal, acc: 'bowtie',
     draw: () => `
-      ${shoulders('#4cbf8a')}
-      <path d="M40 54 Q34 36 42 28 Q44 42 50 48 Z M80 54 Q86 36 78 28 Q76 42 70 48 Z" fill="#f2a93b"/>
-      <path d="M52 47 L56 38 L60 47 L64 38 L68 47 Z" fill="#f2c94c"/>
-      <ellipse cx="60" cy="74" rx="29" ry="27" fill="#4cbf8a"/>
-      <ellipse cx="60" cy="90" rx="19" ry="11" fill="#7fd6a8"/>
-      <ellipse cx="53" cy="88" rx="2.4" ry="1.8" fill="#2f7a55"/><ellipse cx="67" cy="88" rx="2.4" ry="1.8" fill="#2f7a55"/>
-      ${eyes(69, 11)}
-      <path d="M40 98 Q60 106 80 98" fill="none" stroke="#f7e29b" stroke-width="5" stroke-linecap="round"/>`,
+      <path d="M42 40 Q34 24 40 14 Q44 28 52 34 Z M78 40 Q86 24 80 14 Q76 28 68 34 Z" fill="#f2c46b"/>
+      <path d="M50 35 L54 26 L58 34 L62 26 L66 34 L70 27 L72 37 Z" fill="#ef8f7a"/>
+      <ellipse cx="25" cy="62" rx="9" ry="5" fill="#6fbd8f" transform="rotate(-25 25 62)"/>
+      <ellipse cx="95" cy="62" rx="9" ry="5" fill="#6fbd8f" transform="rotate(25 95 62)"/>
+      <ellipse cx="60" cy="66" rx="33" ry="30" fill="#7fca9b"/>
+      <ellipse cx="60" cy="83" rx="22" ry="13" fill="#c9ecd5"/>
+      <ellipse cx="53" cy="80" rx="2.3" ry="1.8" fill="#4d9a6c"/><ellipse cx="67" cy="80" rx="2.3" ry="1.8" fill="#4d9a6c"/>
+      ${eyes(62, 14, 5)} ${blush(74, 24)}
+      <path d="M53 88 Q60 93 67 88" fill="none" stroke="${INK}" stroke-width="1.9" stroke-linecap="round"/>`,
   },
   snake: {
-    name: 'Snake', bg: '#f2c94c',
+    name: 'Snake', bg: PASTEL.yellow, acc: 'beret',
     draw: () => `
-      <path d="M20 122 Q20 100 44 98 L76 98 Q100 100 100 122 Z" fill="#6fbf4b"/>
-      <ellipse cx="60" cy="72" rx="28" ry="24" fill="#6fbf4b"/>
-      <circle cx="44" cy="56" r="3.2" fill="#4f9a33"/><circle cx="76" cy="56" r="3.2" fill="#4f9a33"/><circle cx="60" cy="52" r="3.2" fill="#4f9a33"/>
-      <circle cx="32" cy="110" r="3.5" fill="#4f9a33"/><circle cx="88" cy="110" r="3.5" fill="#4f9a33"/>
-      ${eyes(70, 12)}
-      ${smile(84, 7)}
-      <path d="M60 87 L60 95 M60 95 L56 99 M60 95 L64 99" stroke="#e8473d" stroke-width="2.2" stroke-linecap="round"/>`,
+      <path d="M28 70 Q28 38 60 38 Q92 38 92 70 Q92 98 60 98 Q28 98 28 70 Z" fill="#93c46f"/>
+      <circle cx="44" cy="50" r="3.2" fill="#75a654"/><circle cx="76" cy="50" r="3.2" fill="#75a654"/><circle cx="60" cy="46" r="3.2" fill="#75a654"/>
+      <circle cx="36" cy="80" r="2.6" fill="#75a654"/><circle cx="84" cy="80" r="2.6" fill="#75a654"/>
+      ${eyes(64, 13)} ${blush(74, 21)}
+      <path d="M52 80 Q60 86 68 80" fill="none" stroke="${INK}" stroke-width="1.9" stroke-linecap="round"/>
+      <path d="M60 85 V92 M60 92 L57 95 M60 92 L63 95" stroke="#e46e63" stroke-width="2" stroke-linecap="round"/>`,
   },
   horse: {
-    name: 'Horse', bg: '#e86fa6',
+    name: 'Horse', bg: PASTEL.lilac, acc: 'headphones',
     draw: () => `
-      ${shoulders('#c2814f')}
-      <path d="M38 52 L34 32 L48 44 Z M82 52 L86 32 L72 44 Z" fill="#c2814f"/>
-      <ellipse cx="60" cy="72" rx="25" ry="28" fill="#c2814f"/>
-      <path d="M48 46 Q60 34 72 46 Q66 44 62 52 Q58 44 48 46 Z" fill="#5a3a2a"/>
-      <ellipse cx="60" cy="92" rx="18" ry="12" fill="#e2b28a"/>
-      <ellipse cx="54" cy="91" rx="2.4" ry="3" fill="#7a4e30"/><ellipse cx="66" cy="91" rx="2.4" ry="3" fill="#7a4e30"/>
-      ${eyes(68, 11)}`,
+      <path d="M38 42 L34 22 L50 34 Z M82 42 L86 22 L70 34 Z" fill="#c98b5a"/>
+      <path d="M38 40 L37 30 L45 35 Z M82 40 L83 30 L75 35 Z" fill="#f1cfae"/>
+      <ellipse cx="60" cy="64" rx="27" ry="31" fill="#c98b5a"/>
+      <path d="M44 36 Q60 24 76 36 Q68 34 64 44 Q60 34 52 40 Q50 36 44 36 Z" fill="#7a4f33"/>
+      <ellipse cx="60" cy="86" rx="20" ry="13" fill="#efc9a4"/>
+      <ellipse cx="53" cy="85" rx="2.4" ry="3" fill="#8a5a3a"/><ellipse cx="67" cy="85" rx="2.4" ry="3" fill="#8a5a3a"/>
+      ${eyes(60, 13)}`,
   },
   goat: {
-    name: 'Goat', bg: '#4fb3c8',
+    name: 'Goat', bg: PASTEL.blue, acc: 'bowtie',
     draw: () => `
-      ${shoulders('#f4efe6')}
-      <path d="M44 50 Q34 30 46 24 Q42 36 52 46 Z M76 50 Q86 30 74 24 Q78 36 68 46 Z" fill="#b9a58a"/>
-      <ellipse cx="30" cy="66" rx="11" ry="5.5" fill="#f4efe6" transform="rotate(18 30 66)"/>
-      <ellipse cx="90" cy="66" rx="11" ry="5.5" fill="#f4efe6" transform="rotate(-18 90 66)"/>
-      <ellipse cx="60" cy="74" rx="25" ry="27" fill="#f4efe6"/>
-      <path d="M54 96 Q60 112 66 96 Z" fill="#e3dccf"/>
-      ${eyes(70, 10.5)}
-      <path d="M57 85 L63 85 L60 88 Z" fill="${INK}"/>`,
+      <path d="M46 38 Q36 22 46 14 Q44 26 54 34 Z M74 38 Q84 22 74 14 Q76 26 66 34 Z" fill="#c9b08f"/>
+      <ellipse cx="27" cy="58" rx="12" ry="6" fill="#f6f0e6" transform="rotate(20 27 58)"/>
+      <ellipse cx="93" cy="58" rx="12" ry="6" fill="#f6f0e6" transform="rotate(-20 93 58)"/>
+      <ellipse cx="60" cy="64" rx="27" ry="29" fill="#f6f0e6"/>
+      <path d="M53 88 Q60 106 67 88 Z" fill="#e5dccd"/>
+      ${eyes(60, 12)} ${nose(74, 4)} ${mouth(81, 4.5)}`,
   },
   monkey: {
-    name: 'Monkey', bg: '#8bc34a',
+    name: 'Monkey', bg: PASTEL.yellow, acc: 'headphones',
     draw: () => `
-      ${shoulders('#8a5a3b')}
-      <circle cx="31" cy="72" r="12" fill="#8a5a3b"/><circle cx="31" cy="72" r="7" fill="#f2d0a9"/>
-      <circle cx="89" cy="72" r="12" fill="#8a5a3b"/><circle cx="89" cy="72" r="7" fill="#f2d0a9"/>
-      <ellipse cx="60" cy="72" rx="28" ry="28" fill="#8a5a3b"/>
-      <path d="M38 76 Q38 56 52 58 Q60 62 68 58 Q82 56 82 76 Q82 98 60 98 Q38 98 38 76 Z" fill="#f2d0a9"/>
-      ${eyes(72, 10)}
-      <ellipse cx="57" cy="84" rx="1.6" ry="1.3" fill="${INK}"/><ellipse cx="63" cy="84" rx="1.6" ry="1.3" fill="${INK}"/>
-      ${smile(89, 6)}`,
+      <circle cx="28" cy="64" r="12" fill="#b17a52"/><circle cx="28" cy="64" r="7" fill="#f6d2b3"/>
+      <circle cx="92" cy="64" r="12" fill="#b17a52"/><circle cx="92" cy="64" r="7" fill="#f6d2b3"/>
+      <ellipse cx="60" cy="64" rx="31" ry="31" fill="#b17a52"/>
+      <path d="M36 70 Q36 48 50 50 Q60 55 70 50 Q84 48 84 70 Q84 94 60 94 Q36 94 36 70 Z" fill="#f6d2b3"/>
+      ${eyes(64, 11)}
+      <ellipse cx="57.5" cy="75" rx="1.6" ry="1.2" fill="${INK}"/><ellipse cx="62.5" cy="75" rx="1.6" ry="1.2" fill="${INK}"/>
+      ${mouth(82, 5)}`,
   },
   rooster: {
-    name: 'Rooster', bg: '#5b6bd6',
+    name: 'Rooster', bg: PASTEL.green, acc: 'bowtie',
     draw: () => `
-      ${shoulders('#fff7e8')}
-      <path d="M48 52 Q46 36 54 40 Q56 30 62 38 Q68 30 72 42 Q78 40 74 52 Z" fill="#e8473d"/>
-      <ellipse cx="60" cy="76" rx="27" ry="28" fill="#fff7e8"/>
-      ${eyes(70, 11)}
-      <path d="M52 81 L68 81 L60 92 Z" fill="#f2a93b"/>
-      <path d="M57 92 Q60 102 63 92 Z" fill="#e8473d"/>
-      ${cheeks(84, 20)}`,
+      <path d="M46 40 Q42 24 52 28 Q54 16 61 26 Q68 16 72 30 Q80 28 76 42 Z" fill="#e8706a"/>
+      <ellipse cx="60" cy="68" rx="29" ry="29" fill="#fffaf0"/>
+      ${eyes(62, 13)} ${blush(74, 21)}
+      <path d="M53 72 L67 72 L60 82 Z" fill="#f2b24f"/>
+      <path d="M57 82 Q60 92 63 82 Z" fill="#e8706a"/>`,
   },
   dog: {
-    name: 'Dog', bg: '#ef8f3b',
+    name: 'Dog', bg: PASTEL.teal, acc: 'beret',
     draw: () => `
-      ${shoulders('#d9a36b')}
-      <ellipse cx="36" cy="66" rx="10" ry="18" fill="#8a5a3b" transform="rotate(16 36 66)"/>
-      <ellipse cx="84" cy="66" rx="10" ry="18" fill="#8a5a3b" transform="rotate(-16 84 66)"/>
-      <ellipse cx="60" cy="74" rx="26" ry="27" fill="#d9a36b"/>
-      <circle cx="71" cy="64" r="9" fill="#f0d2a8"/>
-      <ellipse cx="60" cy="89" rx="14" ry="10" fill="#f0d2a8"/>
-      ${eyes(70, 10.5)}
-      <ellipse cx="60" cy="84" rx="5" ry="3.6" fill="${INK}"/>
-      <path d="M56 92 Q60 101 64 92 Z" fill="#f08aa5"/>`,
+      <ellipse cx="32" cy="58" rx="11" ry="20" fill="#9a6644" transform="rotate(18 32 58)"/>
+      <ellipse cx="88" cy="58" rx="11" ry="20" fill="#9a6644" transform="rotate(-18 88 58)"/>
+      <ellipse cx="60" cy="66" rx="28" ry="29" fill="#e2ad78"/>
+      <ellipse cx="60" cy="82" rx="16" ry="12" fill="#f7e2c7"/>
+      ${eyes(62, 12)}
+      <ellipse cx="60" cy="77" rx="5.6" ry="4" fill="${INK}"/>
+      ${mouth(85, 4.5)}`,
   },
   pig: {
-    name: 'Pig', bg: '#4cbf8a',
+    name: 'Pig', bg: PASTEL.green, acc: 'headphones',
     draw: () => `
-      ${shoulders('#f7b3c2')}
-      <path d="M38 54 L34 38 L50 48 Z M82 54 L86 38 L70 48 Z" fill="#f08aa5"/>
-      <ellipse cx="60" cy="74" rx="29" ry="27" fill="#f7b3c2"/>
-      <ellipse cx="60" cy="86" rx="11" ry="8" fill="#f08aa5"/>
-      <ellipse cx="56" cy="86" rx="2.2" ry="3" fill="#c25f7c"/><ellipse cx="64" cy="86" rx="2.2" ry="3" fill="#c25f7c"/>
-      ${eyes(69, 12)}
-      ${cheeks(82, 22, '#e8607f')}`,
+      <path d="M36 44 L30 26 L50 36 Z M84 44 L90 26 L70 36 Z" fill="#ee9ab0"/>
+      <ellipse cx="60" cy="66" rx="32" ry="29" fill="#f6b8c7"/>
+      <ellipse cx="60" cy="78" rx="12" ry="8.5" fill="#ee9ab0"/>
+      <ellipse cx="56" cy="78" rx="2.2" ry="3.2" fill="#c96782"/><ellipse cx="64" cy="78" rx="2.2" ry="3.2" fill="#c96782"/>
+      ${eyes(62, 14)} ${blush(74, 24, '#e46e8a')}`,
   },
 };
 
-// ---------- Musical accessories ----------
+// ---------- Musical accessories (muted, flat) ----------
 
-const NOTE = (x, y, s = 1, fill = '#fff') => `
-  <g transform="translate(${x} ${y}) scale(${s})" fill="${fill}">
+const NOTE = (x, y, s = 1) => `
+  <g transform="translate(${x} ${y}) scale(${s})" fill="#fff" opacity=".85">
     <ellipse cx="0" cy="10" rx="4.4" ry="3.4" transform="rotate(-20 0 10)"/>
     <rect x="3" y="-6" width="1.8" height="16"/>
     <path d="M4.8 -6 Q11 -3 9 4 Q9 -1 4.8 -1 Z"/>
@@ -182,45 +163,27 @@ const NOTE = (x, y, s = 1, fill = '#fff') => `
 
 const ACCESSORIES = {
   headphones: () => `
-    <path d="M30 70 Q30 38 60 38 Q90 38 90 70" fill="none" stroke="${INK}" stroke-width="5" stroke-linecap="round"/>
-    <rect x="23" y="62" width="13" height="20" rx="6" fill="#e8473d"/>
-    <rect x="84" y="62" width="13" height="20" rx="6" fill="#e8473d"/>`,
+    <path d="M27 66 Q27 30 60 30 Q93 30 93 66" fill="none" stroke="#5d6b8a" stroke-width="4.5" stroke-linecap="round"/>
+    <rect x="20" y="58" width="13" height="20" rx="6" fill="#e8857b"/>
+    <rect x="87" y="58" width="13" height="20" rx="6" fill="#e8857b"/>`,
   bowtie: () => `
-    <path d="M60 104 L46 97 L46 111 Z M60 104 L74 97 L74 111 Z" fill="#e8473d"/>
-    <circle cx="60" cy="104" r="3.5" fill="#b8322b"/>`,
+    <path d="M60 99 L46 92 L46 106 Z M60 99 L74 92 L74 106 Z" fill="#e8857b"/>
+    <circle cx="60" cy="99" r="3.4" fill="#c9675e"/>`,
   beret: () => `
-    <ellipse cx="60" cy="49" rx="25" ry="8" fill="#2b2622"/>
-    <path d="M36 49 Q38 34 60 33 Q82 34 84 49 Z" fill="#2b2622"/>
-    <rect x="58" y="27" width="4" height="7" rx="2" fill="#2b2622"/>`,
-  notes: () => '',
-};
-
-const MUSICAL = {
-  rat: 'headphones', ox: 'bowtie', tiger: 'headphones', rabbit: 'beret',
-  dragon: 'bowtie', snake: 'beret', horse: 'headphones', goat: 'bowtie',
-  monkey: 'headphones', rooster: 'bowtie', dog: 'headphones', pig: 'beret',
+    <ellipse cx="60" cy="42" rx="25" ry="7.5" fill="#5d6b8a"/>
+    <path d="M36 42 Q38 27 60 26 Q82 27 84 42 Z" fill="#5d6b8a"/>
+    <rect x="58" y="20" width="4" height="7" rx="2" fill="#5d6b8a"/>`,
 };
 
 export const CHARACTER_IDS = Object.keys(ANIMALS);
 export function characterName(id) { return ANIMALS[id]?.name || ''; }
 
-// Returns an SVG string for a character. variant: 'plain' or 'musical'.
-export function characterSVG(id, variant = 'plain', { title = '' } = {}) {
-  const a = ANIMALS[id] || ANIMALS.rooster;
-  const clip = `clip-${id}-${variant}-${Math.random().toString(36).slice(2, 7)}`;
-  const acc = variant === 'musical' ? ACCESSORIES[MUSICAL[id]]() : '';
-  const notes = variant === 'musical' ? NOTE(23, 26, 0.9) + NOTE(90, 22, 0.75) : '';
-  return `<svg viewBox="0 0 120 124" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="${title || a.name}">
-    <circle cx="60" cy="64" r="58" fill="#d9d3c8"/>
-    <circle cx="60" cy="60" r="58" fill="#fff"/>
-    <clipPath id="${clip}"><circle cx="60" cy="60" r="51"/></clipPath>
-    <g clip-path="url(#${clip})">
-      <circle cx="60" cy="60" r="51" fill="${a.bg}"/>
-      ${notes}
-      <g transform="translate(60 84) scale(1.12) translate(-60 -84)">
-        ${a.draw()}
-        ${acc}
-      </g>
-    </g>
+// Returns an SVG string for a character (always the musical version).
+export function characterSVG(id, _variant = 'musical', { title = '' } = {}) {
+  const a = ANIMALS[id] || ANIMALS.dragon;
+  return `<svg viewBox="0 0 120 120" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="${title || a.name}">
+    <circle cx="60" cy="62" r="54" fill="${a.bg}"/>
+    ${a.draw()}
+    ${ACCESSORIES[a.acc]()}
   </svg>`;
 }
