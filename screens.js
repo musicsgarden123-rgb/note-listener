@@ -1,4 +1,4 @@
-import { CHARACTER_IDS, characterSVG, characterName } from './characters.js?v=4';
+import { CHARACTER_IDS, characterSVG, characterName } from './characters.js?v=5';
 
 // The pages around the practice screen: splash, intro, the first-time setup
 // (onboarding), home, drills, profile, theme and settings.

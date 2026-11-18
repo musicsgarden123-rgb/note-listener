@@ -109,25 +109,27 @@ const CHARACTERS = {
   },
 
   phoenix: {
-    name: 'Phoenix', pal: ['#8a4560', '#f7c79a', '#ffe6c2'],
+    name: 'Phoenix', pal: ['#7a2f4a', '#f6b98a', '#ffe2b8'],
     draw: (u) => `
       <defs>
-        <radialGradient id="${u}body" cx=".45" cy=".35" r=".8"><stop offset="0" stop-color="#fff0b8"/><stop offset="1" stop-color="#f6a650"/></radialGradient>
-        <linearGradient id="${u}flame" x1="1" y1="1" x2="0" y2="0"><stop offset="0" stop-color="#ffd27a" stop-opacity=".95"/><stop offset=".6" stop-color="#ff8f73" stop-opacity=".7"/><stop offset="1" stop-color="#ff6f8a" stop-opacity=".1"/></linearGradient>
-        <linearGradient id="${u}tail" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#ffb35c"/><stop offset="1" stop-color="#ff7d8a" stop-opacity=".2"/></linearGradient>
+        <radialGradient id="${u}body" cx=".45" cy=".3" r=".85"><stop offset="0" stop-color="#ffe9a8"/><stop offset=".6" stop-color="#ffa64d"/><stop offset="1" stop-color="#f0643f"/></radialGradient>
+        <linearGradient id="${u}wing" x1="0" y1="1" x2="0" y2="0"><stop offset="0" stop-color="#ffd36b"/><stop offset=".55" stop-color="#ff8a3d"/><stop offset="1" stop-color="#e8434a"/></linearGradient>
+        <linearGradient id="${u}cov" x1="0" y1="1" x2="0" y2="0"><stop offset="0" stop-color="#fff0b0"/><stop offset="1" stop-color="#ffb04d"/></linearGradient>
+        <linearGradient id="${u}tail" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#ffb34d"/><stop offset=".7" stop-color="#ef5a45"/><stop offset="1" stop-color="#ef5a45" stop-opacity=".1"/></linearGradient>
+        <linearGradient id="${u}crest" x1="0" y1="1" x2="0" y2="0"><stop offset="0" stop-color="#ffb04d"/><stop offset="1" stop-color="#e8434a"/></linearGradient>
       </defs>
-      <g opacity=".95">${mirror(`
-        <path d="M54 66 C44 44 28 34 8 36 C18 42 20 48 26 52 C14 54 10 60 12 66 C22 64 28 66 32 70 C24 74 24 82 28 86 C38 80 48 76 54 74 Z" fill="url(#${u}flame)"/>`)}
-      </g>
-      ${mirror(`<path d="M56 84 C52 98 44 108 36 118 C46 114 54 104 58 92 Z" fill="url(#${u}tail)"/>`)}
-      <path d="M58 86 C58 100 60 110 60 122 C62 110 64 100 62 86 Z" fill="url(#${u}tail)"/>
-      <ellipse cx="60" cy="74" rx="13" ry="16" fill="url(#${u}body)"/>
-      <path d="M60 36 C57 30 56 24 52 20 M60 36 C60 28 60 22 60 16 M60 36 C63 30 64 24 68 20" fill="none" stroke="#ffb35c" stroke-width="1.4" stroke-linecap="round"/>
-      <circle cx="52" cy="20" r="2.4" fill="#ffd27a"/><circle cx="60" cy="16" r="2.6" fill="#ffd27a"/><circle cx="68" cy="20" r="2.4" fill="#ffd27a"/>
-      <circle cx="60" cy="49" r="13" fill="url(#${u}body)"/>
-      ${closedEyes(60, 48, 5.2)} ${blush(60, 53, 8.5)}
-      <path d="M57.5 52 L62.5 52 L60 56.5 Z" fill="#e5844a"/>
-      <circle cx="60" cy="76" r="7" fill="#fff" opacity=".7" filter="url(#${u}blur)"/>`,
+      ${mirror(`<path d="M57 84 C54 96 46 106 40 116 C46 116 52 110 56 102 C56 110 54 116 52 122 C58 114 60 100 60 86 Z" fill="url(#${u}tail)"/>`)}
+      <circle cx="47" cy="111" r="2" fill="#fff3c0" opacity=".85"/><circle cx="73" cy="111" r="2" fill="#fff3c0" opacity=".85"/>
+      <g opacity=".97">${mirror(`<path d="M0 0 C8 -11.4 6.4 -28.5 0 -38 C-6.4 -28.5 -8 -11.4 0 0 Z" fill="url(#${u}wing)" transform="translate(53 68) rotate(-82)"/><path d="M0 0 C8 -13.2 6.4 -33.0 0 -44 C-6.4 -33.0 -8 -13.2 0 0 Z" fill="url(#${u}wing)" transform="translate(53 68) rotate(-68)"/><path d="M0 0 C8 -13.799999999999999 6.4 -34.5 0 -46 C-6.4 -34.5 -8 -13.799999999999999 0 0 Z" fill="url(#${u}wing)" transform="translate(53 68) rotate(-54)"/><path d="M0 0 C8 -13.2 6.4 -33.0 0 -44 C-6.4 -33.0 -8 -13.2 0 0 Z" fill="url(#${u}wing)" transform="translate(53 68) rotate(-40)"/><path d="M0 0 C8 -11.4 6.4 -28.5 0 -38 C-6.4 -28.5 -8 -11.4 0 0 Z" fill="url(#${u}wing)" transform="translate(53 68) rotate(-27)"/>`)}</g>
+      ${mirror(`<path d="M0 0 C7 -7.199999999999999 5.6000000000000005 -18.0 0 -24 C-5.6000000000000005 -18.0 -7 -7.199999999999999 0 0 Z" fill="url(#${u}cov)" transform="translate(54 69) rotate(-74)"/><path d="M0 0 C7 -8.4 5.6000000000000005 -21.0 0 -28 C-5.6000000000000005 -21.0 -7 -8.4 0 0 Z" fill="url(#${u}cov)" transform="translate(54 69) rotate(-58)"/><path d="M0 0 C7 -8.1 5.6000000000000005 -20.25 0 -27 C-5.6000000000000005 -20.25 -7 -8.1 0 0 Z" fill="url(#${u}cov)" transform="translate(54 69) rotate(-43)"/><path d="M0 0 C7 -6.6 5.6000000000000005 -16.5 0 -22 C-5.6000000000000005 -16.5 -7 -6.6 0 0 Z" fill="url(#${u}cov)" transform="translate(54 69) rotate(-30)"/>`)}
+      <path d="M60 34 C55 28 55 20 59 13 C59 20 62 25 64 30 Z" fill="url(#${u}crest)"/>
+      <path d="M57 36 C51 32 49 26 51 19 C53 25 56 28 60 31 Z" fill="url(#${u}crest)" opacity=".9"/>
+      <path d="M63 36 C69 32 71 26 69 19 C67 25 64 28 60 31 Z" fill="url(#${u}crest)" opacity=".9"/>
+      <ellipse cx="60" cy="74" rx="12.5" ry="16" fill="url(#${u}body)"/>
+      <path d="M53 70 Q56 73 60 70 Q64 73 67 70 M54 77 Q57 80 60 77 Q63 80 66 77" fill="none" stroke="#fff3c0" stroke-width=".8" opacity=".8"/>
+      <circle cx="60" cy="50" r="12.5" fill="url(#${u}body)"/>
+      ${closedEyes(60, 49, 5.2)} ${blush(60, 54, 8.5)}
+      <path d="M57.5 53 L62.5 53 L60 57.5 Z" fill="#c9562f"/>`,
   },
 
   unicorn: {
@@ -247,6 +249,16 @@ const CHARACTERS = {
   },
 };
 
+// Small nudges so each character sits in the middle of its circle.
+const SHIFT = { angel: [0, -9], dragon: [0, -9], fairy: [0, -11], fox: [0, -8], mermaid: [-5, -7] };
+
+// For measuring only: the character with no background.
+export function characterLayerSVG(id) {
+  const c = CHARACTERS[id];
+  const u = `m${++uidCount}`;
+  return `<svg viewBox="0 0 120 120" xmlns="http://www.w3.org/2000/svg"><defs><filter id="${u}soft"><feGaussianBlur stdDeviation="1.6"/></filter><filter id="${u}blur"><feGaussianBlur stdDeviation="4"/></filter></defs><g transform="translate(${SHIFT[id]?.[0] || 0} ${SHIFT[id]?.[1] || 0})">${c.draw(u)}</g></svg>`;
+}
+
 export const CHARACTER_IDS = Object.keys(CHARACTERS);
 export function characterName(id) { return CHARACTERS[id]?.name || ''; }
 
@@ -255,6 +267,6 @@ export function characterSVG(id, _variant = 'musical', { title = '' } = {}) {
   const c = CHARACTERS[id] || CHARACTERS.dragon;
   const u = `ch${++uidCount}`;
   return `<svg viewBox="0 0 120 120" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="${title || c.name}">
-    ${scene(u, c.pal, c.draw(u), c.extras ? { extras: c.extras } : {})}
+    ${scene(u, c.pal, `<g transform="translate(${SHIFT[id]?.[0] || 0} ${SHIFT[id]?.[1] || 0})">${c.draw(u)}</g>`, c.extras ? { extras: c.extras } : {})}
   </svg>`;
 }
