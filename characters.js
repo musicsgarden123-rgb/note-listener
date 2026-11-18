@@ -68,17 +68,18 @@ const CHARACTERS = {
         <path d="M54 70 C42 50 22 42 10 50 C16 56 18 62 26 66 C16 68 14 76 20 82 C30 84 38 80 44 78 C40 86 42 92 48 94 C54 88 56 80 56 74 Z" fill="url(#${u}wing)"/>
         <path d="M50 70 C40 58 28 54 18 56 M48 76 C38 72 30 74 24 78" fill="none" stroke="#fff" stroke-width=".8" opacity=".7"/>`)}
       </g>
+      <path d="M56 56 h8 v12 h-8 Z" fill="#f5d6c4"/>
       <path d="M47 68 Q60 62 73 68 L86 118 Q60 124 34 118 Z" fill="url(#${u}robe)"/>
       <path d="M60 70 L58 118 M52 74 L46 118 M68 74 L74 118" stroke="#c2d6ee" stroke-width=".8" opacity=".7"/>
       <rect x="56.5" y="58" width="7" height="12" rx="3" fill="#f6d9c6"/>
-      <g transform="translate(0 7)"><path d="M47 50 Q46 34 60 34 Q74 34 73 50 L75 68 Q60 72 45 68 Z" fill="#f2d58f"/>
+      <g transform="translate(0 7)"><g transform="translate(0 5)"><path d="M47 50 Q46 34 60 34 Q74 34 73 50 L75 68 Q60 72 45 68 Z" fill="#f2d58f"/>
       <circle cx="60" cy="49" r="12.5" fill="#fde8d8"/>
       <path d="M47.5 48 Q47 35 60 35 Q73 35 72.5 48 Q68 41 62 42 Q60 45 56 42 Q51 43 47.5 48 Z" fill="#f2d58f"/>
-      ${closedEyes(60, 51, 4.6)} ${blush(60, 55, 7.5)} ${smile(60, 57.5)}</g>
-      <circle cx="60" cy="80" r="9" fill="#fff" filter="url(#${u}blur)"/>
-      <path d="M55 79 Q60 74 65 79 Q60 84 55 79 Z" fill="#fde8d8"/>
-      <g transform="translate(0 7)"><ellipse cx="60" cy="29" rx="11" ry="3.2" fill="none" stroke="#ffe9a3" stroke-width="3" opacity=".6" filter="url(#${u}soft)"/>
-      <ellipse cx="60" cy="29" rx="11" ry="3.2" fill="none" stroke="#f6d36b" stroke-width="1.8"/></g>`,
+      ${closedEyes(60, 51, 4.6)} ${blush(60, 55, 7.5)} ${smile(60, 57.5)}</g></g>
+      <g transform="translate(0 5)"><circle cx="60" cy="80" r="9" fill="#fff" filter="url(#${u}blur)"/>
+      <path d="M55 79 Q60 74 65 79 Q60 84 55 79 Z" fill="#fde8d8"/></g>
+      <g transform="translate(0 7)"><g transform="translate(0 5)"><ellipse cx="60" cy="29" rx="11" ry="3.2" fill="none" stroke="#ffe9a3" stroke-width="3" opacity=".6" filter="url(#${u}soft)"/>
+      <ellipse cx="60" cy="29" rx="11" ry="3.2" fill="none" stroke="#f6d36b" stroke-width="1.8"/></g></g>`,
   },
 
   dragon: {
@@ -94,16 +95,17 @@ const CHARACTERS = {
       <ellipse cx="60" cy="99" rx="10" ry="12" fill="#f6efcf"/>
       <path d="M52 94 H68 M51 100 H69 M52 106 H68" stroke="#e3d6a6" stroke-width=".8"/>
       <ellipse cx="60" cy="80" rx="11" ry="8" fill="#8fd6b2"/>
-      <g transform="translate(0 9)">${mirror(`<path d="M49 42 C46 34 44 28 40 24 C46 26 52 32 54 40 Z" fill="#f7e2a3"/>`)}
+      <g transform="translate(0 9)"><path d="M52 66 Q60 64 68 66 L70 84 Q60 86 50 84 Z" fill="#8fd6b2"/>
+      <g transform="translate(0 8)">${mirror(`<path d="M49 42 C46 34 44 28 40 24 C46 26 52 32 54 40 Z" fill="#f7e2a3"/>`)}
       ${mirror(`<path d="M42 50 C34 46 30 48 26 52 C32 54 36 56 42 56 Z" fill="#9adbb9"/>`)}
       <path d="M50 38 Q52 30 56 36 Q58 28 62 35 Q66 29 68 37 Q71 33 72 40" fill="#f6b3c1"/>
       <ellipse cx="60" cy="56" rx="19" ry="16" fill="url(#${u}skin)"/>
       <ellipse cx="60" cy="64" rx="11" ry="7.5" fill="#e3f8ea"/>
       <ellipse cx="56.5" cy="62.5" rx="1.2" ry=".9" fill="#4d9a76"/><ellipse cx="63.5" cy="62.5" rx="1.2" ry=".9" fill="#4d9a76"/>
-      ${closedEyes(60, 53, 7.5, 3)} ${blush(60, 58, 12.5, 2.8)} ${smile(60, 67, 2.4)}</g>
-      <circle cx="60" cy="86" r="8" fill="#fff" filter="url(#${u}blur)"/>
+      ${closedEyes(60, 53, 7.5, 3)} ${blush(60, 58, 12.5, 2.8)} ${smile(60, 67, 2.4)}</g></g>
+      <g transform="translate(0 7)"><circle cx="60" cy="86" r="8" fill="#fff" filter="url(#${u}blur)"/>
       <circle cx="60" cy="86" r="5" fill="#fff"/>
-      <ellipse cx="53" cy="86" rx="3.4" ry="2.6" fill="#8fd6b2"/><ellipse cx="67" cy="86" rx="3.4" ry="2.6" fill="#8fd6b2"/>`,
+      <ellipse cx="53" cy="86" rx="3.4" ry="2.6" fill="#8fd6b2"/><ellipse cx="67" cy="86" rx="3.4" ry="2.6" fill="#8fd6b2"/></g>`,
   },
 
   phoenix: {
@@ -161,17 +163,18 @@ const CHARACTERS = {
         <linearGradient id="${u}tail" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#7fe0cf"/><stop offset="1" stop-color="#3a9fb6"/></linearGradient>
         <linearGradient id="${u}fin" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#9ff0e2" stop-opacity=".9"/><stop offset="1" stop-color="#fff" stop-opacity=".3"/></linearGradient>
       </defs>
-      <path d="M46 46 C40 64 38 82 32 98 C42 96 48 88 50 78 L70 78 C72 88 78 96 88 98 C82 82 80 64 74 46 Z" fill="url(#${u}hair)"/>
+      <path d="M60 41 C49 41 45 47 46 54 C40 68 38 84 32 98 C42 96 48 88 50 78 L70 78 C72 88 78 96 88 98 C82 84 80 68 74 54 C75 47 71 41 60 41 Z" fill="url(#${u}hair)"/>
       <path d="M52 78 C50 94 56 104 70 106 C80 107 88 104 92 98 C84 100 74 98 70 92 C68 88 68 82 68 78 Z" fill="url(#${u}tail)"/>
       <path d="M90 98 C96 88 104 86 108 90 C102 92 100 98 98 104 C102 108 102 114 98 116 C96 110 92 104 90 98 Z" fill="url(#${u}fin)"/>
       <path d="M56 86 q3 2 6 0 M58 92 q3 2 6 0 M62 98 q3 2 6 0 M70 101 q3 2 6 0" fill="none" stroke="#c9fff3" stroke-width=".8" opacity=".8"/>
+      <path d="M56 56 h8 v12 h-8 Z" fill="#f5d6c4"/>
       <path d="M52 66 Q60 62 68 66 L69 80 Q60 82 51 80 Z" fill="#fde5d6"/>
       <circle cx="56" cy="71" r="3.2" fill="#c9b3f0"/><circle cx="64" cy="71" r="3.2" fill="#c9b3f0"/>
       <rect x="56.5" y="60" width="7" height="9" rx="3" fill="#f6d9c6"/>
-      <g transform="translate(0 6)"><circle cx="60" cy="50" r="12.5" fill="#fde8d8"/>
+      <g transform="translate(0 6)"><g transform="translate(0 4)"><circle cx="60" cy="50" r="12.5" fill="#fde8d8"/>
       <path d="M47.5 50 Q46 36 60 36 Q74 36 72.5 50 Q70 43 64 42 Q60 46 54 42 Q49 44 47.5 50 Z" fill="url(#${u}hair)"/>
       <path d="M68 40 l1.4 3 l3.2 .4 l-2.4 2.2 l.6 3.2 l-2.8 -1.6 l-2.8 1.6 l.6 -3.2 l-2.4 -2.2 l3.2 -.4 Z" fill="#ffe08a"/>
-      ${closedEyes(60, 52, 4.6)} ${blush(60, 56, 7.5)} ${smile(60, 58.5)}</g>`,
+      ${closedEyes(60, 52, 4.6)} ${blush(60, 56, 7.5)} ${smile(60, 58.5)}</g></g>`,
   },
 
   fairy: {
@@ -184,17 +187,18 @@ const CHARACTERS = {
       ${mirror(`
         <path d="M54 68 C44 50 26 44 18 52 C16 62 30 70 52 72 Z" fill="url(#${u}wing)" stroke="#fff" stroke-opacity=".7" stroke-width=".7"/>
         <path d="M54 74 C42 78 30 88 34 96 C42 98 50 88 55 78 Z" fill="url(#${u}wing)" stroke="#fff" stroke-opacity=".7" stroke-width=".7"/>`)}
+      <path d="M56 56 h8 v12 h-8 Z" fill="#f5d6c4"/>
       <path d="M52 66 Q60 62 68 66 L72 80 Q82 96 80 104 Q70 100 66 106 Q60 100 54 106 Q50 100 40 104 Q38 96 48 80 Z" fill="url(#${u}dress)"/>
       <path d="M57 104 L56 120 M63 104 L64 120" stroke="#fde8d8" stroke-width="3" stroke-linecap="round"/>
       <circle cx="60" cy="78" r="8" fill="#fff9c8" filter="url(#${u}blur)"/>
       <circle cx="60" cy="78" r="3.2" fill="#fffbe0"/>
       <ellipse cx="55.5" cy="80" rx="2.4" ry="2" fill="#fde8d8"/><ellipse cx="64.5" cy="80" rx="2.4" ry="2" fill="#fde8d8"/>
       <rect x="56.5" y="58" width="7" height="10" rx="3" fill="#f6d9c6"/>
-      <g transform="translate(0 6)"><path d="M47 50 Q45 34 60 34 Q75 34 73 50 L74 60 Q70 56 70 50 L50 50 Q50 56 46 60 Z" fill="#b9875a"/>
+      <g transform="translate(0 6)"><g transform="translate(0 4)"><path d="M47 50 Q45 34 60 34 Q75 34 73 50 L74 60 Q70 56 70 50 L50 50 Q50 56 46 60 Z" fill="#b9875a"/>
       <circle cx="60" cy="49" r="12.5" fill="#fde8d8"/>
       <path d="M47.5 48 Q47 36 60 35 Q73 36 72.5 48 Q66 42 58 44 Q52 43 47.5 48 Z" fill="#b9875a"/>
       <circle cx="49" cy="40" r="2.4" fill="#f7a8c4"/><circle cx="54" cy="36.5" r="2.2" fill="#fff"/><circle cx="60" cy="35.2" r="2.4" fill="#f7c76a"/><circle cx="66" cy="36.5" r="2.2" fill="#fff"/><circle cx="71" cy="40" r="2.4" fill="#f7a8c4"/>
-      ${closedEyes(60, 51, 4.6)} ${blush(60, 55, 7.5)} ${smile(60, 57.5)}</g>`,
+      ${closedEyes(60, 51, 4.6)} ${blush(60, 55, 7.5)} ${smile(60, 57.5)}</g></g>`,
   },
 
   fox: {
@@ -208,13 +212,13 @@ const CHARACTERS = {
       ${[-64, -34, 0, 34, 64].map((a) => `<path d="M60 104 C42 92 42 62 60 42 C78 62 78 92 60 104 Z" fill="url(#${u}tail)" transform="rotate(${a} 60 104)" opacity=".95"/>`).join('')}
       <ellipse cx="60" cy="92" rx="12" ry="12" fill="url(#${u}fur)"/>
       <ellipse cx="54" cy="102" rx="4" ry="3" fill="#fff"/><ellipse cx="66" cy="102" rx="4" ry="3" fill="#fff"/>
-      <g transform="translate(0 8)">${mirror(`<path d="M45 52 L40 30 L56 44 Z" fill="#f8d2ae"/><path d="M45.5 48 L43 35 L52.5 43.5 Z" fill="#f4a7b9"/>`)}
+      <g transform="translate(0 8)"><g transform="translate(0 7)">${mirror(`<path d="M45 52 L40 30 L56 44 Z" fill="#f8d2ae"/><path d="M45.5 48 L43 35 L52.5 43.5 Z" fill="#f4a7b9"/>`)}
       <path d="M41 58 Q42 42 60 42 Q78 42 79 58 Q78 72 60 76 Q42 72 41 58 Z" fill="url(#${u}fur)"/>
       <path d="M58 46 Q60 50 62 46" fill="none" stroke="#e86f7a" stroke-width="1.4" stroke-linecap="round"/>
       <ellipse cx="60" cy="66" rx="2" ry="1.4" fill="${INK}"/>
       ${closedEyes(60, 58, 7, 3)}
       <path d="M50 57 L48.5 58.5 M70 57 L71.5 58.5" stroke="${INK}" stroke-width="1" stroke-linecap="round"/>
-      ${blush(60, 63, 11)} ${smile(60, 69, 2)}</g>
+      ${blush(60, 63, 11)} ${smile(60, 69, 2)}</g></g>
       <circle cx="26" cy="64" r="7" fill="url(#${u}fire)"/><circle cx="26" cy="64" r="2.2" fill="#fff"/>
       <circle cx="94" cy="58" r="6" fill="url(#${u}fire)"/><circle cx="94" cy="58" r="1.8" fill="#fff"/>`,
   },
@@ -229,17 +233,17 @@ const CHARACTERS = {
       <circle cx="60" cy="52" r="36" fill="#fff6d6" opacity=".6" filter="url(#${u}blur)"/>
       <circle cx="60" cy="52" r="31" fill="url(#${u}moon)"/>
       <circle cx="46" cy="40" r="3.5" fill="#efdca0" opacity=".6"/><circle cx="78" cy="62" r="4.5" fill="#efdca0" opacity=".5"/><circle cx="74" cy="34" r="2.4" fill="#efdca0" opacity=".6"/>
-      <g transform="translate(0 7)"><ellipse cx="51" cy="40" rx="5.5" ry="16" fill="url(#${u}fur)" transform="rotate(-12 51 40)"/>
+      <g transform="translate(0 7)"><g transform="translate(0 4)"><ellipse cx="51" cy="40" rx="5.5" ry="16" fill="url(#${u}fur)" transform="rotate(-12 51 40)"/>
       <ellipse cx="51" cy="41" rx="2.6" ry="11" fill="#f6c3d3" transform="rotate(-12 51 41)"/>
       <ellipse cx="69" cy="40" rx="5.5" ry="16" fill="url(#${u}fur)" transform="rotate(12 69 40)"/>
-      <ellipse cx="69" cy="41" rx="2.6" ry="11" fill="#f6c3d3" transform="rotate(12 69 41)"/></g>
-      <ellipse cx="60" cy="98" rx="18" ry="17" fill="url(#${u}fur)"/>
-      <g transform="translate(0 7)"><ellipse cx="60" cy="66" rx="15" ry="13.5" fill="url(#${u}fur)"/>
+      <ellipse cx="69" cy="41" rx="2.6" ry="11" fill="#f6c3d3" transform="rotate(12 69 41)"/></g></g>
+      <ellipse cx="60" cy="96" rx="18" ry="17" fill="url(#${u}fur)"/>
+      <g transform="translate(0 7)"><g transform="translate(0 4)"><ellipse cx="60" cy="66" rx="15" ry="13.5" fill="url(#${u}fur)"/>
       ${closedEyes(60, 65, 6)} ${blush(60, 70, 9.5)}
-      <path d="M58.6 69 L61.4 69 L60 70.6 Z" fill="#e88aa3"/> ${smile(60, 72, 1.8)}</g>
-      <circle cx="60" cy="88" r="8" fill="#fff6c0" filter="url(#${u}blur)"/>
+      <path d="M58.6 69 L61.4 69 L60 70.6 Z" fill="#e88aa3"/> ${smile(60, 72, 1.8)}</g></g>
+      <g transform="translate(0 6)"><circle cx="60" cy="88" r="8" fill="#fff6c0" filter="url(#${u}blur)"/>
       <path d="M60 82 l1.8 4 l4.4 .5 l-3.3 3 l.9 4.3 l-3.8 -2.2 l-3.8 2.2 l.9 -4.3 l-3.3 -3 l4.4 -.5 Z" fill="#ffe27a"/>
-      <ellipse cx="53" cy="90" rx="3.2" ry="2.6" fill="#fff"/><ellipse cx="67" cy="90" rx="3.2" ry="2.6" fill="#fff"/>`,
+      <ellipse cx="53" cy="90" rx="3.2" ry="2.6" fill="#fff"/><ellipse cx="67" cy="90" rx="3.2" ry="2.6" fill="#fff"/></g>`,
   },
 };
 
