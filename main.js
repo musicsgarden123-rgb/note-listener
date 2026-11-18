@@ -1,5 +1,5 @@
 import { detectPitch, freqToMidi, midiToFreq, rms } from './pitch.js?v=4';
-import { initScreens, showScreen } from './screens.js?v=7';
+import { initScreens, showScreen } from './screens.js?v=8';
 
 // ======================================================================
 // Constants

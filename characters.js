@@ -249,35 +249,26 @@ const CHARACTERS = {
   },
 
   bear: {
-    name: 'Bear', pal: ['#3a2418', '#c8955e', '#ffe0b8'],
+    name: 'Bear', pal: ['#6a4426', '#f0cf8f', '#fff2cf'],
     draw: (u) => `
       <defs>
-        <radialGradient id="${u}fur" gradientUnits="userSpaceOnUse" cx="54" cy="50" r="60"><stop offset="0" stop-color="#b47a4e"/><stop offset="1" stop-color="#5e3a24"/></radialGradient>
-        <filter id="${u}fuzz" x="-10%" y="-10%" width="120%" height="120%"><feTurbulence type="fractalNoise" baseFrequency=".75" numOctaves="1" seed="3"/><feDisplacementMap in="SourceGraphic" scale="1.6"/></filter>
+        <radialGradient id="${u}fur" cx=".45" cy=".35" r=".8"><stop offset="0" stop-color="#d49a68"/><stop offset="1" stop-color="#8f5a38"/></radialGradient>
+        <linearGradient id="${u}pot" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#ffe48a"/><stop offset="1" stop-color="#f0a83c"/></linearGradient>
       </defs>
-      <g filter="url(#${u}fuzz)">
-        <ellipse cx="60" cy="96" rx="27" ry="25" fill="url(#${u}fur)"/>
-        <circle cx="40" cy="36" r="8.5" fill="url(#${u}fur)"/><circle cx="80" cy="36" r="8.5" fill="url(#${u}fur)"/>
-        <ellipse cx="60" cy="55" rx="23" ry="20" fill="url(#${u}fur)"/>
-      </g>
-      <circle cx="40" cy="36" r="4.4" fill="#d9a27a"/><circle cx="80" cy="36" r="4.4" fill="#d9a27a"/>
-            <path d="M42 72 Q60 80 78 72 L77 78 Q60 86 43 78 Z" fill="#c9483f"/>
-      <path d="M70 79 L78 90 L72 89 L68 81 Z" fill="#a8382f"/>
-      <g filter="url(#${u}fuzz)">
-        <path d="M36 96 Q56 101 74 90" fill="none" stroke="#6e4428" stroke-width="10" stroke-linecap="round"/>
-        <circle cx="76" cy="89" r="5.6" fill="#7a4c30"/>
-        <path d="M84 96 Q64 101 46 90" fill="none" stroke="#8a5a3a" stroke-width="10" stroke-linecap="round"/>
-        <circle cx="44" cy="89" r="5.6" fill="#966442"/>
-      </g>
-      <ellipse cx="60" cy="63" rx="10" ry="7.5" fill="#e3bf98"/>
-      <path d="M56.5 58.5 Q60 57 63.5 58.5 Q62.5 62 60 62.4 Q57.5 62 56.5 58.5 Z" fill="${INK}"/>
-      <path d="M55 66 Q59 68.5 65.5 65" fill="none" stroke="${INK}" stroke-width="1.4" stroke-linecap="round"/>
-      <path d="M62.6 66.3 L64.6 65.6 L64 68.6 Z" fill="#fff"/>
-      <circle cx="50.5" cy="53" r="3" fill="${INK}"/><circle cx="51.4" cy="52" r="1" fill="#fff"/>
-      <circle cx="69.5" cy="53" r="3" fill="${INK}"/><circle cx="70.4" cy="52" r="1" fill="#fff"/>
-      <path d="M44.5 46.5 L55 49.5 M75.5 46.5 L65 49.5" stroke="#2e1c12" stroke-width="2.6" stroke-linecap="round"/>
-      <path d="M67 43 L73 60" stroke="#f0b8a6" stroke-width="1.6" stroke-linecap="round"/>
-      <path d="M68.2 47.5 L71.2 46.5 M70.2 53 L73.2 52" stroke="#f0b8a6" stroke-width="1.1" stroke-linecap="round"/>`,
+      <ellipse cx="60" cy="92" rx="29" ry="25" fill="url(#${u}fur)"/>
+      <ellipse cx="60" cy="97" rx="18" ry="16" fill="#f1d2b0"/>
+      ${mirror(`<circle cx="40" cy="38" r="8" fill="#a36b45"/><circle cx="40" cy="38" r="4.3" fill="#e6b089"/>`)}
+      <ellipse cx="60" cy="55" rx="23" ry="18" fill="url(#${u}fur)"/>
+      <ellipse cx="60" cy="61" rx="9" ry="6.5" fill="#f1d2b0"/>
+      <ellipse cx="60" cy="58" rx="3" ry="2.2" fill="${INK}"/>
+      ${closedEyes(60, 51, 7.5, 3)} ${blush(60, 57, 14, 3)} ${smile(60, 63, 2)}
+      <circle cx="60" cy="90" r="9" fill="#ffe9a0" opacity=".8" filter="url(#${u}blur)"/>
+      <path d="M52 84 h16 l-1 3 q2 6 -2 10 h-10 q-4 -4 -2 -10 Z" fill="url(#${u}pot)"/>
+      <rect x="51" y="82" width="18" height="3.4" rx="1.7" fill="#c98a3c"/>
+      <path d="M56 84 q-1 4 1 6" fill="none" stroke="#fff6c8" stroke-width="1.2" stroke-linecap="round"/>
+      <ellipse cx="49" cy="91" rx="5" ry="4" fill="#a36b45"/><ellipse cx="71" cy="91" rx="5" ry="4" fill="#a36b45"/>
+      <ellipse cx="44" cy="113" rx="7" ry="4.5" fill="#a36b45"/><ellipse cx="76" cy="113" rx="7" ry="4.5" fill="#a36b45"/>
+      <ellipse cx="44" cy="113" rx="3.6" ry="2.4" fill="#e6b089"/><ellipse cx="76" cy="113" rx="3.6" ry="2.4" fill="#e6b089"/>`,
   },
 
   cyclops: {
