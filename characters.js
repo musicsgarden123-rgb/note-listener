@@ -1,189 +1,252 @@
-// The 12 zodiac characters, drawn as flat vector art in one soft, pastel style:
-// a coloured circle, a big simple face, small dot eyes, a tiny nose and mouth.
-// Every character wears a small musical touch (headphones, a bow tie or a beret).
+// Profile characters: a small cast of mythological figures, each drawn as a soft,
+// glowing scene (light beams, sparkles, a gentle glow, closed-eye faces), in the
+// same style as the Clarity angel. All original artwork drawn in code.
 
-const INK = '#3b2a20';
+const INK = '#4a3a4a';
+let uidCount = 0;
 
-const PASTEL = {
-  green: '#d6e9a1', pink: '#f4c2d2', blue: '#9cc3e8',
-  teal: '#94d6d2', lilac: '#d2b8e3', yellow: '#f6dc8f', peach: '#f7c7a6',
-};
+// ---------- Shared pieces ----------
 
-const eyes = (y = 64, gap = 15, r = 4.6) => `
-  <circle cx="${60 - gap}" cy="${y}" r="${r}" fill="${INK}"/><circle cx="${60 - gap + 1.5}" cy="${y - 1.6}" r="1.4" fill="#fff"/>
-  <circle cx="${60 + gap}" cy="${y}" r="${r}" fill="${INK}"/><circle cx="${60 + gap + 1.5}" cy="${y - 1.6}" r="1.4" fill="#fff"/>`;
+const closedEyes = (cx, cy, gap = 5, w = 2.6) => `
+  <path d="M${cx - gap - w} ${cy} Q${cx - gap} ${cy + 2.4} ${cx - gap + w} ${cy} M${cx + gap - w} ${cy} Q${cx + gap} ${cy + 2.4} ${cx + gap + w} ${cy}"
+    fill="none" stroke="${INK}" stroke-width="1.3" stroke-linecap="round"/>`;
 
-const nose = (y = 74, w = 4.5, fill = INK) =>
-  `<path d="M${60 - w} ${y} Q60 ${y - 2.2} ${60 + w} ${y} Q61.5 ${y + 4} 60 ${y + 4.4} Q58.5 ${y + 4} ${60 - w} ${y} Z" fill="${fill}"/>`;
+const blush = (cx, cy, gap = 8, r = 2.6) => `
+  <ellipse cx="${cx - gap}" cy="${cy}" rx="${r}" ry="${r * 0.6}" fill="#f29bb0" opacity=".55"/>
+  <ellipse cx="${cx + gap}" cy="${cy}" rx="${r}" ry="${r * 0.6}" fill="#f29bb0" opacity=".55"/>`;
 
-const mouth = (y = 81, w = 5) =>
-  `<path d="M60 ${y - 2.4} V${y} M${60 - w} ${y - 0.6} Q${60 - w / 2} ${y + 3.6} 60 ${y} Q${60 + w / 2} ${y + 3.6} ${60 + w} ${y - 0.6}" fill="none" stroke="${INK}" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"/>`;
+const smile = (cx, cy, w = 1.8) =>
+  `<path d="M${cx - w} ${cy} Q${cx} ${cy + 1.6} ${cx + w} ${cy}" fill="none" stroke="${INK}" stroke-width="1.1" stroke-linecap="round"/>`;
 
-const blush = (y = 76, gap = 23, c = '#ef9a9a') =>
-  `<ellipse cx="${60 - gap}" cy="${y}" rx="5" ry="3" fill="${c}" opacity=".45"/><ellipse cx="${60 + gap}" cy="${y}" rx="5" ry="3" fill="${c}" opacity=".45"/>`;
+const mirror = (svg) => `${svg}<g transform="translate(120 0) scale(-1 1)">${svg}</g>`;
 
-// ---------- The animals (head roughly from y 20 to y 100) ----------
+const SPARKS = [[14, 30, 0.9], [24, 70, 0.7], [100, 26, 1], [94, 64, 0.7], [36, 16, 0.6], [82, 12, 0.8], [106, 46, 0.6], [12, 52, 0.6], [30, 96, 0.5], [92, 92, 0.6]];
+const sparkles = () => SPARKS.map(([x, y, r]) => `<circle cx="${x}" cy="${y}" r="${r}" fill="#fff" opacity=".8"/>`).join('')
+  + `<path d="M98 34 l1 3 l3 1 l-3 1 l-1 3 l-1 -3 l-3 -1 l3 -1 Z" fill="#fff" opacity=".9"/>
+     <path d="M20 40 l.8 2.4 l2.4 .8 l-2.4 .8 l-.8 2.4 l-.8 -2.4 l-2.4 -.8 l2.4 -.8 Z" fill="#fff" opacity=".8"/>
+     <g fill="#fff" opacity=".55" transform="translate(22 82) scale(.55)"><ellipse cx="0" cy="10" rx="4.4" ry="3.4" transform="rotate(-20 0 10)"/><rect x="3" y="-6" width="1.8" height="16"/><path d="M4.8 -6 Q11 -3 9 4 Q9 -1 4.8 -1 Z"/></g>`;
 
-const ANIMALS = {
-  rat: {
-    name: 'Rat', bg: PASTEL.lilac, acc: 'headphones',
-    draw: () => `
-      <circle cx="33" cy="40" r="16" fill="#a9abb4"/><circle cx="33" cy="40" r="9.5" fill="#f2b6c4"/>
-      <circle cx="87" cy="40" r="16" fill="#a9abb4"/><circle cx="87" cy="40" r="9.5" fill="#f2b6c4"/>
-      <ellipse cx="60" cy="68" rx="31" ry="28" fill="#a9abb4"/>
-      <ellipse cx="60" cy="81" rx="15" ry="11" fill="#e1e2e6"/>
-      ${eyes(64, 14)} ${nose(74, 4, '#e88aa3')} ${mouth(82, 4.5)}
-      <path d="M44 77 L31 74 M44 81 L32 83 M76 77 L89 74 M76 81 L88 83" stroke="${INK}" stroke-width="1.2" stroke-linecap="round" opacity=".45"/>`,
-  },
-  ox: {
-    name: 'Ox', bg: PASTEL.green, acc: 'bowtie',
-    draw: () => `
-      <path d="M40 40 Q26 36 24 20 Q34 30 46 32 Z" fill="#f2e4c8"/><path d="M80 40 Q94 36 96 20 Q86 30 74 32 Z" fill="#f2e4c8"/>
-      <ellipse cx="28" cy="56" rx="11" ry="6.5" fill="#a86c46" transform="rotate(-18 28 56)"/>
-      <ellipse cx="92" cy="56" rx="11" ry="6.5" fill="#a86c46" transform="rotate(18 92 56)"/>
-      <path d="M32 58 Q32 32 60 32 Q88 32 88 58 L86 80 Q60 92 34 80 Z" fill="#b97a50"/>
-      <ellipse cx="60" cy="84" rx="21" ry="13" fill="#f0c6ad"/>
-      <ellipse cx="53" cy="84" rx="2.4" ry="3.2" fill="#9c5c3e"/><ellipse cx="67" cy="84" rx="2.4" ry="3.2" fill="#9c5c3e"/>
-      ${eyes(60, 13)}`,
-  },
-  tiger: {
-    name: 'Tiger', bg: PASTEL.blue, acc: 'headphones',
-    draw: () => `
-      <path d="M30 46 L32 26 L48 36 Z" fill="#f0a24f"/><path d="M34 40 L35 31 L43 36 Z" fill="#fbe3c6"/>
-      <path d="M90 46 L88 26 L72 36 Z" fill="#f0a24f"/><path d="M86 40 L85 31 L77 36 Z" fill="#fbe3c6"/>
-      <ellipse cx="60" cy="66" rx="32" ry="29" fill="#f0a24f"/>
-      <path d="M30 72 Q44 70 60 82 Q76 70 90 72 Q86 96 60 96 Q34 96 30 72 Z" fill="#fff6ea"/>
-      <path d="M60 38 L56 48 L64 48 Z M30 58 L40 60 L31 64 Z M90 58 L80 60 L89 64 Z" fill="#8a5a3a"/>
-      ${eyes(62, 14)} ${nose(75)} ${mouth(83)}`,
-  },
-  rabbit: {
-    name: 'Rabbit', bg: PASTEL.pink, acc: 'beret',
-    draw: () => `
-      <ellipse cx="45" cy="26" rx="9" ry="22" fill="#f8f1e8" transform="rotate(-10 45 26)"/>
-      <ellipse cx="45" cy="27" rx="4.5" ry="15" fill="#f2b6c4" transform="rotate(-10 45 27)"/>
-      <ellipse cx="75" cy="26" rx="9" ry="22" fill="#f8f1e8" transform="rotate(10 75 26)"/>
-      <ellipse cx="75" cy="27" rx="4.5" ry="15" fill="#f2b6c4" transform="rotate(10 75 27)"/>
-      <ellipse cx="60" cy="70" rx="30" ry="27" fill="#f8f1e8"/>
-      ${eyes(66, 13)} ${blush(77, 21)} ${nose(75, 3.8, '#e88aa3')} ${mouth(83, 4.5)}`,
-  },
-  dragon: {
-    name: 'Dragon', bg: PASTEL.teal, acc: 'bowtie',
-    draw: () => `
-      <path d="M42 40 Q34 24 40 14 Q44 28 52 34 Z M78 40 Q86 24 80 14 Q76 28 68 34 Z" fill="#f2c46b"/>
-      <path d="M50 35 L54 26 L58 34 L62 26 L66 34 L70 27 L72 37 Z" fill="#ef8f7a"/>
-      <ellipse cx="25" cy="62" rx="9" ry="5" fill="#6fbd8f" transform="rotate(-25 25 62)"/>
-      <ellipse cx="95" cy="62" rx="9" ry="5" fill="#6fbd8f" transform="rotate(25 95 62)"/>
-      <ellipse cx="60" cy="66" rx="33" ry="30" fill="#7fca9b"/>
-      <ellipse cx="60" cy="83" rx="22" ry="13" fill="#c9ecd5"/>
-      <ellipse cx="53" cy="80" rx="2.3" ry="1.8" fill="#4d9a6c"/><ellipse cx="67" cy="80" rx="2.3" ry="1.8" fill="#4d9a6c"/>
-      ${eyes(62, 14, 5)} ${blush(74, 24)}
-      <path d="M53 88 Q60 93 67 88" fill="none" stroke="${INK}" stroke-width="1.9" stroke-linecap="round"/>`,
-  },
-  snake: {
-    name: 'Snake', bg: PASTEL.yellow, acc: 'beret',
-    draw: () => `
-      <path d="M28 70 Q28 38 60 38 Q92 38 92 70 Q92 98 60 98 Q28 98 28 70 Z" fill="#93c46f"/>
-      <circle cx="44" cy="50" r="3.2" fill="#75a654"/><circle cx="76" cy="50" r="3.2" fill="#75a654"/><circle cx="60" cy="46" r="3.2" fill="#75a654"/>
-      <circle cx="36" cy="80" r="2.6" fill="#75a654"/><circle cx="84" cy="80" r="2.6" fill="#75a654"/>
-      ${eyes(64, 13)} ${blush(74, 21)}
-      <path d="M52 80 Q60 86 68 80" fill="none" stroke="${INK}" stroke-width="1.9" stroke-linecap="round"/>
-      <path d="M60 85 V92 M60 92 L57 95 M60 92 L63 95" stroke="#e46e63" stroke-width="2" stroke-linecap="round"/>`,
-  },
-  horse: {
-    name: 'Horse', bg: PASTEL.lilac, acc: 'headphones',
-    draw: () => `
-      <path d="M38 42 L34 22 L50 34 Z M82 42 L86 22 L70 34 Z" fill="#c98b5a"/>
-      <path d="M38 40 L37 30 L45 35 Z M82 40 L83 30 L75 35 Z" fill="#f1cfae"/>
-      <ellipse cx="60" cy="64" rx="27" ry="31" fill="#c98b5a"/>
-      <path d="M44 36 Q60 24 76 36 Q68 34 64 44 Q60 34 52 40 Q50 36 44 36 Z" fill="#7a4f33"/>
-      <ellipse cx="60" cy="86" rx="20" ry="13" fill="#efc9a4"/>
-      <ellipse cx="53" cy="85" rx="2.4" ry="3" fill="#8a5a3a"/><ellipse cx="67" cy="85" rx="2.4" ry="3" fill="#8a5a3a"/>
-      ${eyes(60, 13)}`,
-  },
-  goat: {
-    name: 'Goat', bg: PASTEL.blue, acc: 'bowtie',
-    draw: () => `
-      <path d="M46 38 Q36 22 46 14 Q44 26 54 34 Z M74 38 Q84 22 74 14 Q76 26 66 34 Z" fill="#c9b08f"/>
-      <ellipse cx="27" cy="58" rx="12" ry="6" fill="#f6f0e6" transform="rotate(20 27 58)"/>
-      <ellipse cx="93" cy="58" rx="12" ry="6" fill="#f6f0e6" transform="rotate(-20 93 58)"/>
-      <ellipse cx="60" cy="64" rx="27" ry="29" fill="#f6f0e6"/>
-      <path d="M53 88 Q60 106 67 88 Z" fill="#e5dccd"/>
-      ${eyes(60, 12)} ${nose(74, 4)} ${mouth(81, 4.5)}`,
-  },
-  monkey: {
-    name: 'Monkey', bg: PASTEL.yellow, acc: 'headphones',
-    draw: () => `
-      <circle cx="28" cy="64" r="12" fill="#b17a52"/><circle cx="28" cy="64" r="7" fill="#f6d2b3"/>
-      <circle cx="92" cy="64" r="12" fill="#b17a52"/><circle cx="92" cy="64" r="7" fill="#f6d2b3"/>
-      <ellipse cx="60" cy="64" rx="31" ry="31" fill="#b17a52"/>
-      <path d="M36 70 Q36 48 50 50 Q60 55 70 50 Q84 48 84 70 Q84 94 60 94 Q36 94 36 70 Z" fill="#f6d2b3"/>
-      ${eyes(64, 11)}
-      <ellipse cx="57.5" cy="75" rx="1.6" ry="1.2" fill="${INK}"/><ellipse cx="62.5" cy="75" rx="1.6" ry="1.2" fill="${INK}"/>
-      ${mouth(82, 5)}`,
-  },
-  rooster: {
-    name: 'Rooster', bg: PASTEL.green, acc: 'bowtie',
-    draw: () => `
-      <path d="M46 40 Q42 24 52 28 Q54 16 61 26 Q68 16 72 30 Q80 28 76 42 Z" fill="#e8706a"/>
-      <ellipse cx="60" cy="68" rx="29" ry="29" fill="#fffaf0"/>
-      ${eyes(62, 13)} ${blush(74, 21)}
-      <path d="M53 72 L67 72 L60 82 Z" fill="#f2b24f"/>
-      <path d="M57 82 Q60 92 63 82 Z" fill="#e8706a"/>`,
-  },
-  dog: {
-    name: 'Dog', bg: PASTEL.teal, acc: 'beret',
-    draw: () => `
-      <ellipse cx="32" cy="58" rx="11" ry="20" fill="#9a6644" transform="rotate(18 32 58)"/>
-      <ellipse cx="88" cy="58" rx="11" ry="20" fill="#9a6644" transform="rotate(-18 88 58)"/>
-      <ellipse cx="60" cy="66" rx="28" ry="29" fill="#e2ad78"/>
-      <ellipse cx="60" cy="82" rx="16" ry="12" fill="#f7e2c7"/>
-      ${eyes(62, 12)}
-      <ellipse cx="60" cy="77" rx="5.6" ry="4" fill="${INK}"/>
-      ${mouth(85, 4.5)}`,
-  },
-  pig: {
-    name: 'Pig', bg: PASTEL.green, acc: 'headphones',
-    draw: () => `
-      <path d="M36 44 L30 26 L50 36 Z M84 44 L90 26 L70 36 Z" fill="#ee9ab0"/>
-      <ellipse cx="60" cy="66" rx="32" ry="29" fill="#f6b8c7"/>
-      <ellipse cx="60" cy="78" rx="12" ry="8.5" fill="#ee9ab0"/>
-      <ellipse cx="56" cy="78" rx="2.2" ry="3.2" fill="#c96782"/><ellipse cx="64" cy="78" rx="2.2" ry="3.2" fill="#c96782"/>
-      ${eyes(62, 14)} ${blush(74, 24, '#e46e8a')}`,
-  },
-};
+const bubbles = () => [[16, 34, 2.6], [24, 58, 1.8], [100, 30, 3], [94, 56, 2], [86, 14, 1.6], [34, 18, 1.4], [104, 80, 1.8], [14, 84, 1.6]]
+  .map(([x, y, r]) => `<circle cx="${x}" cy="${y}" r="${r}" fill="#fff" fill-opacity=".15" stroke="#fff" stroke-opacity=".7" stroke-width=".7"/>`).join('');
 
-// ---------- Musical accessories (muted, flat) ----------
-
-const NOTE = (x, y, s = 1) => `
-  <g transform="translate(${x} ${y}) scale(${s})" fill="#fff" opacity=".85">
-    <ellipse cx="0" cy="10" rx="4.4" ry="3.4" transform="rotate(-20 0 10)"/>
-    <rect x="3" y="-6" width="1.8" height="16"/>
-    <path d="M4.8 -6 Q11 -3 9 4 Q9 -1 4.8 -1 Z"/>
+function scene(u, pal, inner, { extras = sparkles() } = {}) {
+  return `
+  <defs>
+    <clipPath id="${u}clip"><circle cx="60" cy="60" r="58"/></clipPath>
+    <linearGradient id="${u}bg" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="${pal[0]}"/><stop offset="1" stop-color="${pal[1]}"/></linearGradient>
+    <radialGradient id="${u}glow"><stop offset="0" stop-color="#fff" stop-opacity=".95"/><stop offset=".35" stop-color="${pal[2]}" stop-opacity=".55"/><stop offset="1" stop-color="${pal[2]}" stop-opacity="0"/></radialGradient>
+    <linearGradient id="${u}ray" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#fff" stop-opacity=".6"/><stop offset="1" stop-color="#fff" stop-opacity="0"/></linearGradient>
+    <filter id="${u}soft" x="-50%" y="-50%" width="200%" height="200%"><feGaussianBlur stdDeviation="1.6"/></filter>
+    <filter id="${u}blur" x="-50%" y="-50%" width="200%" height="200%"><feGaussianBlur stdDeviation="4"/></filter>
+  </defs>
+  <g clip-path="url(#${u}clip)">
+    <rect width="120" height="120" fill="url(#${u}bg)"/>
+    <g filter="url(#${u}soft)" opacity=".5">
+      <polygon points="14,0 24,0 34,120 18,120" fill="url(#${u}ray)"/>
+      <polygon points="40,0 46,0 52,120 42,120" fill="url(#${u}ray)"/>
+      <polygon points="68,0 78,0 82,120 66,120" fill="url(#${u}ray)"/>
+      <polygon points="96,0 102,0 98,120 88,120" fill="url(#${u}ray)"/>
+    </g>
+    <circle cx="60" cy="64" r="48" fill="url(#${u}glow)"/>
+    ${extras}
+    ${inner}
+    <ellipse cx="60" cy="122" rx="62" ry="16" fill="#fff" opacity=".75" filter="url(#${u}blur)"/>
   </g>`;
+}
 
-const ACCESSORIES = {
-  headphones: () => `
-    <path d="M27 66 Q27 30 60 30 Q93 30 93 66" fill="none" stroke="#5d6b8a" stroke-width="4.5" stroke-linecap="round"/>
-    <rect x="20" y="58" width="13" height="20" rx="6" fill="#e8857b"/>
-    <rect x="87" y="58" width="13" height="20" rx="6" fill="#e8857b"/>`,
-  bowtie: () => `
-    <path d="M60 99 L46 92 L46 106 Z M60 99 L74 92 L74 106 Z" fill="#e8857b"/>
-    <circle cx="60" cy="99" r="3.4" fill="#c9675e"/>`,
-  beret: () => `
-    <ellipse cx="60" cy="42" rx="25" ry="7.5" fill="#5d6b8a"/>
-    <path d="M36 42 Q38 27 60 26 Q82 27 84 42 Z" fill="#5d6b8a"/>
-    <rect x="58" y="20" width="4" height="7" rx="2" fill="#5d6b8a"/>`,
+// ---------- The characters ----------
+
+const CHARACTERS = {
+  angel: {
+    name: 'Angel', pal: ['#3d6a9a', '#b6d2ee', '#dcecff'],
+    draw: (u) => `
+      <defs>
+        <linearGradient id="${u}robe" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#fff"/><stop offset="1" stop-color="#cfe1f6"/></linearGradient>
+        <linearGradient id="${u}wing" x1="1" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#fff" stop-opacity=".95"/><stop offset="1" stop-color="#e3eeff" stop-opacity=".3"/></linearGradient>
+      </defs>
+      <g opacity=".9">${mirror(`
+        <path d="M54 70 C42 50 22 42 10 50 C16 56 18 62 26 66 C16 68 14 76 20 82 C30 84 38 80 44 78 C40 86 42 92 48 94 C54 88 56 80 56 74 Z" fill="url(#${u}wing)"/>
+        <path d="M50 70 C40 58 28 54 18 56 M48 76 C38 72 30 74 24 78" fill="none" stroke="#fff" stroke-width=".8" opacity=".7"/>`)}
+      </g>
+      <path d="M47 68 Q60 62 73 68 L86 118 Q60 124 34 118 Z" fill="url(#${u}robe)"/>
+      <path d="M60 70 L58 118 M52 74 L46 118 M68 74 L74 118" stroke="#c2d6ee" stroke-width=".8" opacity=".7"/>
+      <path d="M47 50 Q46 34 60 34 Q74 34 73 50 L75 68 Q60 72 45 68 Z" fill="#f2d58f"/>
+      <circle cx="60" cy="49" r="12.5" fill="#fde8d8"/>
+      <path d="M47.5 48 Q47 35 60 35 Q73 35 72.5 48 Q68 41 62 42 Q60 45 56 42 Q51 43 47.5 48 Z" fill="#f2d58f"/>
+      ${closedEyes(60, 51, 4.6)} ${blush(60, 55, 7.5)} ${smile(60, 57.5)}
+      <circle cx="60" cy="80" r="9" fill="#fff" filter="url(#${u}blur)"/>
+      <path d="M55 79 Q60 74 65 79 Q60 84 55 79 Z" fill="#fde8d8"/>
+      <ellipse cx="60" cy="29" rx="11" ry="3.2" fill="none" stroke="#ffe9a3" stroke-width="3" opacity=".6" filter="url(#${u}soft)"/>
+      <ellipse cx="60" cy="29" rx="11" ry="3.2" fill="none" stroke="#f6d36b" stroke-width="1.8"/>`,
+  },
+
+  dragon: {
+    name: 'Dragon', pal: ['#2b6a6b', '#a6dccd', '#d9fbe9'],
+    draw: (u) => `
+      <defs>
+        <radialGradient id="${u}skin" cx=".45" cy=".35" r=".8"><stop offset="0" stop-color="#c9f2d9"/><stop offset="1" stop-color="#6fc49c"/></radialGradient>
+        <linearGradient id="${u}wing" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#fff" stop-opacity=".85"/><stop offset="1" stop-color="#bff0dc" stop-opacity=".25"/></linearGradient>
+      </defs>
+      ${mirror(`<path d="M46 82 C34 70 20 70 14 76 C22 78 22 84 28 86 C22 90 24 96 30 96 C38 94 44 90 48 88 Z" fill="url(#${u}wing)"/>`)}
+      <path d="M74 104 C92 104 98 92 92 84 C90 92 84 96 76 96 Z" fill="#7fcca6"/>
+      <ellipse cx="60" cy="96" rx="18" ry="17" fill="url(#${u}skin)"/>
+      <ellipse cx="60" cy="99" rx="10" ry="12" fill="#f6efcf"/>
+      <path d="M52 94 H68 M51 100 H69 M52 106 H68" stroke="#e3d6a6" stroke-width=".8"/>
+      ${mirror(`<path d="M49 42 C46 34 44 28 40 24 C46 26 52 32 54 40 Z" fill="#f7e2a3"/>`)}
+      ${mirror(`<path d="M42 50 C34 46 30 48 26 52 C32 54 36 56 42 56 Z" fill="#9adbb9"/>`)}
+      <path d="M50 38 Q52 30 56 36 Q58 28 62 35 Q66 29 68 37 Q71 33 72 40" fill="#f6b3c1"/>
+      <ellipse cx="60" cy="56" rx="19" ry="16" fill="url(#${u}skin)"/>
+      <ellipse cx="60" cy="64" rx="11" ry="7.5" fill="#e3f8ea"/>
+      <ellipse cx="56.5" cy="62.5" rx="1.2" ry=".9" fill="#4d9a76"/><ellipse cx="63.5" cy="62.5" rx="1.2" ry=".9" fill="#4d9a76"/>
+      ${closedEyes(60, 53, 7.5, 3)} ${blush(60, 58, 12.5, 2.8)} ${smile(60, 67, 2.4)}
+      <circle cx="60" cy="86" r="8" fill="#fff" filter="url(#${u}blur)"/>
+      <circle cx="60" cy="86" r="5" fill="#fff"/>
+      <ellipse cx="53" cy="86" rx="3.4" ry="2.6" fill="#8fd6b2"/><ellipse cx="67" cy="86" rx="3.4" ry="2.6" fill="#8fd6b2"/>`,
+  },
+
+  phoenix: {
+    name: 'Phoenix', pal: ['#8a4560', '#f7c79a', '#ffe6c2'],
+    draw: (u) => `
+      <defs>
+        <radialGradient id="${u}body" cx=".45" cy=".35" r=".8"><stop offset="0" stop-color="#fff0b8"/><stop offset="1" stop-color="#f6a650"/></radialGradient>
+        <linearGradient id="${u}flame" x1="1" y1="1" x2="0" y2="0"><stop offset="0" stop-color="#ffd27a" stop-opacity=".95"/><stop offset=".6" stop-color="#ff8f73" stop-opacity=".7"/><stop offset="1" stop-color="#ff6f8a" stop-opacity=".1"/></linearGradient>
+        <linearGradient id="${u}tail" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#ffb35c"/><stop offset="1" stop-color="#ff7d8a" stop-opacity=".2"/></linearGradient>
+      </defs>
+      <g opacity=".95">${mirror(`
+        <path d="M54 66 C44 44 28 34 8 36 C18 42 20 48 26 52 C14 54 10 60 12 66 C22 64 28 66 32 70 C24 74 24 82 28 86 C38 80 48 76 54 74 Z" fill="url(#${u}flame)"/>`)}
+      </g>
+      ${mirror(`<path d="M56 84 C52 98 44 108 36 118 C46 114 54 104 58 92 Z" fill="url(#${u}tail)"/>`)}
+      <path d="M58 86 C58 100 60 110 60 122 C62 110 64 100 62 86 Z" fill="url(#${u}tail)"/>
+      <ellipse cx="60" cy="74" rx="13" ry="16" fill="url(#${u}body)"/>
+      <path d="M60 36 C57 30 56 24 52 20 M60 36 C60 28 60 22 60 16 M60 36 C63 30 64 24 68 20" fill="none" stroke="#ffb35c" stroke-width="1.4" stroke-linecap="round"/>
+      <circle cx="52" cy="20" r="2.4" fill="#ffd27a"/><circle cx="60" cy="16" r="2.6" fill="#ffd27a"/><circle cx="68" cy="20" r="2.4" fill="#ffd27a"/>
+      <circle cx="60" cy="49" r="13" fill="url(#${u}body)"/>
+      ${closedEyes(60, 48, 5.2)} ${blush(60, 53, 8.5)}
+      <path d="M57.5 52 L62.5 52 L60 56.5 Z" fill="#e5844a"/>
+      <circle cx="60" cy="76" r="7" fill="#fff" opacity=".7" filter="url(#${u}blur)"/>`,
+  },
+
+  unicorn: {
+    name: 'Unicorn', pal: ['#6a5a9e', '#efc8e2', '#ffe9f6'],
+    draw: (u) => `
+      <defs>
+        <radialGradient id="${u}coat" cx=".45" cy=".35" r=".8"><stop offset="0" stop-color="#fff"/><stop offset="1" stop-color="#e6dcf3"/></radialGradient>
+        <linearGradient id="${u}horn" x1="0" y1="1" x2="0" y2="0"><stop offset="0" stop-color="#f6cf6a"/><stop offset="1" stop-color="#fff3c4"/></linearGradient>
+      </defs>
+      <path d="M48 70 C46 92 36 106 28 122 L92 122 C84 106 74 92 72 70 Z" fill="url(#${u}coat)"/>
+      <path d="M50 44 C40 52 38 66 42 80 C38 90 40 100 44 108 C46 96 48 88 50 80 Z" fill="#f7b8d2" opacity=".9"/>
+      <path d="M72 44 C86 50 90 66 86 82 C92 90 90 104 84 116 C80 100 78 90 74 82 Z" fill="#c9b3f0"/>
+      <path d="M70 42 C80 50 82 62 78 76 C82 84 80 94 76 102 C74 90 72 82 70 76 Z" fill="#f7b8d2"/>
+      ${mirror(`<path d="M44 46 L40 30 L52 40 Z" fill="url(#${u}coat)"/><path d="M44.5 43 L42.5 34 L49 39.5 Z" fill="#f7c6da"/>`)}
+      <ellipse cx="60" cy="58" rx="18" ry="19" fill="url(#${u}coat)"/>
+      <ellipse cx="60" cy="71" rx="11" ry="8" fill="#f9e6ef"/>
+      <ellipse cx="56.5" cy="71" rx="1.1" ry="1.5" fill="#d79ab4"/><ellipse cx="63.5" cy="71" rx="1.1" ry="1.5" fill="#d79ab4"/>
+      <path d="M50 42 C54 36 64 34 70 40 C66 40 64 44 60 48 C58 44 54 42 50 42 Z" fill="#a9d4f5"/>
+      <path d="M56 40 L60 14 L64 40 Z" fill="#fff6c8" opacity=".7" filter="url(#${u}soft)"/>
+      <path d="M56.5 40 L60 16 L63.5 40 Z" fill="url(#${u}horn)"/>
+      <path d="M57 34 L63 32 M57.6 28 L62.4 26.4 M58.3 22 L61.7 20.8" stroke="#e8b84e" stroke-width=".8"/>
+      ${closedEyes(60, 58, 7, 3)}
+      <path d="M50 59 L48.5 60.5 M70 59 L71.5 60.5" stroke="${INK}" stroke-width="1" stroke-linecap="round"/>
+      ${blush(60, 63, 11)} ${smile(60, 76, 2)}`,
+  },
+
+  mermaid: {
+    name: 'Mermaid', pal: ['#1f5878', '#94dbd6', '#d6fbf5'],
+    extras: bubbles(),
+    draw: (u) => `
+      <defs>
+        <linearGradient id="${u}hair" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#f28f8a"/><stop offset="1" stop-color="#f7c3a4"/></linearGradient>
+        <linearGradient id="${u}tail" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#7fe0cf"/><stop offset="1" stop-color="#3a9fb6"/></linearGradient>
+        <linearGradient id="${u}fin" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#9ff0e2" stop-opacity=".9"/><stop offset="1" stop-color="#fff" stop-opacity=".3"/></linearGradient>
+      </defs>
+      <path d="M46 46 C40 64 38 82 32 98 C42 96 48 88 50 78 L70 78 C72 88 78 96 88 98 C82 82 80 64 74 46 Z" fill="url(#${u}hair)"/>
+      <path d="M52 78 C50 94 56 104 70 106 C80 107 88 104 92 98 C84 100 74 98 70 92 C68 88 68 82 68 78 Z" fill="url(#${u}tail)"/>
+      <path d="M90 98 C96 88 104 86 108 90 C102 92 100 98 98 104 C102 108 102 114 98 116 C96 110 92 104 90 98 Z" fill="url(#${u}fin)"/>
+      <path d="M56 86 q3 2 6 0 M58 92 q3 2 6 0 M62 98 q3 2 6 0 M70 101 q3 2 6 0" fill="none" stroke="#c9fff3" stroke-width=".8" opacity=".8"/>
+      <path d="M52 66 Q60 62 68 66 L69 80 Q60 82 51 80 Z" fill="#fde5d6"/>
+      <circle cx="56" cy="71" r="3.2" fill="#c9b3f0"/><circle cx="64" cy="71" r="3.2" fill="#c9b3f0"/>
+      <circle cx="60" cy="50" r="12.5" fill="#fde8d8"/>
+      <path d="M47.5 50 Q46 36 60 36 Q74 36 72.5 50 Q70 43 64 42 Q60 46 54 42 Q49 44 47.5 50 Z" fill="url(#${u}hair)"/>
+      <path d="M68 40 l1.4 3 l3.2 .4 l-2.4 2.2 l.6 3.2 l-2.8 -1.6 l-2.8 1.6 l.6 -3.2 l-2.4 -2.2 l3.2 -.4 Z" fill="#ffe08a"/>
+      ${closedEyes(60, 52, 4.6)} ${blush(60, 56, 7.5)} ${smile(60, 58.5)}`,
+  },
+
+  fairy: {
+    name: 'Fairy', pal: ['#4d7a5e', '#dcebaa', '#f6ffd9'],
+    draw: (u) => `
+      <defs>
+        <linearGradient id="${u}wing" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#ffd1ec" stop-opacity=".85"/><stop offset="1" stop-color="#bfe6ff" stop-opacity=".35"/></linearGradient>
+        <linearGradient id="${u}dress" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#bfe8c8"/><stop offset="1" stop-color="#f6c7d8"/></linearGradient>
+      </defs>
+      ${mirror(`
+        <path d="M54 68 C44 50 26 44 18 52 C16 62 30 70 52 72 Z" fill="url(#${u}wing)" stroke="#fff" stroke-opacity=".7" stroke-width=".7"/>
+        <path d="M54 74 C42 78 30 88 34 96 C42 98 50 88 55 78 Z" fill="url(#${u}wing)" stroke="#fff" stroke-opacity=".7" stroke-width=".7"/>`)}
+      <path d="M52 66 Q60 62 68 66 L72 80 Q82 96 80 104 Q70 100 66 106 Q60 100 54 106 Q50 100 40 104 Q38 96 48 80 Z" fill="url(#${u}dress)"/>
+      <path d="M57 104 L56 120 M63 104 L64 120" stroke="#fde8d8" stroke-width="3" stroke-linecap="round"/>
+      <circle cx="60" cy="78" r="8" fill="#fff9c8" filter="url(#${u}blur)"/>
+      <circle cx="60" cy="78" r="3.2" fill="#fffbe0"/>
+      <ellipse cx="55.5" cy="80" rx="2.4" ry="2" fill="#fde8d8"/><ellipse cx="64.5" cy="80" rx="2.4" ry="2" fill="#fde8d8"/>
+      <path d="M47 50 Q45 34 60 34 Q75 34 73 50 L74 60 Q70 56 70 50 L50 50 Q50 56 46 60 Z" fill="#b9875a"/>
+      <circle cx="60" cy="49" r="12.5" fill="#fde8d8"/>
+      <path d="M47.5 48 Q47 36 60 35 Q73 36 72.5 48 Q66 42 58 44 Q52 43 47.5 48 Z" fill="#b9875a"/>
+      <circle cx="49" cy="40" r="2.4" fill="#f7a8c4"/><circle cx="54" cy="36.5" r="2.2" fill="#fff"/><circle cx="60" cy="35.2" r="2.4" fill="#f7c76a"/><circle cx="66" cy="36.5" r="2.2" fill="#fff"/><circle cx="71" cy="40" r="2.4" fill="#f7a8c4"/>
+      ${closedEyes(60, 51, 4.6)} ${blush(60, 55, 7.5)} ${smile(60, 57.5)}`,
+  },
+
+  fox: {
+    name: 'Fox Spirit', pal: ['#3a3470', '#e9b394', '#ffe3cf'],
+    draw: (u) => `
+      <defs>
+        <linearGradient id="${u}tail" x1="0" y1="1" x2="0" y2="0"><stop offset="0" stop-color="#f6a66b"/><stop offset=".7" stop-color="#ffd9b8"/><stop offset="1" stop-color="#fff"/></linearGradient>
+        <radialGradient id="${u}fur" cx=".45" cy=".35" r=".8"><stop offset="0" stop-color="#fff"/><stop offset="1" stop-color="#f8d7b8"/></radialGradient>
+        <radialGradient id="${u}fire"><stop offset="0" stop-color="#fff"/><stop offset=".5" stop-color="#bfe2ff"/><stop offset="1" stop-color="#7fb8ff" stop-opacity="0"/></radialGradient>
+      </defs>
+      ${[-64, -34, 0, 34, 64].map((a) => `<path d="M60 104 C42 92 42 62 60 42 C78 62 78 92 60 104 Z" fill="url(#${u}tail)" transform="rotate(${a} 60 104)" opacity=".95"/>`).join('')}
+      <ellipse cx="60" cy="92" rx="12" ry="12" fill="url(#${u}fur)"/>
+      <ellipse cx="54" cy="102" rx="4" ry="3" fill="#fff"/><ellipse cx="66" cy="102" rx="4" ry="3" fill="#fff"/>
+      ${mirror(`<path d="M45 52 L40 30 L56 44 Z" fill="#f8d2ae"/><path d="M45.5 48 L43 35 L52.5 43.5 Z" fill="#f4a7b9"/>`)}
+      <path d="M41 58 Q42 42 60 42 Q78 42 79 58 Q78 72 60 76 Q42 72 41 58 Z" fill="url(#${u}fur)"/>
+      <path d="M58 46 Q60 50 62 46" fill="none" stroke="#e86f7a" stroke-width="1.4" stroke-linecap="round"/>
+      <ellipse cx="60" cy="66" rx="2" ry="1.4" fill="${INK}"/>
+      ${closedEyes(60, 58, 7, 3)}
+      <path d="M50 57 L48.5 58.5 M70 57 L71.5 58.5" stroke="${INK}" stroke-width="1" stroke-linecap="round"/>
+      ${blush(60, 63, 11)} ${smile(60, 69, 2)}
+      <circle cx="26" cy="64" r="7" fill="url(#${u}fire)"/><circle cx="26" cy="64" r="2.2" fill="#fff"/>
+      <circle cx="94" cy="58" r="6" fill="url(#${u}fire)"/><circle cx="94" cy="58" r="1.8" fill="#fff"/>`,
+  },
+
+  moonrabbit: {
+    name: 'Moon Rabbit', pal: ['#1e2753', '#7d8cc4', '#e6ecff'],
+    draw: (u) => `
+      <defs>
+        <radialGradient id="${u}moon" cx=".4" cy=".4" r=".7"><stop offset="0" stop-color="#fffbe6"/><stop offset="1" stop-color="#f6e3a8"/></radialGradient>
+        <radialGradient id="${u}fur" cx=".45" cy=".35" r=".8"><stop offset="0" stop-color="#fff"/><stop offset="1" stop-color="#dfe3f2"/></radialGradient>
+      </defs>
+      <circle cx="60" cy="52" r="36" fill="#fff6d6" opacity=".6" filter="url(#${u}blur)"/>
+      <circle cx="60" cy="52" r="31" fill="url(#${u}moon)"/>
+      <circle cx="46" cy="40" r="3.5" fill="#efdca0" opacity=".6"/><circle cx="78" cy="62" r="4.5" fill="#efdca0" opacity=".5"/><circle cx="74" cy="34" r="2.4" fill="#efdca0" opacity=".6"/>
+      <ellipse cx="51" cy="40" rx="5.5" ry="16" fill="url(#${u}fur)" transform="rotate(-12 51 40)"/>
+      <ellipse cx="51" cy="41" rx="2.6" ry="11" fill="#f6c3d3" transform="rotate(-12 51 41)"/>
+      <ellipse cx="69" cy="40" rx="5.5" ry="16" fill="url(#${u}fur)" transform="rotate(12 69 40)"/>
+      <ellipse cx="69" cy="41" rx="2.6" ry="11" fill="#f6c3d3" transform="rotate(12 69 41)"/>
+      <ellipse cx="60" cy="98" rx="18" ry="17" fill="url(#${u}fur)"/>
+      <ellipse cx="60" cy="66" rx="15" ry="13.5" fill="url(#${u}fur)"/>
+      ${closedEyes(60, 65, 6)} ${blush(60, 70, 9.5)}
+      <path d="M58.6 69 L61.4 69 L60 70.6 Z" fill="#e88aa3"/> ${smile(60, 72, 1.8)}
+      <circle cx="60" cy="88" r="8" fill="#fff6c0" filter="url(#${u}blur)"/>
+      <path d="M60 82 l1.8 4 l4.4 .5 l-3.3 3 l.9 4.3 l-3.8 -2.2 l-3.8 2.2 l.9 -4.3 l-3.3 -3 l4.4 -.5 Z" fill="#ffe27a"/>
+      <ellipse cx="53" cy="90" rx="3.2" ry="2.6" fill="#fff"/><ellipse cx="67" cy="90" rx="3.2" ry="2.6" fill="#fff"/>`,
+  },
 };
 
-export const CHARACTER_IDS = Object.keys(ANIMALS);
-export function characterName(id) { return ANIMALS[id]?.name || ''; }
+export const CHARACTER_IDS = Object.keys(CHARACTERS);
+export function characterName(id) { return CHARACTERS[id]?.name || ''; }
 
-// Returns an SVG string for a character (always the musical version).
+// Returns an SVG string for a character. Unknown ids (such as old zodiac picks) show the dragon.
 export function characterSVG(id, _variant = 'musical', { title = '' } = {}) {
-  const a = ANIMALS[id] || ANIMALS.dragon;
-  return `<svg viewBox="0 0 120 120" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="${title || a.name}">
-    <circle cx="60" cy="62" r="54" fill="${a.bg}"/>
-    ${a.draw()}
-    ${ACCESSORIES[a.acc]()}
+  const c = CHARACTERS[id] || CHARACTERS.dragon;
+  const u = `ch${++uidCount}`;
+  return `<svg viewBox="0 0 120 120" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="${title || c.name}">
+    ${scene(u, c.pal, c.draw(u), c.extras ? { extras: c.extras } : {})}
   </svg>`;
 }

@@ -871,3 +871,66 @@ body { font-family: var(--font-body); }
 button, .char-btn, .home-card { -webkit-tap-highlight-color: transparent; }
 /* Keep the onboarding button in reach while the character list scrolls */
 .onboard .screen-actions { position: sticky; bottom: 0; background: var(--surface); padding-top: 12px; }
+
+/* ---------- Glowing sky (Clarity style) for the splash and intro ---------- */
+.sky {
+  position: relative;
+  overflow: hidden;
+  background: linear-gradient(180deg, #2c4c78 0%, #5d86b6 52%, #cfe1f4 100%);
+  color: #fff;
+}
+.sky::before { /* soft beams of light from above */
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background: linear-gradient(97deg,
+    transparent 8%, rgba(255,255,255,.20) 13%, transparent 19%,
+    transparent 31%, rgba(255,255,255,.13) 35%, transparent 40%,
+    transparent 57%, rgba(255,255,255,.18) 63%, transparent 70%,
+    transparent 82%, rgba(255,255,255,.11) 87%, transparent 92%);
+  filter: blur(6px);
+  -webkit-mask-image: linear-gradient(180deg, #000 0%, #000 45%, transparent 95%);
+  mask-image: linear-gradient(180deg, #000 0%, #000 45%, transparent 95%);
+  animation: beams 7s ease-in-out infinite;
+}
+.sky::after { /* glow and mist */
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background:
+    radial-gradient(ellipse 60% 40% at 50% 38%, rgba(255,255,255,.35), transparent 70%),
+    radial-gradient(ellipse 90% 22% at 50% 104%, rgba(255,255,255,.95), transparent 70%);
+}
+@keyframes beams { 50% { opacity: .65; } }
+.sky-sparkles {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background-image:
+    radial-gradient(circle at 12% 18%, #fff 0 1.2px, transparent 2px),
+    radial-gradient(circle at 84% 12%, #fff 0 1.5px, transparent 2.4px),
+    radial-gradient(circle at 70% 30%, #fff 0 1px, transparent 1.8px),
+    radial-gradient(circle at 22% 44%, #fff 0 1px, transparent 1.8px),
+    radial-gradient(circle at 90% 50%, #fff 0 1.2px, transparent 2px),
+    radial-gradient(circle at 8% 66%, #fff 0 1px, transparent 1.8px),
+    radial-gradient(circle at 40% 8%, #fff 0 1px, transparent 1.8px),
+    radial-gradient(circle at 60% 60%, #fff 0 .9px, transparent 1.6px);
+  animation: twinkle 3.2s ease-in-out infinite;
+}
+@keyframes twinkle { 50% { opacity: .45; } }
+.sky > :not(.splash-crowd):not(.sky-sparkles) { position: relative; z-index: 1; }
+.sky .splash-crowd { z-index: 1; }
+.sky .crowd-char svg { filter: drop-shadow(0 0 14px rgba(255, 255, 255, 0.45)); }
+.sky .mascot svg { filter: drop-shadow(0 0 22px rgba(255, 255, 255, 0.55)); }
+.sky .mascot-shadow { background: rgba(255, 255, 255, 0.35); }
+.sky .brand { color: #fff; text-shadow: 0 2px 12px rgba(30, 50, 90, 0.35); }
+.sky .brand span, .sky .splash-title span { color: #ffdc8a; }
+.sky .tagline { color: rgba(255, 255, 255, 0.88); }
+.sky .splash-title { text-shadow: 0 2px 14px rgba(30, 50, 90, 0.4); }
+@media (prefers-reduced-motion: reduce) { .sky::before, .sky-sparkles { animation: none; } }
+.sky .splash-tap { color: #2c4c78; opacity: .75; }
+.home-hero { background: linear-gradient(170deg, #2c4c78 0%, #5d86b6 70%, #9fc1e4 100%) !important; }
+.home-hero::after { background: radial-gradient(ellipse at 70% 30%, rgba(255,255,255,.28), transparent 65%) !important; }
+.home-brand span { color: #ffdc8a; }
