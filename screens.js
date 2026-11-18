@@ -1,4 +1,4 @@
-import { CHARACTER_IDS, characterSVG, characterName } from './characters.js?v=5';
+import { CHARACTER_IDS, characterSVG, characterName } from './characters.js?v=6';
 
 // The pages around the practice screen: splash, intro, the first-time setup
 // (onboarding), home, drills, profile, theme and settings.
@@ -91,7 +91,7 @@ function buildSplash() {
   const crowd = $('splash-crowd');
   const cast = [
     ['angel', 'musical'], ['phoenix', 'musical'], ['dragon', 'musical'],
-    ['unicorn', 'musical'], ['moonrabbit', 'musical'], ['mermaid', 'musical'],
+    ['shark', 'musical'], ['unicorn', 'musical'], ['bear', 'musical'],
   ];
   crowd.innerHTML = cast.map(([id, v], i) => `<div class="crowd-char c${i}">${characterSVG(id, v)}</div>`).join('');
   $('intro-mascot').innerHTML = characterSVG(MASCOT, 'musical');

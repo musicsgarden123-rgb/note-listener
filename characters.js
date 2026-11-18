@@ -247,10 +247,111 @@ const CHARACTERS = {
       <path d="M60 82 l1.8 4 l4.4 .5 l-3.3 3 l.9 4.3 l-3.8 -2.2 l-3.8 2.2 l.9 -4.3 l-3.3 -3 l4.4 -.5 Z" fill="#ffe27a"/>
       <ellipse cx="53" cy="90" rx="3.2" ry="2.6" fill="#fff"/><ellipse cx="67" cy="90" rx="3.2" ry="2.6" fill="#fff"/></g>`,
   },
+
+  bear: {
+    name: 'Bear', pal: ['#6a4426', '#f0cf8f', '#fff2cf'],
+    draw: (u) => `
+      <defs>
+        <radialGradient id="${u}fur" cx=".45" cy=".35" r=".8"><stop offset="0" stop-color="#d49a68"/><stop offset="1" stop-color="#8f5a38"/></radialGradient>
+        <linearGradient id="${u}pot" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#ffe48a"/><stop offset="1" stop-color="#f0a83c"/></linearGradient>
+      </defs>
+      <ellipse cx="60" cy="91" rx="22" ry="23" fill="url(#${u}fur)"/>
+      <ellipse cx="60" cy="96" rx="13" ry="15" fill="#f1d2b0"/>
+      ${mirror(`<circle cx="43" cy="37" r="7.5" fill="#a36b45"/><circle cx="43" cy="37" r="4" fill="#e6b089"/>`)}
+      <ellipse cx="60" cy="54" rx="19" ry="17" fill="url(#${u}fur)"/>
+      <ellipse cx="60" cy="61" rx="9" ry="6.5" fill="#f1d2b0"/>
+      <ellipse cx="60" cy="58" rx="3" ry="2.2" fill="${INK}"/>
+      ${closedEyes(60, 51, 7.5, 3)} ${blush(60, 57, 12)} ${smile(60, 63, 2)}
+      <circle cx="60" cy="90" r="9" fill="#ffe9a0" opacity=".8" filter="url(#${u}blur)"/>
+      <path d="M52 84 h16 l-1 3 q2 6 -2 10 h-10 q-4 -4 -2 -10 Z" fill="url(#${u}pot)"/>
+      <rect x="51" y="82" width="18" height="3.4" rx="1.7" fill="#c98a3c"/>
+      <path d="M56 84 q-1 4 1 6" fill="none" stroke="#fff6c8" stroke-width="1.2" stroke-linecap="round"/>
+      <ellipse cx="50" cy="91" rx="4.2" ry="3.4" fill="#a36b45"/><ellipse cx="70" cy="91" rx="4.2" ry="3.4" fill="#a36b45"/>`,
+  },
+
+  cyclops: {
+    name: 'Cyclops', pal: ['#2e3b4e', '#a3b4c8', '#eef4fb'],
+    draw: (u) => `
+      <defs>
+        <radialGradient id="${u}skin" cx=".45" cy=".35" r=".8"><stop offset="0" stop-color="#e4d8fa"/><stop offset="1" stop-color="#ab96dc"/></radialGradient>
+        <linearGradient id="${u}tunic" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#d9b48a"/><stop offset="1" stop-color="#b48a5e"/></linearGradient>
+      </defs>
+      <path d="M56 60 h8 v12 h-8 Z" fill="#b9a6e4"/>
+      <path d="M40 74 Q60 66 80 74 L88 118 Q60 124 32 118 Z" fill="url(#${u}tunic)"/>
+      <path d="M46 72 L76 108" stroke="#8a6440" stroke-width="4" stroke-linecap="round"/>
+      ${mirror(`<ellipse cx="43" cy="52" rx="3.6" ry="5" fill="#b9a6e4"/>`)}
+      <circle cx="60" cy="51" r="17" fill="url(#${u}skin)"/>
+      <path d="M50 37 L53 31 L56 36 L60 29 L64 36 L67 31 L70 37 Q60 33 50 37 Z" fill="#6a4a3a"/>
+      <ellipse cx="60" cy="49" rx="8" ry="7.6" fill="#fff"/>
+      <circle cx="60" cy="50" r="4.6" fill="#4f86c6"/><circle cx="60" cy="50" r="2.3" fill="${INK}"/>
+      <circle cx="61.8" cy="48.2" r="1.4" fill="#fff"/>
+      <path d="M52 39.5 Q60 36.5 68 39.5" fill="none" stroke="#6a4a3a" stroke-width="1.6" stroke-linecap="round"/>
+      ${blush(60, 58, 11)}
+      <path d="M54 61 Q60 66 66 61" fill="none" stroke="${INK}" stroke-width="1.3" stroke-linecap="round"/>
+      <path d="M58 62.6 h3 v2.2 h-3 Z" fill="#fff"/>`,
+  },
+
+  minotaur: {
+    name: 'Minotaur', pal: ['#4f2e22', '#c99a74', '#f8e3cf'],
+    draw: (u) => `
+      <defs>
+        <radialGradient id="${u}fur" cx=".45" cy=".35" r=".8"><stop offset="0" stop-color="#c48d62"/><stop offset="1" stop-color="#7a4f33"/></radialGradient>
+        <linearGradient id="${u}horn" x1="1" y1="1" x2="0" y2="0"><stop offset="0" stop-color="#e9dcc4"/><stop offset="1" stop-color="#fffaf0"/></linearGradient>
+      </defs>
+      <path d="M34 78 Q60 66 86 78 L92 120 L28 120 Z" fill="url(#${u}fur)"/>
+      <path d="M44 74 L74 112" stroke="#5a3a26" stroke-width="5" stroke-linecap="round"/>
+      <circle cx="51" cy="86" r="2.2" fill="#e8c46a"/>
+      ${mirror(`<path d="M47 43 C36 44 28 38 26 24 C32 32 40 34 49 36 Z" fill="url(#${u}horn)"/>`)}
+      ${mirror(`<ellipse cx="39" cy="51" rx="7" ry="3.4" fill="#8f5a38" transform="rotate(-20 39 51)"/><ellipse cx="39.5" cy="51" rx="4" ry="1.7" fill="#e6a8a0" transform="rotate(-20 39.5 51)"/>`)}
+      <ellipse cx="60" cy="54" rx="16" ry="17" fill="url(#${u}fur)"/>
+      <path d="M52 40 Q56 34 60 38 Q64 34 68 40 Q60 43 52 40 Z" fill="#5a3a26"/>
+      <ellipse cx="60" cy="64" rx="11" ry="8" fill="#e9c3a6"/>
+      <ellipse cx="56" cy="63" rx="1.4" ry="2" fill="#9a6450"/><ellipse cx="64" cy="63" rx="1.4" ry="2" fill="#9a6450"/>
+      <circle cx="60" cy="68.5" r="3.2" fill="none" stroke="#e8c46a" stroke-width="1.4"/>
+      ${closedEyes(60, 51, 7, 3)} ${blush(60, 57, 11.5)}`,
+  },
+
+  demon: {
+    name: 'Little Demon', pal: ['#3e1834', '#d9768c', '#ffd6dc'],
+    draw: (u) => `
+      <defs>
+        <radialGradient id="${u}skin" cx=".45" cy=".35" r=".8"><stop offset="0" stop-color="#ffa3a0"/><stop offset="1" stop-color="#d9545f"/></radialGradient>
+        <linearGradient id="${u}wing" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#6b2d5a"/><stop offset="1" stop-color="#9c4a7d" stop-opacity=".75"/></linearGradient>
+      </defs>
+      ${mirror(`<path d="M50 84 C40 70 26 66 16 70 C20 74 20 78 24 80 C20 82 20 86 24 88 C28 86 32 88 34 90 C36 86 42 86 50 90 Z" fill="url(#${u}wing)"/>`)}
+      <path d="M70 98 C84 100 90 92 88 84" fill="none" stroke="#d9545f" stroke-width="2.6" stroke-linecap="round"/>
+      <path d="M88 78 L92 86 L84 86 Z" fill="#d9545f"/>
+      <ellipse cx="60" cy="90" rx="15" ry="17" fill="url(#${u}skin)"/>
+      <ellipse cx="60" cy="94" rx="9" ry="11" fill="#ffc2bd"/>
+      ${mirror(`<path d="M44 58 L35 50 L46 50 Z" fill="#e6676f"/>`)}
+      <circle cx="60" cy="58" r="17" fill="url(#${u}skin)"/>
+      ${mirror(`<path d="M49 44 C45 38 45 32 48 27 C49 33 53 37 56 41 Z" fill="#4a2440"/>`)}
+      <path d="M50 51 L56 53 M70 51 L64 53" stroke="${INK}" stroke-width="1.3" stroke-linecap="round"/>
+      ${closedEyes(60, 56, 6.5, 2.8)} ${blush(60, 62, 10.5)}
+      <path d="M54 64 Q60 70 66 64" fill="none" stroke="${INK}" stroke-width="1.3" stroke-linecap="round"/>
+      <path d="M62.2 65.6 L64.6 64.6 L63.8 68 Z" fill="#fff"/>`,
+  },
+
+  shark: {
+    name: 'Shark', pal: ['#0f3a66', '#6fb3d9', '#dff4ff'],
+    extras: bubbles(),
+    draw: (u) => `
+      <defs>
+        <radialGradient id="${u}skin" cx=".45" cy=".3" r=".85"><stop offset="0" stop-color="#b8d6ee"/><stop offset="1" stop-color="#5b8db8"/></radialGradient>
+      </defs>
+      <path d="M50 46 C54 36 58 28 64 22 C64 30 68 38 72 46 Z" fill="#5b8db8"/>
+      ${mirror(`<path d="M38 80 C30 86 24 94 22 102 C30 98 36 94 42 90 Z" fill="#5b8db8"/>`)}
+      <ellipse cx="60" cy="72" rx="26" ry="29" fill="url(#${u}skin)"/>
+      <path d="M38 78 Q60 70 82 78 Q80 100 60 101 Q40 100 38 78 Z" fill="#f4fbff"/>
+      ${mirror(`<path d="M37 66 q2 3 0 6 M40 64 q2 3 0 6 M43 63 q2 3 0 6" fill="none" stroke="#3f6f99" stroke-width=".9" stroke-linecap="round" opacity=".7"/>`)}
+      ${closedEyes(60, 60, 10, 3.2)} ${blush(60, 67, 15, 3)}
+      <path d="M50 76 Q60 84 70 76" fill="#e6707e" stroke="${INK}" stroke-width="1.3" stroke-linejoin="round"/>
+      <path d="M52 76.6 L54 79 L56 77.6 L58 79.6 L60 78 L62 79.6 L64 77.6 L66 79 L68 76.6" fill="#fff" stroke="#fff" stroke-width=".6" stroke-linejoin="round"/>`,
+  },
 };
 
 // Small nudges so each character sits in the middle of its circle.
-const SHIFT = { angel: [0, -9], dragon: [0, -9], fairy: [0, -11], fox: [0, -8], mermaid: [-5, -7] };
+const SHIFT = { angel: [0, -9], dragon: [0, -9], fairy: [0, -11], fox: [0, -8], mermaid: [-5, -7], bear: [0, -5], cyclops: [0, -6], minotaur: [0, -4], demon: [0, -2], shark: [0, 4] };
 
 // For measuring only: the character with no background.
 export function characterLayerSVG(id) {
@@ -259,7 +360,8 @@ export function characterLayerSVG(id) {
   return `<svg viewBox="0 0 120 120" xmlns="http://www.w3.org/2000/svg"><defs><filter id="${u}soft"><feGaussianBlur stdDeviation="1.6"/></filter><filter id="${u}blur"><feGaussianBlur stdDeviation="4"/></filter></defs><g transform="translate(${SHIFT[id]?.[0] || 0} ${SHIFT[id]?.[1] || 0})">${c.draw(u)}</g></svg>`;
 }
 
-export const CHARACTER_IDS = Object.keys(CHARACTERS);
+// The order they appear in the picker (mixed so every kind of character shows near the top).
+export const CHARACTER_IDS = ['dragon', 'angel', 'shark', 'phoenix', 'minotaur', 'unicorn', 'bear', 'mermaid', 'cyclops', 'fairy', 'demon', 'fox', 'moonrabbit'];
 export function characterName(id) { return CHARACTERS[id]?.name || ''; }
 
 // Returns an SVG string for a character. Unknown ids (such as old zodiac picks) show the dragon.
