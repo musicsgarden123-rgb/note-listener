@@ -934,3 +934,5 @@ button, .char-btn, .home-card { -webkit-tap-highlight-color: transparent; }
 .home-hero { background: linear-gradient(170deg, #2c4c78 0%, #5d86b6 70%, #9fc1e4 100%) !important; }
 .home-hero::after { background: radial-gradient(ellipse at 70% 30%, rgba(255,255,255,.28), transparent 65%) !important; }
 .home-brand span { color: #ffdc8a; }
+
+.setting-hint { margin: -4px 4px 10px; font-size: 0.85rem; color: var(--muted, #8a8075); }

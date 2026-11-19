@@ -15,8 +15,11 @@ const SHARP_NAMES = ['C', 'C#', 'D', 'D#', 'E', 'F', 'F#', 'G', 'G#', 'A', 'A#',
 const FLAT_NAMES = ['C', 'Db', 'D', 'Eb', 'E', 'F', 'Gb', 'G', 'Ab', 'A', 'Bb', 'B'];
 
 const SILENCE_RMS = 0.0015;  // never listen below this (about -56 dB)
-const GATE_OVER_FLOOR = 2.5;  // a note must be this many times louder than the room's own noise
-const MIN_CLARITY = 0.85;    // ignore pitch readings less certain than this
+// Mic sensitivity (1 to 10, set in Settings) decides these together:
+let micBoostDb = 22;          // how much the microphone is turned up before listening
+let gateOverFloor = 2.4;      // a note must be this many times louder than the room's own noise
+let minClarity = 0.79;        // ignore pitch readings less certain than this
+let pitchThreshold = 0.19;    // how strict the pitch finder is (higher = accepts rougher sounds)
 const MATCH_CENTS = 50;      // within this many cents of the question note counts as correct
 const MATCH_FRAMES = 3;      // steady correct readings before the mic answer counts
 const FOLLOW_FRAMES = 4;     // steady readings before the keyboard scrolls to a note
@@ -57,7 +60,8 @@ const $ = (id) => document.getElementById(id);
 let ctx;
 let analyser;
 let micSource;
-let micFilter;             // removes rumble below the lowest piano note before listening
+let micFilter;
+let micGain;               // the sensitivity boost             // removes rumble below the lowest piano note before listening
 let noiseFloor = 0.003;    // how loud the room is when nobody plays (tracked as we go)
 let micStream;
 let buffer;
@@ -197,6 +201,21 @@ $('key-size').addEventListener('input', (e) => {
 });
 $('key-size').addEventListener('change', (e) => remember('sr-key-size', e.target.value));
 
+// Mic sensitivity: 1 (only clear, loud notes) to 10 (picks up quiet or rough notes).
+function setSensitivity(level) {
+  const s = (Math.min(10, Math.max(1, level)) - 1) / 9;
+  micBoostDb = 6 + s * 30;
+  gateOverFloor = 3.5 - s * 2;
+  minClarity = 0.9 - s * 0.2;
+  pitchThreshold = 0.12 + s * 0.13;
+  if (micGain) micGain.gain.value = 10 ** (micBoostDb / 20);
+  $('mic-sens').value = level;
+  $('mic-sens-val').textContent = String(level);
+}
+$('mic-sens').addEventListener('input', (e) => setSensitivity(Number(e.target.value)));
+$('mic-sens').addEventListener('change', (e) => remember('sr-mic-sens', e.target.value));
+setSensitivity(Number(recall('sr-mic-sens')) || 6);
+
 // Set up everything that doesn't need sound straight away.
 function init() {
   if (!window.Vex) {
@@ -251,7 +270,9 @@ function ensureAudio() {
   micFilter2.type = 'highpass';
   micFilter2.frequency.value = 22;
   micFilter2.Q.value = 0.7;
-  micFilter.connect(micFilter2).connect(analyser);
+  micGain = ctx.createGain();
+  micGain.gain.value = 10 ** (micBoostDb / 20);
+  micFilter.connect(micFilter2).connect(micGain).connect(analyser);
   buildSoundChains();
   loadPiano('piano');
   if (PIANOS[$('waveform').value]) loadPiano($('waveform').value);
@@ -1207,14 +1228,14 @@ function tick() {
   showLoudness(level);
   // Track the room's background noise: drop to quiet moments at once, rise only slowly.
   noiseFloor = level < noiseFloor ? level : noiseFloor + (level - noiseFloor) * 0.002;
-  const gate = Math.max(SILENCE_RMS, noiseFloor * GATE_OVER_FLOOR);
+  const gate = Math.max(SILENCE_RMS, noiseFloor * gateOverFloor);
 
   // Pitch detection is the heavy part, so it runs every other frame (~30 times a second).
   if (frame++ % 2 === 0) {
     // Ignore the mic while the app is playing, so it doesn't hear itself.
     const appPlaying = performance.now() < playingUntil && !$('self-test').checked;
     const pitch = level > gate && !appPlaying ? findPitch() : null;
-    if (pitch && pitch.clarity >= MIN_CLARITY) showPitch(pitch, level);
+    if (pitch && pitch.clarity >= minClarity) showPitch(pitch, level);
     else showNoPitch(appPlaying);
   }
   requestAnimationFrame(tick);
@@ -1224,11 +1245,11 @@ function tick() {
 // that finds nothing do we run the slower full-size check for the lowest notes.
 function findPitch() {
   const recent = buffer.subarray(buffer.length / 2);
-  const quick = detectPitch(recent, ctx.sampleRate, { minFreq: 64 });
-  if (quick && quick.clarity >= MIN_CLARITY) return quick;
+  const quick = detectPitch(recent, ctx.sampleRate, { minFreq: 64, threshold: pitchThreshold });
+  if (quick && quick.clarity >= minClarity) return quick;
   lowTurn = !lowTurn;
   if (!lowTurn) return quick; // the slow check runs on every other reading
-  return detectPitch(buffer, ctx.sampleRate, { minFreq: 25, maxFreq: 70 }) || quick;
+  return detectPitch(buffer, ctx.sampleRate, { minFreq: 25, maxFreq: 70, threshold: pitchThreshold }) || quick;
 }
 
 function showLoudness(level) {
