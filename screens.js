@@ -1,5 +1,6 @@
 import { CHARACTER_IDS, characterSVG, characterName } from './characters.js?v=8';
 import { startTour } from './tour.js?v=1';
+import { THEME_IDS, themeName, wallpaperSVG, wallpaperCount } from './wallpapers.js?v=2';
 
 // The pages around the practice screen: splash, intro, the first-time setup
 // (onboarding), home, drills, profile, theme and settings.
@@ -12,6 +13,49 @@ const SCREENS = ['splash', 'intro', 'onboard', 'home', 'drills-page', 'profile-p
 let api = null;
 let profile = null; // { name, character, variant, heard }
 let settingsFromPractice = false;
+
+// ---------- Wallpaper ----------
+const WALL_KEY = 'sr-wall';
+let wall = '';   // "theme:variant", or '' for none
+function loadWall() { try { wall = localStorage.getItem(WALL_KEY) || ''; } catch { wall = ''; } }
+function applyWall() {
+  const [id, v] = wall.split(':');
+  $('wallpaper').innerHTML = id ? wallpaperSVG(id, Number(v) || 0) : '';
+}
+// The wallpaper shows behind the home page and the practice screen only.
+function showWall(on) { document.body.classList.toggle('has-wall', Boolean(on && wall)); }
+
+function renderWalls() {
+  const grid = $('wall-grid');
+  grid.innerHTML = '';
+  const options = [['', 'None']];
+  for (const id of THEME_IDS) {
+    const n = wallpaperCount(id);
+    for (let v = 0; v < n; v++) options.push([`${id}:${v}`, themeName(id) + (n > 1 ? ` ${v === 0 ? 'A' : 'B'}` : '')]);
+  }
+  for (const [key, label] of options) {
+    const b = document.createElement('button');
+    b.type = 'button';
+    b.className = 'wall-tile';
+    b.setAttribute('role', 'radio');
+    b.setAttribute('aria-checked', String(key === wall));
+    const pic = document.createElement('span');
+    pic.className = 'wall-pic';
+    if (key) { const [id, v] = key.split(':'); pic.innerHTML = wallpaperSVG(id, Number(v)); }
+    const name = document.createElement('span');
+    name.className = 'wall-name';
+    name.textContent = label;
+    b.append(pic, name);
+    b.addEventListener('click', () => {
+      wall = key;
+      try { localStorage.setItem(WALL_KEY, wall); } catch { /* storage may be blocked */ }
+      applyWall();
+      for (const other of grid.children) other.setAttribute('aria-checked', 'false');
+      b.setAttribute('aria-checked', 'true');
+    });
+    grid.append(b);
+  }
+}
 
 function loadProfile() {
   try { return JSON.parse(localStorage.getItem(PROFILE_KEY) || 'null'); } catch { return null; }
@@ -50,12 +94,15 @@ export function showScreen(id, { from } = {}) {
   if (id === 'home') renderHome();
   if (id === 'drills-page') renderDrills();
   if (id === 'profile-page') renderProfile();
+  if (id === 'theme-page') renderWalls();
+  showWall(id === 'home');
   window.scrollTo(0, 0);
 }
 
 function enterPractice() {
   settingsFromPractice = false;
   hideAll();
+  showWall(true);
   api.openPractice();
 }
 
@@ -262,6 +309,8 @@ function wireProfile() {
 export function initScreens(appApi) {
   api = appApi;
   profile = loadProfile();
+  loadWall();
+  applyWall();
   buildSplash();
   wireOnboarding();
   wireProfile();

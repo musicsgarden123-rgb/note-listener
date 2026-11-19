@@ -7,10 +7,11 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fredoka:wght@500;600;700&family=Nunito:wght@500;700;800&display=swap">
-  <link rel="stylesheet" href="style.css?v=14">
+  <link rel="stylesheet" href="style.css?v=15">
 </head>
 <body>
   <!--APP-START-->
+  <div id="wallpaper" class="wallpaper" aria-hidden="true"></div>
 
   <!-- ===== Splash ===== -->
   <section id="splash" class="screen splash sky" aria-label="Sight Reader">
@@ -133,15 +134,9 @@
   <!-- ===== Theme ===== -->
   <section id="theme-page" class="screen page with-nav" hidden>
     <header class="page-head"><h1>Theme</h1></header>
-    <div class="theme-soon">
-      <div id="theme-mascot" class="mascot small" aria-hidden="true"></div>
-      <h2>Themes are coming soon</h2>
-      <p>Seasonal backgrounds for the staff, and the option to use your own picture.</p>
-      <div class="theme-tiles" aria-hidden="true">
-        <div class="tile spring">Spring</div><div class="tile summer">Summer</div>
-        <div class="tile autumn">Autumn</div><div class="tile winter">Winter</div>
-      </div>
-    </div>
+    <p class="theme-intro">Choose a background for your home page and practice screen.</p>
+    <div id="wall-grid" class="wall-grid" role="radiogroup" aria-label="Background"></div>
+    <div id="theme-mascot" hidden></div>
   </section>
 
   <!-- ===== Settings ===== -->
@@ -265,6 +260,6 @@
   <!--APP-END-->
 
   <script src="vendor/vexflow-4.2.5-bravura.js"></script>
-  <script type="module" src="main.js?v=21"></script>
+  <script type="module" src="main.js?v=22"></script>
 </body>
 </html>

@@ -694,7 +694,6 @@ const THEMES = {
   summer: { name: 'Summer', walls: [{ draw: beachScene, seed: 202 }, { draw: waveScene, seed: 203 }] },
   autumn: { name: 'Autumn', walls: [{ seed: 1095, draw: (u, r) => { const t = T('dawn'); return base(u, t.sky) + rays(u) + sun(u, 90, 140, 16, t.sun, t.glow) + range(r, 250, 50, '#c9a7b8', .7) + mist(u, 230, 40, .7) + Array.from({ length: 7 }, (_, i) => autumnTree(i * 48 + 10, 320, 1, r, ['#f2a03d', '#e8743b', '#f6c453'])).join('') + mist(u, 300, 40, .5) + leaves(r, 18) + fog(u); } }] },
   winter: { name: 'Winter', walls: [{ draw: winterScene, seed: 204 }] },
-  christmas: { name: 'Christmas', walls: [{ draw: xmasScene, seed: 205 }] },
   halloween: { name: 'Halloween', walls: [{ draw: halloweenScene, seed: 206 }] },
   easter: { name: 'Easter', walls: [{ draw: easterScene, seed: 207 }] },
   sakura: { name: 'Cherry blossom', walls: [{ draw: sakuraScene, seed: 208 }] },
