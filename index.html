@@ -7,7 +7,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fredoka:wght@500;600;700&family=Nunito:wght@500;700;800&display=swap">
-  <link rel="stylesheet" href="style.css?v=13">
+  <link rel="stylesheet" href="style.css?v=14">
 </head>
 <body>
   <!--APP-START-->
@@ -82,20 +82,13 @@
     <div class="home-hero">
       <div class="home-hero-top">
         <span class="home-brand">Sight <span>Reader</span></span>
+        <button id="home-tutorial" type="button" class="tutorial-btn">Tutorial</button>
         <button id="home-avatar" type="button" class="avatar-btn" aria-label="Your profile"></button>
       </div>
       <h1 id="home-hello" class="home-hello">Hi!</h1>
       <p class="home-sub">Ready to practise?</p>
     </div>
     <div class="home-cards">
-      <button id="card-practice" type="button" class="home-card">
-        <svg viewBox="0 0 80 56" aria-hidden="true" class="card-art">
-          <g stroke="#cfc7ba" stroke-width="2"><path d="M4 12h72M4 20h72M4 28h72M4 36h72M4 44h72"/></g>
-          <ellipse cx="34" cy="40" rx="7" ry="5" transform="rotate(-20 34 40)" fill="#3fa66a"/><path d="M40 39V12" stroke="#3fa66a" stroke-width="3"/>
-          <ellipse cx="56" cy="32" rx="7" ry="5" transform="rotate(-20 56 32)" fill="#3fa66a"/><path d="M62 31V6" stroke="#3fa66a" stroke-width="3"/><path d="M40 12L62 6" stroke="#3fa66a" stroke-width="5"/>
-        </svg>
-        <span>Sight reading</span>
-      </button>
       <button id="card-drills" type="button" class="home-card">
         <svg viewBox="0 0 80 56" aria-hidden="true" class="card-art">
           <rect x="10" y="6" width="60" height="44" rx="8" fill="#fbe7d2"/>
@@ -103,6 +96,14 @@
           <g stroke="#e0c3a3" stroke-width="4" stroke-linecap="round"><path d="M32 18h28M32 28h22M32 38h26"/></g>
         </svg>
         <span>Drills</span>
+      </button>
+      <button id="card-practice" type="button" class="home-card">
+        <svg viewBox="0 0 80 56" aria-hidden="true" class="card-art">
+          <g stroke="#cfc7ba" stroke-width="2"><path d="M4 12h72M4 20h72M4 28h72M4 36h72M4 44h72"/></g>
+          <ellipse cx="34" cy="40" rx="7" ry="5" transform="rotate(-20 34 40)" fill="#3fa66a"/><path d="M40 39V12" stroke="#3fa66a" stroke-width="3"/>
+          <ellipse cx="56" cy="32" rx="7" ry="5" transform="rotate(-20 56 32)" fill="#3fa66a"/><path d="M62 31V6" stroke="#3fa66a" stroke-width="3"/><path d="M40 12L62 6" stroke="#3fa66a" stroke-width="5"/>
+        </svg>
+        <span>Sight reading</span>
       </button>
     </div>
   </section>
@@ -152,6 +153,7 @@
       <h1>Settings</h1>
     </header>
     <div class="settings-body">
+      <button id="settings-tutorial" type="button" class="setting-row setting-button">Show me around (tutorial) <span aria-hidden="true">›</span></button>
       <label class="setting-row">Sound
         <select id="waveform">
           <option value="piano">Grand piano</option>
@@ -263,6 +265,6 @@
   <!--APP-END-->
 
   <script src="vendor/vexflow-4.2.5-bravura.js"></script>
-  <script type="module" src="main.js?v=20"></script>
+  <script type="module" src="main.js?v=21"></script>
 </body>
 </html>

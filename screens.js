@@ -1,4 +1,5 @@
 import { CHARACTER_IDS, characterSVG, characterName } from './characters.js?v=8';
+import { startTour } from './tour.js?v=1';
 
 // The pages around the practice screen: splash, intro, the first-time setup
 // (onboarding), home, drills, profile, theme and settings.
@@ -166,6 +167,8 @@ function wireOnboarding() {
     profile = { name: draft.name.trim(), character: draft.character, variant: draft.variant, heard: draft.heard };
     saveProfile();
     showScreen('home');
+    // First time in: the tutorial starts by itself (Exit any time).
+    setTimeout(startTour, 400);
   });
 }
 
@@ -218,6 +221,7 @@ function renderDrills() {
       play.className = 'btn btn-green small';
       play.textContent = 'Practise';
       play.addEventListener('click', () => { api.selectDrill(d.id); enterPractice(); });
+      if (!d.preset) { play.dataset.practise = d.id; play.dataset.name = d.name; }
       row.append(info, edit, play);
       list.append(row);
     }
@@ -265,6 +269,9 @@ export function initScreens(appApi) {
   $('splash').addEventListener('click', leaveSplash);
   $('card-practice').addEventListener('click', enterPractice);
   $('card-drills').addEventListener('click', () => showScreen('drills-page'));
+  for (const id of ['home-tutorial', 'settings-tutorial']) {
+    $(id).addEventListener('click', () => { showScreen('home'); setTimeout(startTour, 150); });
+  }
   $('home-avatar').addEventListener('click', () => showScreen('profile-page'));
   $('drills-new').addEventListener('click', () => enterEditor(null));
   $('settings-back').addEventListener('click', enterPractice);

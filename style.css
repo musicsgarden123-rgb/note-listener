@@ -936,3 +936,34 @@ button, .char-btn, .home-card { -webkit-tap-highlight-color: transparent; }
 .home-brand span { color: #ffdc8a; }
 
 .setting-hint { margin: -4px 4px 10px; font-size: 0.85rem; color: var(--muted, #8a8075); }
+
+/* ---------- Tutorial ---------- */
+.tutorial-btn {
+  margin-left: auto; margin-right: 10px; min-height: 0; padding: 7px 14px;
+  border-radius: 999px; border: 1.5px solid rgba(255,255,255,.7);
+  background: rgba(255,255,255,.18); color: #fff; font: 700 0.9rem/1 Nunito, system-ui, sans-serif;
+}
+.setting-button { width: 100%; text-align: left; font: inherit; cursor: pointer; }
+.tour { position: fixed; inset: 0; z-index: 1000; pointer-events: none; }
+.tour-block { position: fixed; background: rgba(20, 24, 40, 0.58); pointer-events: auto; }
+.tour-ring {
+  position: fixed; border-radius: 14px; pointer-events: none;
+  box-shadow: 0 0 0 3px #ffd36b, 0 0 22px 6px rgba(255, 211, 107, 0.55);
+  animation: tour-pulse 1.6s ease-in-out infinite;
+}
+@keyframes tour-pulse { 50% { box-shadow: 0 0 0 3px #ffd36b, 0 0 32px 10px rgba(255, 211, 107, 0.35); } }
+.tour-bubble {
+  position: fixed; display: flex; gap: 12px; align-items: flex-start; pointer-events: auto;
+  padding: 14px; border-radius: 18px; background: #fffdf8; color: #2d2620;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+}
+.tour-face { flex: 0 0 54px; width: 54px; height: 54px; }
+.tour-face svg { width: 100%; height: 100%; display: block; }
+.tour-body { flex: 1; min-width: 0; }
+.tour-text { margin: 2px 0 10px; font: 600 1rem/1.4 Nunito, system-ui, sans-serif; }
+.tour-bar { display: flex; align-items: center; gap: 8px; }
+.tour-count { font-size: 0.8rem; color: #8a8075; margin-right: auto; }
+.tour-bar button { min-height: 0; padding: 8px 14px; border-radius: 12px; font: 700 0.9rem/1 Nunito, system-ui, sans-serif; cursor: pointer; }
+.tour-exit { background: transparent; border: 1.5px solid #d8cfc2; color: #6b6158; }
+.tour-next { background: #3fa66a; border: none; color: #fff; box-shadow: 0 3px 0 #2e7d50; }
+@media (prefers-reduced-motion: reduce) { .tour-ring { animation: none; } }
