@@ -14,7 +14,8 @@ const LETTER_STEP = { C: 0, D: 1, E: 2, F: 3, G: 4, A: 5, B: 6 };
 const SHARP_NAMES = ['C', 'C#', 'D', 'D#', 'E', 'F', 'F#', 'G', 'G#', 'A', 'A#', 'B'];
 const FLAT_NAMES = ['C', 'Db', 'D', 'Eb', 'E', 'F', 'Gb', 'G', 'Ab', 'A', 'Bb', 'B'];
 
-const SILENCE_RMS = 0.01;    // below this the mic is treated as silent
+const SILENCE_RMS = 0.0015;  // never listen below this (about -56 dB)
+const GATE_OVER_FLOOR = 2.5;  // a note must be this many times louder than the room's own noise
 const MIN_CLARITY = 0.85;    // ignore pitch readings less certain than this
 const MATCH_CENTS = 50;      // within this many cents of the question note counts as correct
 const MATCH_FRAMES = 3;      // steady correct readings before the mic answer counts
@@ -56,11 +57,14 @@ const $ = (id) => document.getElementById(id);
 let ctx;
 let analyser;
 let micSource;
+let micFilter;             // removes rumble below the lowest piano note before listening
+let noiseFloor = 0.003;    // how loud the room is when nobody plays (tracked as we go)
 let micStream;
 let buffer;
 let listening = true;
 let playingUntil = 0;
 let frame = 0;
+let lowTurn = false;
 
 const keyEls = new Map();   // midi -> key element
 let litMidi = null;
@@ -237,6 +241,17 @@ function ensureAudio() {
   const silent = ctx.createGain();
   silent.gain.value = 0;
   analyser.connect(silent).connect(ctx.destination);
+  // Some microphones (iPads especially) pick up a slow, deep rumble that drowns
+  // out the note. Two gentle filters remove everything below the lowest piano note.
+  micFilter = ctx.createBiquadFilter();
+  micFilter.type = 'highpass';
+  micFilter.frequency.value = 22;
+  micFilter.Q.value = 0.7;
+  const micFilter2 = ctx.createBiquadFilter();
+  micFilter2.type = 'highpass';
+  micFilter2.frequency.value = 22;
+  micFilter2.Q.value = 0.7;
+  micFilter.connect(micFilter2).connect(analyser);
   buildSoundChains();
   loadPiano('piano');
   if (PIANOS[$('waveform').value]) loadPiano($('waveform').value);
@@ -462,7 +477,8 @@ async function connectMic(deviceId) {
     },
   });
   micSource = ctx.createMediaStreamSource(micStream);
-  micSource.connect(analyser); // to the listener only; it reaches the speakers at zero volume
+  micSource.connect(micFilter); // to the listener only; it reaches the speakers at zero volume
+  noiseFloor = 0.003;
   // iPads can pause the audio engine when the microphone starts; wake it up.
   if (ctx.state !== 'running') {
     try { await ctx.resume(); } catch { /* ignore */ }
@@ -1189,12 +1205,15 @@ function tick() {
   analyser.getFloatTimeDomainData(buffer);
   const level = rms(buffer);
   showLoudness(level);
+  // Track the room's background noise: drop to quiet moments at once, rise only slowly.
+  noiseFloor = level < noiseFloor ? level : noiseFloor + (level - noiseFloor) * 0.002;
+  const gate = Math.max(SILENCE_RMS, noiseFloor * GATE_OVER_FLOOR);
 
   // Pitch detection is the heavy part, so it runs every other frame (~30 times a second).
   if (frame++ % 2 === 0) {
     // Ignore the mic while the app is playing, so it doesn't hear itself.
     const appPlaying = performance.now() < playingUntil && !$('self-test').checked;
-    const pitch = level > SILENCE_RMS && !appPlaying ? findPitch() : null;
+    const pitch = level > gate && !appPlaying ? findPitch() : null;
     if (pitch && pitch.clarity >= MIN_CLARITY) showPitch(pitch, level);
     else showNoPitch(appPlaying);
   }
@@ -1207,7 +1226,8 @@ function findPitch() {
   const recent = buffer.subarray(buffer.length / 2);
   const quick = detectPitch(recent, ctx.sampleRate, { minFreq: 64 });
   if (quick && quick.clarity >= MIN_CLARITY) return quick;
-  if (frame % 4 !== 0) return quick;
+  lowTurn = !lowTurn;
+  if (!lowTurn) return quick; // the slow check runs on every other reading
   return detectPitch(buffer, ctx.sampleRate, { minFreq: 25, maxFreq: 70 }) || quick;
 }
 
