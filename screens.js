@@ -1,6 +1,7 @@
 import { CHARACTER_IDS, characterSVG, characterName } from './characters.js?v=8';
 import { startTour } from './tour.js?v=1';
 import { THEME_IDS, themeName, wallpaperSVG, wallpaperCount } from './wallpapers.js?v=2';
+import { LOOKS, applyLook, deriveLook, lookArt } from './theme.js?v=1';
 
 // The pages around the practice screen: splash, intro, the first-time setup
 // (onboarding), home, drills, profile, theme and settings.
@@ -13,6 +14,41 @@ const SCREENS = ['splash', 'intro', 'onboard', 'home', 'drills-page', 'profile-p
 let api = null;
 let profile = null; // { name, character, variant, heard }
 let settingsFromPractice = false;
+
+// ---------- Look (colours and fonts) ----------
+const LOOK_KEY = 'sr-look';
+let look = 'recital';
+function loadLook() {
+  try { look = new URLSearchParams(location.search).get('look') || localStorage.getItem(LOOK_KEY) || 'recital'; } catch { look = 'recital'; }
+  applyLook(look);
+}
+function renderLooks() {
+  const grid = $('look-grid');
+  grid.innerHTML = '';
+  for (const L of LOOKS) {
+    const c = deriveLook(L);
+    const b = document.createElement('button');
+    b.type = 'button';
+    b.className = 'look-tile';
+    b.setAttribute('role', 'radio');
+    b.setAttribute('aria-checked', String(L.id === look));
+    const sw = document.createElement('span');
+    sw.className = 'look-swatch';
+    sw.style.background = `linear-gradient(160deg, ${c.hdr0}, ${c.hdr1})`;
+    sw.innerHTML = lookArt(L, c);
+    const name = document.createElement('span');
+    name.textContent = L.name;
+    b.append(sw, name);
+    b.addEventListener('click', () => {
+      look = L.id;
+      try { localStorage.setItem(LOOK_KEY, look); } catch { /* storage may be blocked */ }
+      applyLook(look);
+      for (const o of grid.children) o.setAttribute('aria-checked', 'false');
+      b.setAttribute('aria-checked', 'true');
+    });
+    grid.append(b);
+  }
+}
 
 // ---------- Wallpaper ----------
 const WALL_KEY = 'sr-wall';
@@ -94,7 +130,7 @@ export function showScreen(id, { from } = {}) {
   if (id === 'home') renderHome();
   if (id === 'drills-page') renderDrills();
   if (id === 'profile-page') renderProfile();
-  if (id === 'theme-page') renderWalls();
+  if (id === 'theme-page') { renderLooks(); renderWalls(); }
   showWall(id === 'home');
   window.scrollTo(0, 0);
 }
@@ -165,7 +201,7 @@ function showStep(i) {
   for (const el of $('onboard').querySelectorAll('.ob-step')) el.hidden = el.dataset.step !== step;
   $('ob-bar').style.width = `${((i + 1) / STEPS.length) * 100}%`;
   $('ob-next').textContent = NEXT_LABEL[step];
-  $('ob-next').className = step === 'welcome' ? 'btn btn-green' : 'btn btn-blue';
+  $('ob-next').className = 'btn';
   if (step === 'name') setTimeout(() => $('ob-name').focus(), 50);
   if (step === 'character') {
     $('pick-title').textContent = `Choose a character for ${draft.name}`;
@@ -246,6 +282,9 @@ function renderDrills() {
       list.append(p);
       return;
     }
+    const card = document.createElement('div');
+    card.className = 'list-card';
+    list.append(card);
     for (const d of drills) {
       const row = document.createElement('div');
       row.className = 'drill-row';
@@ -260,17 +299,17 @@ function renderDrills() {
       info.append(name, count);
       const edit = document.createElement('button');
       edit.type = 'button';
-      edit.className = 'btn btn-plain small';
+      edit.className = 'btn-text';
       edit.textContent = d.preset ? 'Copy' : 'Edit';
       edit.addEventListener('click', () => enterEditor(d));
       const play = document.createElement('button');
       play.type = 'button';
-      play.className = 'btn btn-green small';
-      play.textContent = 'Practise';
+      play.className = 'btn-tonal';
+      play.innerHTML = '<svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><path class="fill" d="M8 5.5v13a1 1 0 0 0 1.5.9l10-6.5a1 1 0 0 0 0-1.7l-10-6.5A1 1 0 0 0 8 5.5z"/></svg>Practise';
       play.addEventListener('click', () => { api.selectDrill(d.id); enterPractice(); });
       if (!d.preset) { play.dataset.practise = d.id; play.dataset.name = d.name; }
       row.append(info, edit, play);
-      list.append(row);
+      card.append(row);
     }
   };
   section('My drills', mine, 'No drills yet. Tap "New drill" to make one.');
@@ -309,6 +348,7 @@ function wireProfile() {
 export function initScreens(appApi) {
   api = appApi;
   profile = loadProfile();
+  loadLook();
   loadWall();
   applyWall();
   buildSplash();

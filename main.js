@@ -1,5 +1,5 @@
 import { detectPitch, freqToMidi, midiToFreq, rms } from './pitch.js?v=4';
-import { initScreens, showScreen } from './screens.js?v=10';
+import { initScreens, showScreen } from './screens.js?v=11';
 
 // ======================================================================
 // Constants
@@ -52,6 +52,8 @@ const PRESETS = [
 ];
 
 const $ = (id) => document.getElementById(id);
+const ICON_CHECK = '<svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg><span class="sr-only">Correct</span>';
+const ICON_BULB = '<svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M9 18h6M10 21h4M12 3a6 6 0 0 0-3.5 10.9c.6.5 1 1.2 1 2V16h5v-.1c0-.8.4-1.5 1-2A6 6 0 0 0 12 3z"/></svg>';
 
 // ======================================================================
 // State
@@ -297,7 +299,7 @@ async function openPractice() {
 function leavePractice() {
   practiceOpen = false;
   // Stop listening while the student is on other pages.
-  if (micMode) { stopMic(); listening = false; micMode = false; $('mic-toggle').setAttribute('aria-pressed', 'false'); $('mic-toggle').textContent = '🎤 Mic off'; }
+  if (micMode) { stopMic(); listening = false; micMode = false; $('mic-toggle').setAttribute('aria-pressed', 'false'); $('mic-toggle').querySelector('span').textContent = 'Mic off'; }
   $('app').hidden = true;
 }
 
@@ -455,7 +457,7 @@ async function setMicMode(on, { quiet = false } = {}) {
       listening = false;
       stopMic();
       status.textContent = err && err.name === 'NotAllowedError'
-        ? 'The microphone is blocked. Allow it for this site in your browser settings, then tap 🎤 again.'
+        ? 'The microphone is blocked. Allow it for this site in your browser settings, then tap the mic button again.'
         : 'No microphone was found, so the app can\'t hear a real piano. Tap the keys on screen instead.';
       status.hidden = quiet && !(err && err.name === 'NotAllowedError') ? true : false;
     }
@@ -468,7 +470,7 @@ async function setMicMode(on, { quiet = false } = {}) {
   }
   remember('sr-mic', micMode ? '1' : '0');
   $('mic-toggle').setAttribute('aria-pressed', String(micMode));
-  $('mic-toggle').textContent = micMode ? '🎤 Mic on' : '🎤 Mic off';
+  $('mic-toggle').querySelector('span').textContent = micMode ? 'Mic on' : 'Mic off';
   updateDock();
 }
 
@@ -875,7 +877,7 @@ function answer(midi) {
   key.classList.add('is-correct');
   clearTimeout(key._flash);
   key._flash = setTimeout(() => key.classList.remove('is-correct'), CORRECT_FLASH_MS);
-  $('feedback').textContent = '✓';
+  $('feedback').innerHTML = ICON_CHECK;
   $('feedback').className = 'feedback good';
   clearTimeout(answer._fb);
   answer._fb = setTimeout(() => { $('feedback').textContent = ''; }, 600);
@@ -888,7 +890,8 @@ function showHint() {
   if ($('dock').hidden) {
     // No keyboard on screen (mic mode): name the note instead.
     clearTimeout(answer._fb);
-    $('feedback').textContent = `💡 ${itemSpell(question).pretty}`;
+    $('feedback').innerHTML = ICON_BULB;
+    $('feedback').append(itemSpell(question).pretty);
     $('feedback').className = 'feedback hint';
     return;
   }
