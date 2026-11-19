@@ -27,16 +27,20 @@ export function ensure(fg, bgs, min = 4.5) {
 // ---------- The looks ----------
 // bg, ink, accent; hdr = header gradient; display = display font; art = header drawing.
 export const LOOKS = [
-  { id: 'recital', name: 'Starlight Recital', bg: '#0f1124', ink: '#f3eee6', accent: '#f2c46d', hdr: ['#1b1d44', '#0f1124'], display: "'Playfair Display', serif", displayWeight: 700, art: 'recital' },
+  // Kept from round 1
   { id: 'moonlake', name: 'Moonlit Lake', bg: '#0e1a2a', ink: '#eef3fa', accent: '#9cc8ff', hdr: ['#20385e', '#0e1a2a'], display: "'Cormorant Garamond', serif", displayWeight: 700, art: 'moonlake' },
-  { id: 'lantern', name: 'Lantern Garden', bg: '#1a1012', ink: '#f7ece4', accent: '#f0b35a', hdr: ['#3a1a1c', '#1a1012'], display: "'Fraunces', serif", displayWeight: 700, art: 'lantern' },
-  { id: 'aurora', name: 'Aurora Keys', bg: '#0e1a1f', ink: '#eaf6f2', accent: '#7fe0c4', hdr: ['#12323a', '#0e1a1f'], display: "'DM Serif Display', serif", displayWeight: 400, art: 'aurora' },
-  { id: 'dragon', name: 'Dragon Dusk', bg: '#17111c', ink: '#f6eef2', accent: '#ffb347', hdr: ['#4a2a4a', '#17111c'], display: "'Fredoka', sans-serif", displayWeight: 600, art: 'dragon' },
-  { id: 'sakura', name: 'Sakura Night', bg: '#18101a', ink: '#f8edf2', accent: '#ff9ec4', hdr: ['#3a2038', '#18101a'], display: "'Cormorant Garamond', serif", displayWeight: 700, displayItalic: true, art: 'sakura' },
-  { id: 'golden', name: 'Golden Hour', bg: '#fbf7ef', ink: '#2c2418', accent: '#8a5c12', hdr: ['#f7dcae', '#fbf1df'], display: "'Cormorant Garamond', serif", displayWeight: 700, art: 'golden' },
-  { id: 'lavender', name: 'Lavender Twilight', bg: '#f7f3fa', ink: '#2a2236', accent: '#6b4a9b', hdr: ['#d9c8ee', '#f3ecfa'], display: "'Fraunces', serif", displayWeight: 600, displayItalic: true, art: 'lavender' },
   { id: 'candy', name: 'Candy Stars', bg: '#1c1216', ink: '#fbeef3', accent: '#ff8fb8', hdr: ['#3e1f36', '#1c1216'], display: "'Baloo 2', sans-serif", displayWeight: 800, art: 'candy' },
-  { id: 'ocean', name: 'Ocean Glow', bg: '#0a1a24', ink: '#e8f7fa', accent: '#3fe0d0', hdr: ['#0f3a4e', '#0a1a24'], display: "'Baloo 2', sans-serif", displayWeight: 700, art: 'ocean' },
+  // Round 2
+  { id: 'lullaby', name: 'Starry Lullaby', bg: '#121434', ink: '#eef0ff', accent: '#a9b8ff', hdr: ['#262a6a', '#121434'], display: "'Baloo 2', sans-serif", displayWeight: 800, art: 'lullaby' },
+  { id: 'cottoncandy', name: 'Cotton Candy Sky', bg: '#1a1428', ink: '#fbf0ff', accent: '#f4a8ff', hdr: ['#43305e', '#1a1428'], display: "'Fredoka', sans-serif", displayWeight: 600, art: 'cottoncandy' },
+  { id: 'moonrabbit', name: 'Moon Rabbit', bg: '#101a33', ink: '#f1f4fb', accent: '#ffe08a', hdr: ['#22345e', '#101a33'], display: "'Cormorant Garamond', serif", displayWeight: 700, art: 'moonrabbit' },
+  { id: 'galaxy', name: 'Galaxy Swirl', bg: '#120f2a', ink: '#f2eeff', accent: '#c59bff', hdr: ['#2e2462', '#120f2a'], display: "'Baloo 2', sans-serif", displayWeight: 700, art: 'galaxy' },
+  { id: 'shooting', name: 'Shooting Stars', bg: '#0c1630', ink: '#eaf4ff', accent: '#7fd0ff', hdr: ['#1a3466', '#0c1630'], display: "'Fraunces', serif", displayWeight: 700, displayItalic: true, art: 'shooting' },
+  { id: 'planets', name: 'Bubblegum Planets', bg: '#1b1030', ink: '#fdf0fb', accent: '#ff8fd8', hdr: ['#3c2366', '#1b1030'], display: "'Fredoka', sans-serif", displayWeight: 700, art: 'planets' },
+  { id: 'snowmoon', name: 'Midnight Snow', bg: '#0f1a30', ink: '#f0f6ff', accent: '#cfe6ff', hdr: ['#223c66', '#0f1a30'], display: "'Cormorant Garamond', serif", displayWeight: 700, displayItalic: true, art: 'snowmoon' },
+  { id: 'crystal', name: 'Crystal Cave', bg: '#121626', ink: '#eefaff', accent: '#8ff0ff', hdr: ['#23304e', '#121626'], display: "'DM Serif Display', serif", displayWeight: 400, art: 'crystal' },
+  { id: 'moonpiano', name: 'Moonlit Piano', bg: '#0e1426', ink: '#eef3fb', accent: '#9cc8ff', hdr: ['#1f2e56', '#0e1426'], display: "'Playfair Display', serif", displayWeight: 700, art: 'moonpiano' },
+  { id: 'starjar', name: 'Star Candy Jar', bg: '#1c1220', ink: '#fff0f6', accent: '#ffb3d1', hdr: ['#3a2244', '#1c1220'], display: "'Baloo 2', sans-serif", displayWeight: 800, art: 'starjar' },
 ];
 
 // Works out every colour of a look (the playbook's recipe), with contrast checked.
@@ -126,6 +130,44 @@ const ART = {
     return `${glow(g, c.accent, 104, 60, 60)}${jelly(92, 54, 1.4)}${jelly(132, 40, 0.9)}${jelly(64, 34, 0.7)}
     <path d="M0 104 q20 -10 40 0 t40 0 t40 0 t40 0 L160 120 L0 120 Z" fill="#0f3a4e"/><path d="M0 110 q20 -8 40 0 t40 0 t40 0 t40 0" stroke="${c.accent}" stroke-width="1.4" fill="none" opacity=".5"/>
     ${dots([[30, 70, 1.6], [50, 92, 1], [150, 86, 1.2], [118, 18, 1]], '#bff6ec')}`; },
+  lullaby: (c) => { const g = `g${++gid}`; const cloud = (x, y, s) => `<g transform="translate(${x} ${y}) scale(${s})" fill="#3c4290"><circle cx="-12" cy="0" r="9"/><circle cx="0" cy="-6" r="12"/><circle cx="14" cy="0" r="9"/><rect x="-21" y="0" width="44" height="9" rx="4.5"/></g>`;
+    return `${glow(g, c.accent, 110, 46, 56)}<circle cx="112" cy="44" r="22" fill="#fff6d6"/><circle cx="124" cy="36" r="20" fill="${c.hdr0}"/>
+    <path d="M100 46 q3 3 6 0" stroke="#3b2a40" stroke-width="1.4" fill="none" stroke-linecap="round"/>
+    ${cloud(80, 88, 1)}${cloud(140, 76, 0.75)}${spark(48, 28, 6, c.accent)}${spark(150, 24, 4, '#fff6d6')}${spark(66, 64, 3.4, c.accent)}
+    <text x="134" y="58" font-size="10" font-family="sans-serif" font-weight="800" fill="${c.accent}">z</text><text x="142" y="48" font-size="8" font-family="sans-serif" font-weight="800" fill="${c.accent}">z</text>`; },
+  cottoncandy: (c) => { const g = `g${++gid}`; const puff = (x, y, s, col) => `<g transform="translate(${x} ${y}) scale(${s})" fill="${col}"><circle cx="-14" cy="2" r="11"/><circle cx="0" cy="-8" r="15"/><circle cx="16" cy="0" r="12"/><rect x="-25" y="2" width="53" height="12" rx="6"/></g>`;
+    return `${glow(g, c.accent, 104, 60, 60)}${puff(100, 62, 1.3, '#f6b8f0')}${puff(100, 66, 1.3, '#e89ae6')}${puff(70, 96, 0.8, '#c8a8ff')}${puff(146, 92, 0.7, '#f6b8f0')}
+    ${spark(140, 30, 6, '#fff3c0')}${spark(56, 40, 4, '#fff')}${dots([[30, 70, 1.4], [150, 56, 1.2], [84, 24, 1]], '#fff')}`; },
+  moonrabbit: (c) => { const g = `g${++gid}`; return `${glow(g, c.accent, 108, 54, 62)}<circle cx="108" cy="54" r="34" fill="#fff4cc"/>
+    <g fill="#d8c28a" opacity=".9"><ellipse cx="104" cy="64" rx="12" ry="9"/><circle cx="94" cy="54" r="7"/><ellipse cx="90" cy="42" rx="2.6" ry="9" transform="rotate(-15 90 42)"/><ellipse cx="96" cy="41" rx="2.6" ry="9" transform="rotate(8 96 41)"/><circle cx="116" cy="68" r="3"/></g>
+    <circle cx="124" cy="40" r="3" fill="#ecd9a4"/><circle cx="128" cy="62" r="2.2" fill="#ecd9a4"/>
+    ${spark(44, 30, 5, c.accent)}${dots([[30, 80, 1.2], [152, 24, 1.2], [60, 100, 1]], '#fff')}`; },
+  galaxy: (c) => { const g = `g${++gid}`; let arms = '';
+    for (let i = 0; i < 70; i++) { const t = i / 70, a = t * Math.PI * 3.2, r = 4 + t * 46; for (const off of [0, Math.PI]) arms += `<circle cx="${(108 + Math.cos(a + off) * r).toFixed(1)}" cy="${(58 + Math.sin(a + off) * r * 0.55).toFixed(1)}" r="${(1.8 - t * 1.1).toFixed(2)}" fill="${i % 3 ? c.accent : '#ffffff'}" opacity="${(1 - t * 0.6).toFixed(2)}"/>`; }
+    return `${glow(g, c.accent, 108, 58, 56)}${arms}<circle cx="108" cy="58" r="6" fill="#fff"/>${spark(40, 30, 5, '#fff')}${dots([[30, 90, 1.2], [150, 100, 1]], '#fff')}`; },
+  shooting: (c) => { const g = `g${++gid}`; const star = (x, y, len, s) => `<defs><linearGradient id="${g}t${x}" x1="1" y1="0" x2="0" y2="1"><stop offset="0" stop-color="${c.accent}"/><stop offset="1" stop-color="${c.accent}" stop-opacity="0"/></linearGradient></defs><path d="M${x} ${y} L${x - len} ${y + len * 0.6}" stroke="url(#${g}t${x})" stroke-width="${3 * s}" stroke-linecap="round"/>${spark(x, y, 6 * s, '#fff')}`;
+    return `${glow(g, c.accent, 110, 50, 56)}${star(140, 24, 60, 1.2)}${star(110, 64, 44, 0.9)}${star(70, 36, 36, 0.7)}${dots([[30, 80, 1.4], [150, 96, 1.2], [96, 104, 1], [40, 20, 1]], '#fff')}`; },
+  planets: (c) => { const g = `g${++gid}`; return `${glow(g, c.accent, 108, 58, 58)}
+    <circle cx="108" cy="58" r="24" fill="${c.accent}"/><circle cx="100" cy="50" r="6" fill="#ffc8ee" opacity=".7"/><circle cx="116" cy="66" r="4" fill="#d870b8" opacity=".6"/>
+    <ellipse cx="108" cy="58" rx="40" ry="9" fill="none" stroke="#ffe08a" stroke-width="3" transform="rotate(-14 108 58)"/>
+    <circle cx="56" cy="34" r="8" fill="#9fd8ff"/><circle cx="150" cy="100" r="6" fill="#b8f0a8"/>${spark(150, 24, 5, '#fff')}${dots([[34, 90, 1.4], [80, 100, 1]], '#fff')}`; },
+  snowmoon: (c) => { const g = `g${++gid}`; const flake = (x, y, s) => `<g transform="translate(${x} ${y}) scale(${s})" stroke="#fff" stroke-width="1.4" stroke-linecap="round"><path d="M0 -6 V6 M-5.2 -3 L5.2 3 M-5.2 3 L5.2 -3"/></g>`;
+    return `${glow(g, c.accent, 112, 40, 52)}<circle cx="112" cy="40" r="18" fill="#f6faff"/>
+    <path d="M0 96 Q40 74 84 90 Q120 70 160 88 L160 120 L0 120 Z" fill="#dfeaf8"/><path d="M30 120 Q80 98 160 108 L160 120 Z" fill="#b8cce6"/>
+    <path d="M58 90 l6 -16 l6 16 Z M66 92 l5 -12 l5 12 Z" fill="#2c4a6a"/>${flake(40, 30, 1)}${flake(150, 64, 0.8)}${flake(80, 56, 0.7)}${flake(142, 18, 0.6)}`; },
+  crystal: (c) => { const g = `g${++gid}`; const gem = (x, y, w, h, col) => `<path d="M${x} ${y} L${x + w / 2} ${y - h} L${x + w} ${y} Z" fill="${col}"/><path d="M${x + w / 2} ${y - h} L${x + w * 0.62} ${y} L${x + w} ${y} Z" fill="#ffffff" opacity=".25"/>`;
+    return `${glow(g, c.accent, 108, 70, 58)}${gem(80, 112, 26, 72, c.accent)}${gem(100, 112, 22, 52, '#b89aff')}${gem(118, 112, 30, 86, '#6fd8f0')}${gem(140, 112, 18, 40, c.accent)}${gem(64, 112, 18, 34, '#b89aff')}
+    <rect x="50" y="110" width="110" height="10" fill="#1a2238"/>${spark(48, 34, 5, '#fff')}${spark(150, 30, 4, c.accent)}${dots([[30, 70, 1.2], [96, 22, 1]], '#fff')}`; },
+  moonpiano: (c) => { const g = `g${++gid}`; return `${glow(g, c.accent, 120, 34, 46)}<circle cx="120" cy="34" r="15" fill="#f4f8ff"/>
+    <g fill="#060a18"><path d="M48 98 Q48 74 74 72 Q94 70 102 58 Q114 46 128 58 Q136 68 130 82 L130 98 Z"/><rect x="52" y="98" width="4" height="16"/><rect x="122" y="98" width="4" height="16"/></g>
+    <rect x="48" y="90" width="82" height="4" fill="#eef3fb"/>${[0, 1, 2, 3, 4, 5, 6, 7, 8].map((i) => `<rect x="${52 + i * 9}" y="90" width="2.4" height="2.6" fill="#060a18"/>`).join('')}
+    <path d="M60 50 l0 -14 l10 -2 l0 14" stroke="${c.accent}" stroke-width="1.6" fill="none"/><ellipse cx="57.6" cy="50" rx="3" ry="2.2" fill="${c.accent}"/><ellipse cx="67.6" cy="48" rx="3" ry="2.2" fill="${c.accent}"/>
+    ${dots([[30, 30, 1.2], [150, 70, 1.2], [96, 20, 1]], '#fff')}`; },
+  starjar: (c) => { const g = `g${++gid}`; let stars = '';
+    const cols = [c.accent, '#ffe08a', '#9fe8d0', '#c8a8ff', '#ffffff'];
+    for (let i = 0; i < 14; i++) stars += spark(92 + (i % 5) * 9 + (i % 2) * 3, 104 - Math.floor(i / 5) * 12 - (i % 3) * 2, 4.4, cols[i % 5]);
+    return `${glow(g, c.accent, 112, 70, 58)}<path d="M86 40 h52 v8 q8 6 8 18 v40 q0 10 -10 10 h-48 q-10 0 -10 -10 v-40 q0 -12 8 -18 Z" fill="#ffffff" opacity=".12" stroke="#fff" stroke-opacity=".5" stroke-width="2"/>
+    <rect x="84" y="32" width="56" height="10" rx="3" fill="${c.accent}"/>${stars}${spark(60, 40, 6, '#ffe08a')}${spark(154, 26, 4, c.accent)}${dots([[40, 90, 1.4], [150, 60, 1.2]], '#fff')}`; },
 };
 
 export function lookArt(look, colours) {

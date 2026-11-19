@@ -1,7 +1,7 @@
 import { CHARACTER_IDS, characterSVG, characterName } from './characters.js?v=8';
 import { startTour } from './tour.js?v=1';
 import { THEME_IDS, themeName, wallpaperSVG, wallpaperCount } from './wallpapers.js?v=2';
-import { LOOKS, applyLook, deriveLook, lookArt } from './theme.js?v=1';
+import { LOOKS, applyLook, deriveLook, lookArt } from './theme.js?v=2';
 
 // The pages around the practice screen: splash, intro, the first-time setup
 // (onboarding), home, drills, profile, theme and settings.
@@ -17,9 +17,9 @@ let settingsFromPractice = false;
 
 // ---------- Look (colours and fonts) ----------
 const LOOK_KEY = 'sr-look';
-let look = 'recital';
+let look = 'moonlake';
 function loadLook() {
-  try { look = new URLSearchParams(location.search).get('look') || localStorage.getItem(LOOK_KEY) || 'recital'; } catch { look = 'recital'; }
+  try { look = new URLSearchParams(location.search).get('look') || localStorage.getItem(LOOK_KEY) || 'moonlake'; } catch { look = 'moonlake'; }
   applyLook(look);
 }
 function renderLooks() {
