@@ -1,7 +1,7 @@
 import { CHARACTER_IDS, characterSVG, characterName } from './characters.js?v=8';
 import { startTour } from './tour.js?v=1';
 import { THEME_IDS, themeName, wallpaperSVG, wallpaperCount } from './wallpapers.js?v=2';
-import { LOOKS, applyLook, deriveLook, lookArt } from './theme.js?v=3';
+import { LOOKS, applyLook, deriveLook, lookArt } from './theme.js?v=4';
 
 // The pages around the practice screen: splash, intro, the first-time setup
 // (onboarding), home, drills, profile, theme and settings.

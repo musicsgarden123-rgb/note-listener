@@ -183,5 +183,7 @@ export function applyLook(id) {
   document.documentElement.style.colorScheme = c.dark ? 'dark' : 'light';
   const art = document.getElementById('hero-art');
   if (art) art.innerHTML = lookArt(look, c);
+  const scene = document.getElementById('practice-scene');
+  if (scene) scene.innerHTML = lookArt(look, c);
   return look;
 }

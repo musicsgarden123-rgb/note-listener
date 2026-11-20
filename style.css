@@ -379,7 +379,9 @@ body.has-wall .home, body.has-wall .app { position: relative; z-index: 1; backgr
 body.has-wall .home-hero { background: linear-gradient(180deg, rgba(8, 10, 20, .55), rgba(8, 10, 20, 0)); --hdr-ink: #fff; --hdr-sub: #eef0f6; }
 body.has-wall .hero-art { display: none; }
 body.has-wall .home-hello, body.has-wall .home-sub, body.has-wall .home-brand { text-shadow: 0 2px 8px rgba(0,0,0,.4); }
-body.has-wall .topbar, body.has-wall .quiz { background: color-mix(in srgb, var(--card) 86%, transparent); border-radius: var(--radius); padding: 8px; -webkit-backdrop-filter: blur(8px); backdrop-filter: blur(8px); }
+/* With a picture behind practice: a soft wash of the look's colour keeps the staff readable. */
+body.has-wall .app::before { content: ""; position: absolute; inset: 0; z-index: 0; pointer-events: none; background: linear-gradient(180deg, color-mix(in srgb, var(--bg) 45%, transparent), color-mix(in srgb, var(--bg) 70%, transparent)); }
+body.has-wall .practice-scene { display: none; }
 body.has-wall .bottom-nav { z-index: 5; }
 
 @media (prefers-reduced-motion: reduce) {
@@ -388,3 +390,16 @@ body.has-wall .bottom-nav { z-index: 5; }
 .sr-only { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
 
 @media (min-width: 700px) { .home-cards { max-width: 640px; } }
+
+/* ---------- Practice as one scene: no boxes, the staff sits on the picture ---------- */
+.app { position: relative; overflow: hidden; background: linear-gradient(180deg, var(--hdr-0) 0%, var(--bg) 62%); --staff-ink: var(--ink); --staff-line: color-mix(in srgb, var(--ink) 62%, transparent); }
+.practice-scene { position: absolute; inset: 0; z-index: 0; pointer-events: none; overflow: hidden; }
+.practice-scene svg { position: absolute; right: -34%; top: 6%; width: min(100vw, 560px); height: auto; opacity: 0.26; }
+.practice-scene::after { content: ""; position: absolute; inset: 0; background-image: radial-gradient(circle at 14% 22%, #fff 0 1px, transparent 1.8px), radial-gradient(circle at 78% 8%, #fff 0 1.2px, transparent 2px), radial-gradient(circle at 36% 64%, #fff 0 0.9px, transparent 1.6px), radial-gradient(circle at 88% 48%, #fff 0 1px, transparent 1.8px), radial-gradient(circle at 8% 78%, #fff 0 1px, transparent 1.8px); opacity: 0.55; }
+.app > :not(.practice-scene) { position: relative; z-index: 1; }
+.staff { background: transparent; border: none; border-radius: 0; padding: 0; }
+.staff svg { fill: var(--staff-ink); stroke: var(--staff-ink); filter: drop-shadow(0 1px 6px color-mix(in srgb, var(--bg) 70%, transparent)); }
+.staff svg g[stroke="#999999"] { stroke: var(--staff-line); }
+.staff svg g[fill="#999999"] { fill: var(--staff-line); }
+.dock { background: transparent; border-top: none; }
+.kb-track { background: color-mix(in srgb, var(--ink) 18%, transparent); }
