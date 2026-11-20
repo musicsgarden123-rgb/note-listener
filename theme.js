@@ -27,20 +27,11 @@ export function ensure(fg, bgs, min = 4.5) {
 // ---------- The looks ----------
 // bg, ink, accent; hdr = header gradient; display = display font; art = header drawing.
 export const LOOKS = [
-  // Kept from round 1
   { id: 'moonlake', name: 'Moonlit Lake', bg: '#0e1a2a', ink: '#eef3fa', accent: '#9cc8ff', hdr: ['#20385e', '#0e1a2a'], display: "'Cormorant Garamond', serif", displayWeight: 700, art: 'moonlake' },
   { id: 'candy', name: 'Candy Stars', bg: '#1c1216', ink: '#fbeef3', accent: '#ff8fb8', hdr: ['#3e1f36', '#1c1216'], display: "'Baloo 2', sans-serif", displayWeight: 800, art: 'candy' },
-  // Round 2
-  { id: 'lullaby', name: 'Starry Lullaby', bg: '#121434', ink: '#eef0ff', accent: '#a9b8ff', hdr: ['#262a6a', '#121434'], display: "'Baloo 2', sans-serif", displayWeight: 800, art: 'lullaby' },
-  { id: 'cottoncandy', name: 'Cotton Candy Sky', bg: '#1a1428', ink: '#fbf0ff', accent: '#f4a8ff', hdr: ['#43305e', '#1a1428'], display: "'Fredoka', sans-serif", displayWeight: 600, art: 'cottoncandy' },
   { id: 'moonrabbit', name: 'Moon Rabbit', bg: '#101a33', ink: '#f1f4fb', accent: '#ffe08a', hdr: ['#22345e', '#101a33'], display: "'Cormorant Garamond', serif", displayWeight: 700, art: 'moonrabbit' },
-  { id: 'galaxy', name: 'Galaxy Swirl', bg: '#120f2a', ink: '#f2eeff', accent: '#c59bff', hdr: ['#2e2462', '#120f2a'], display: "'Baloo 2', sans-serif", displayWeight: 700, art: 'galaxy' },
-  { id: 'shooting', name: 'Shooting Stars', bg: '#0c1630', ink: '#eaf4ff', accent: '#7fd0ff', hdr: ['#1a3466', '#0c1630'], display: "'Fraunces', serif", displayWeight: 700, displayItalic: true, art: 'shooting' },
-  { id: 'planets', name: 'Bubblegum Planets', bg: '#1b1030', ink: '#fdf0fb', accent: '#ff8fd8', hdr: ['#3c2366', '#1b1030'], display: "'Fredoka', sans-serif", displayWeight: 700, art: 'planets' },
   { id: 'snowmoon', name: 'Midnight Snow', bg: '#0f1a30', ink: '#f0f6ff', accent: '#cfe6ff', hdr: ['#223c66', '#0f1a30'], display: "'Cormorant Garamond', serif", displayWeight: 700, displayItalic: true, art: 'snowmoon' },
   { id: 'crystal', name: 'Crystal Cave', bg: '#121626', ink: '#eefaff', accent: '#8ff0ff', hdr: ['#23304e', '#121626'], display: "'DM Serif Display', serif", displayWeight: 400, art: 'crystal' },
-  { id: 'moonpiano', name: 'Moonlit Piano', bg: '#0e1426', ink: '#eef3fb', accent: '#9cc8ff', hdr: ['#1f2e56', '#0e1426'], display: "'Playfair Display', serif", displayWeight: 700, art: 'moonpiano' },
-  { id: 'starjar', name: 'Star Candy Jar', bg: '#1c1220', ink: '#fff0f6', accent: '#ffb3d1', hdr: ['#3a2244', '#1c1220'], display: "'Baloo 2', sans-serif", displayWeight: 800, art: 'starjar' },
 ];
 
 // Works out every colour of a look (the playbook's recipe), with contrast checked.
