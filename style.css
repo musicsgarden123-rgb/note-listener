@@ -380,7 +380,7 @@ body.has-wall .home-hero { background: linear-gradient(180deg, rgba(8, 10, 20, .
 body.has-wall .hero-art { display: none; }
 body.has-wall .home-hello, body.has-wall .home-sub, body.has-wall .home-brand { text-shadow: 0 2px 8px rgba(0,0,0,.4); }
 /* With a picture behind practice: a soft wash of the look's colour keeps the staff readable. */
-body.has-wall .app::before { content: ""; position: absolute; inset: 0; z-index: 0; pointer-events: none; background: linear-gradient(180deg, color-mix(in srgb, var(--bg) 45%, transparent), color-mix(in srgb, var(--bg) 70%, transparent)); }
+body.has-wall .app::before { content: ""; position: absolute; inset: 0; z-index: 0; pointer-events: none; background: linear-gradient(180deg, color-mix(in srgb, var(--bg) 55%, transparent) 0, color-mix(in srgb, var(--bg) 10%, transparent) 30%, color-mix(in srgb, var(--bg) 10%, transparent) 70%, color-mix(in srgb, var(--bg) 55%, transparent) 100%); }
 body.has-wall .practice-scene { display: none; }
 body.has-wall .bottom-nav { z-index: 5; }
 
@@ -392,15 +392,23 @@ body.has-wall .bottom-nav { z-index: 5; }
 @media (min-width: 700px) { .home-cards { max-width: 640px; } }
 
 /* ---------- Practice as one scene: no boxes, the staff sits on the picture ---------- */
-.app { position: relative; overflow: hidden; background: linear-gradient(180deg, var(--hdr-0) 0%, var(--bg) 62%); --staff-ink: #1b1a1f; --staff-line: #6a6870; }
+.app { position: relative; overflow: hidden; background: linear-gradient(180deg, var(--hdr-0) 0%, var(--bg) 62%); --staff-ink: #141318; --staff-line: #3a3940; }
 .practice-scene { position: absolute; inset: 0; z-index: 0; pointer-events: none; overflow: hidden; }
-.practice-scene svg { position: absolute; right: -34%; top: 6%; width: min(100vw, 560px); height: auto; opacity: 0.26; }
+.practice-scene svg { position: absolute; right: -12%; top: 10%; width: min(118vw, 680px); height: auto; opacity: 0.85; }
 .practice-scene::after { content: ""; position: absolute; inset: 0; background-image: radial-gradient(circle at 14% 22%, #fff 0 1px, transparent 1.8px), radial-gradient(circle at 78% 8%, #fff 0 1.2px, transparent 2px), radial-gradient(circle at 36% 64%, #fff 0 0.9px, transparent 1.6px), radial-gradient(circle at 88% 48%, #fff 0 1px, transparent 1.8px), radial-gradient(circle at 8% 78%, #fff 0 1px, transparent 1.8px); opacity: 0.55; }
 .app > :not(.practice-scene) { position: relative; z-index: 1; }
 .staff { position: relative; background: transparent; border: none; border-radius: 0; padding: 0; isolation: isolate; }
-.staff::before { content: ""; position: absolute; inset: 8px; z-index: -1; border-radius: 40px; background: var(--paper); opacity: 0.94; filter: blur(16px); box-shadow: 0 0 60px 12px color-mix(in srgb, var(--accent) 22%, transparent); }
+.staff::before {
+  /* A see-through light band across the whole width: the scene still shows, black notes stay clear. */
+  content: ""; position: absolute; top: 0; bottom: 0; left: -24px; right: -24px; z-index: -1;
+  background: color-mix(in srgb, var(--paper) 74%, transparent);
+  -webkit-mask-image: linear-gradient(180deg, transparent 0, #000 14%, #000 86%, transparent 100%);
+  mask-image: linear-gradient(180deg, transparent 0, #000 14%, #000 86%, transparent 100%);
+}
 .staff svg { fill: var(--staff-ink); stroke: var(--staff-ink); }
 .staff svg g[stroke="#999999"] { stroke: var(--staff-line); }
 .staff svg g[fill="#999999"] { fill: var(--staff-line); }
 .dock { background: transparent; border-top: none; }
 .kb-track { background: color-mix(in srgb, var(--ink) 18%, transparent); }
+
+.score, .accuracy { text-shadow: 0 1px 6px color-mix(in srgb, var(--bg) 80%, transparent); }
