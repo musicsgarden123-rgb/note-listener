@@ -49,10 +49,12 @@ export function deriveLook(L) {
   const hdrInk = ensure(dark ? '#ffffff' : L.ink, L.hdr, 7);
   const hdrSub = ensure(mix(hdrInk, L.hdr[0], 0.25), L.hdr);
   const hdrAccent = ensure(L.accent, L.hdr, 3);
-  const paper = dark ? '#f8f3e9' : mix(L.bg, W, 0.4);
+  const paper = dark ? mix('#fbf7ef', L.accent, 0.1) : mix(L.bg, W, 0.4);
+  const accentOnPaper = ensure(L.accent, [paper], 3.5);
+  const keyDetect = mix(L.accent, W, 0.35);
   return {
     dark, bg: L.bg, card, line, ink, muted, accent: L.accent, accentInk, accentText, tonal, tonalInk,
-    hdr0: L.hdr[0], hdr1: L.hdr[1], hdrInk, hdrSub, hdrAccent, paper,
+    hdr0: L.hdr[0], hdr1: L.hdr[1], hdrInk, hdrSub, hdrAccent, paper, accentOnPaper, keyDetect,
   };
 }
 
@@ -175,7 +177,8 @@ export function applyLook(id) {
   set('--accent', c.accent); set('--accent-ink', c.accentInk); set('--accent-text', c.accentText);
   set('--tonal', c.tonal); set('--tonal-ink', c.tonalInk);
   set('--hdr-0', c.hdr0); set('--hdr-1', c.hdr1); set('--hdr-ink', c.hdrInk); set('--hdr-sub', c.hdrSub); set('--hdr-accent', c.hdrAccent);
-  set('--paper', c.paper);
+  set('--paper', c.paper); set('--accent-paper', c.accentOnPaper);
+  set('--key-correct', c.accent); set('--key-correct-ink', c.accentInk); set('--key-detect', c.keyDetect);
   set('--font-display', look.display);
   set('--display-weight', String(look.displayWeight || 700));
   set('--display-style', look.displayItalic ? 'italic' : 'normal');

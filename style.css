@@ -343,10 +343,10 @@ input[type="checkbox"] { width: 24px; height: 24px; flex: none; }
 .key.black.is-hint { background: color-mix(in srgb, var(--accent) 75%, var(--ebony)); }
 .key.is-hint::after { content: ''; position: absolute; inset: 0; border-radius: inherit; box-shadow: inset 0 0 0 3px var(--accent); animation: pulse 1.2s ease-in-out infinite; pointer-events: none; }
 @keyframes pulse { 50% { opacity: 0.35; } }
-.key.is-detected { background: var(--detect); box-shadow: 0 0 calc(4px + var(--glow) * 20px) calc(var(--glow) * 4px) color-mix(in srgb, var(--detect) 70%, transparent); z-index: 1; }
-.key.black.is-detected { background: var(--detect); z-index: 3; }
-.key.is-correct, .key.black.is-correct { background: var(--good); box-shadow: 0 0 24px 4px color-mix(in srgb, var(--good) 70%, transparent); }
-.key.is-correct .key-label { color: #fff; }
+.key.is-detected { background: var(--key-detect, var(--detect)); box-shadow: 0 0 calc(4px + var(--glow) * 20px) calc(var(--glow) * 4px) color-mix(in srgb, var(--key-detect, var(--detect)) 70%, transparent); z-index: 1; }
+.key.black.is-detected { background: var(--key-detect, var(--detect)); z-index: 3; }
+.key.is-correct, .key.black.is-correct { background: var(--key-correct, var(--good)); box-shadow: 0 0 28px 6px color-mix(in srgb, var(--key-correct, var(--good)) 75%, transparent); }
+.key.is-correct .key-label { color: var(--key-correct-ink, #fff); }
 .key.is-selected::before {
   content: ''; position: absolute; left: 50%; width: calc(var(--white-w) * 0.42); height: calc(var(--white-w) * 0.42); max-width: 22px; max-height: 22px;
   transform: translateX(-50%); border-radius: 999px; background: var(--pick); pointer-events: none; z-index: 1;
@@ -392,13 +392,14 @@ body.has-wall .bottom-nav { z-index: 5; }
 @media (min-width: 700px) { .home-cards { max-width: 640px; } }
 
 /* ---------- Practice as one scene: no boxes, the staff sits on the picture ---------- */
-.app { position: relative; overflow: hidden; background: linear-gradient(180deg, var(--hdr-0) 0%, var(--bg) 62%); --staff-ink: var(--ink); --staff-line: color-mix(in srgb, var(--ink) 62%, transparent); }
+.app { position: relative; overflow: hidden; background: linear-gradient(180deg, var(--hdr-0) 0%, var(--bg) 62%); --staff-ink: #1b1a1f; --staff-line: #6a6870; }
 .practice-scene { position: absolute; inset: 0; z-index: 0; pointer-events: none; overflow: hidden; }
 .practice-scene svg { position: absolute; right: -34%; top: 6%; width: min(100vw, 560px); height: auto; opacity: 0.26; }
 .practice-scene::after { content: ""; position: absolute; inset: 0; background-image: radial-gradient(circle at 14% 22%, #fff 0 1px, transparent 1.8px), radial-gradient(circle at 78% 8%, #fff 0 1.2px, transparent 2px), radial-gradient(circle at 36% 64%, #fff 0 0.9px, transparent 1.6px), radial-gradient(circle at 88% 48%, #fff 0 1px, transparent 1.8px), radial-gradient(circle at 8% 78%, #fff 0 1px, transparent 1.8px); opacity: 0.55; }
 .app > :not(.practice-scene) { position: relative; z-index: 1; }
-.staff { background: transparent; border: none; border-radius: 0; padding: 0; }
-.staff svg { fill: var(--staff-ink); stroke: var(--staff-ink); filter: drop-shadow(0 1px 6px color-mix(in srgb, var(--bg) 70%, transparent)); }
+.staff { position: relative; background: transparent; border: none; border-radius: 0; padding: 0; isolation: isolate; }
+.staff::before { content: ""; position: absolute; inset: 8px; z-index: -1; border-radius: 40px; background: var(--paper); opacity: 0.94; filter: blur(16px); box-shadow: 0 0 60px 12px color-mix(in srgb, var(--accent) 22%, transparent); }
+.staff svg { fill: var(--staff-ink); stroke: var(--staff-ink); }
 .staff svg g[stroke="#999999"] { stroke: var(--staff-line); }
 .staff svg g[fill="#999999"] { fill: var(--staff-line); }
 .dock { background: transparent; border-top: none; }

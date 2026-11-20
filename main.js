@@ -1,5 +1,5 @@
 import { detectPitch, freqToMidi, midiToFreq, rms } from './pitch.js?v=4';
-import { initScreens, showScreen } from './screens.js?v=14';
+import { initScreens, showScreen } from './screens.js?v=15';
 
 // ======================================================================
 // Constants
@@ -1109,7 +1109,7 @@ function renderQuestion(correct = false) {
     items: [question],
     lowStep: Math.min(...steps),
     highStep: Math.max(...steps),
-    color: correct ? cssVar('--good', '#1f9d55') : null,
+    color: correct ? cssVar('--accent-paper', '#1f9d55') : null,
     label: correct ? `${itemSpell(question).pretty}, correct` : 'Which note is this?',
   });
 }
@@ -1176,10 +1176,9 @@ function drawGrandStaff(el, { items, lowStep, highStep, color, wide = false, lab
       duration: 'w',
     });
     if (s.acc) note.addModifier(new VF.Accidental(s.acc), 0);
-    if (color) {
-      note.setStyle({ fillStyle: color, strokeStyle: color });
-      note.setLedgerLineStyle({ strokeStyle: color });
-    }
+    if (color) note.setStyle({ fillStyle: color, strokeStyle: color });
+    // Ledger lines match the staff lines (they used to stay dark grey and disappear).
+    note.setLedgerLineStyle({ strokeStyle: color || '#1b1a1f', lineWidth: 1.6 });
     note.setStave(stave);
     const mc = new VF.ModifierContext();
     note.addToModifierContext(mc);
