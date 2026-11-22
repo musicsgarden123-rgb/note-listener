@@ -10,7 +10,7 @@ A note-reading drill with a full piano.
 - **Sound:** a warm grand piano by default (softer-played Salamander Grand Piano recordings with a touch of extra body), or the soft, pure and buzzy synth sounds. A tap sounds for half a second; holding a key down keeps the note sounding until you let go, like a real piano.
 - **Sound details (top):** the live readout (detected note, frequency, tuning, clarity, loudness). It's for testing and will be hidden later; click its title to fold it away.
 
-It's plain HTML and JavaScript with no build step. The grand staff is drawn by [VexFlow](https://www.vexflow.com) 4.2.5 (MIT licence), saved in `vendor/` so the app works offline. Audio is processed only in your browser; nothing is recorded or uploaded.
+It's plain HTML and JavaScript with no build step. The grand staff is drawn by [VexFlow](https://www.vexflow.com) 4.2.5 (MIT licence), saved in `vendor/` so the app works offline. Audio is processed only in your browser; no sound is recorded or uploaded. The live site uses Google Analytics (measurement ID `G-Q0NN5CRJH0`) to count visits and see how the app is used. It doesn't run when you test on `localhost`.
 
 ## Run it
 Browsers only allow the microphone on `https://` or `http://localhost`, so serve the folder rather than opening the file directly. In a terminal, run:
