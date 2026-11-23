@@ -109,18 +109,20 @@ function build() {
 // ---------- Taking the picture ----------
 function take() { const svg = staffEl.querySelector('svg'); if (svg) snapshotFrom(svg); }
 
-// Picture of just the grand staff: cropped to the drawing itself, never the empty box or the keyboard.
+// Picture of the staff as it looks on screen, white space included, so there is room
+// above and below the grand staff to write ledger-line notes. Never the keyboard.
 export async function snapshotFrom(svg) {
   shotBtn.disabled = true;
   try {
     const { img, w: cw, h: ch } = await svgImage(svg);
     const scale = Math.max(2, window.devicePixelRatio || 1);
-    const pad = 20;
-    const w = Math.round((cw + pad * 2) * scale), h = Math.round((ch + pad * 2) * scale);
+    const padX = 24;
+    const padY = Math.max(32, ch * 0.18);
+    const w = Math.round((cw + padX * 2) * scale), h = Math.round((ch + padY * 2) * scale);
     for (const cv of [baseCv, inkCv]) { cv.width = w; cv.height = h; }
     const ctx = baseCv.getContext('2d');
     ctx.fillStyle = '#fff'; ctx.fillRect(0, 0, w, h);
-    ctx.drawImage(img, pad * scale, pad * scale, cw * scale, ch * scale);
+    ctx.drawImage(img, padX * scale, padY * scale, cw * scale, ch * scale);
     strokes = []; undoStack = []; redoStack = [];
     paint();
     hasShot = true;
@@ -133,8 +135,8 @@ export async function snapshotFrom(svg) {
 }
 
 // Copies the staff's on-screen colours into the copy, so it looks the same outside the page.
-// The size comes from the drawing's own frame (its viewBox), so only the music is in the picture.
 function svgImage(svg) {
+  const r = svg.getBoundingClientRect();
   const clone = svg.cloneNode(true);
   const src = [svg, ...svg.querySelectorAll('*')];
   const dst = [clone, ...clone.querySelectorAll('*')];
@@ -142,24 +144,14 @@ function svgImage(svg) {
     const cs = getComputedStyle(el);
     dst[i].setAttribute('style', COPY_PROPS.map((p) => `${p}:${cs.getPropertyValue(p)}`).join(';'));
   });
-  let vb = svg.viewBox?.baseVal;
-  if (!vb || !vb.width) {
-    const r = svg.getBoundingClientRect();
-    vb = { x: 0, y: 0, width: r.width, height: r.height };
-    clone.setAttribute('viewBox', `0 0 ${r.width} ${r.height}`);
-  }
-  // About 420px tall for a grand staff; wide drills keep their full length.
-  const k = Math.min(2.2, 420 / vb.height);
-  const w = vb.width * k, h = vb.height * k;
+  if (!clone.getAttribute('viewBox')) clone.setAttribute('viewBox', `0 0 ${r.width} ${r.height}`);
   clone.setAttribute('xmlns', 'http://www.w3.org/2000/svg');
-  clone.setAttribute('width', w);
-  clone.setAttribute('height', h);
-  clone.setAttribute('preserveAspectRatio', 'xMidYMid meet');
-  clone.style.width = clone.style.height = '';
+  clone.setAttribute('width', r.width);
+  clone.setAttribute('height', r.height);
   const xml = new XMLSerializer().serializeToString(clone);
   return new Promise((resolve, reject) => {
     const img = new Image();
-    img.onload = () => resolve({ img, w, h });
+    img.onload = () => resolve({ img, w: r.width, h: r.height });
     img.onerror = reject;
     img.src = 'data:image/svg+xml;charset=utf-8,' + encodeURIComponent(xml);
   });

@@ -1,6 +1,6 @@
 // Reference: clean pictures of the note-reading shortcuts from the method book (Unit 18).
 // ABCDE around Middle C, FACE in the spaces, EGBDF on the lines, and all three together.
-import { snapshotFrom } from './snapshot.js?v=2';
+import { snapshotFrom } from './snapshot.js?v=3';
 
 const C = { middle: '#7c3aed', spaces: '#2563eb', lines: '#e5484d' };
 const MIDDLE = [['a', 3], ['b', 3], ['c', 4], ['d', 4], ['e', 4]];
@@ -110,7 +110,7 @@ function draw(el, notes) {
   const width = x + clefRoom + 24 + notes.length * spacing + 10;
   const trebleY = 30, gap = 64, staffH = 40;
   const bassY = trebleY + staffH + gap;
-  const height = bassY + staffH + 44;
+  const height = bassY + staffH + 30;
 
   const renderer = new VF.Renderer(el, VF.Renderer.Backends.SVG);
   renderer.resize(width, height);
@@ -138,9 +138,9 @@ function draw(el, notes) {
     tick.setX(14 + i * spacing);
     note.setContext(ctx).draw();
 
-    // The letter: treble notes in the gap between the staves, bass notes below the bass staff.
+    // Every letter sits on one row in the gap between the staves, so they read left to right.
     const cx = note.getAbsoluteX() + note.getGlyphWidth() / 2;
-    const ty = onTreble ? trebleY + staffH + gap / 2 + 8 : bassY + staffH + 30;
+    const ty = trebleY + staffH + gap / 2 + 8;
     const t = document.createElementNS('http://www.w3.org/2000/svg', 'text');
     t.setAttribute('x', cx); t.setAttribute('y', ty);
     t.setAttribute('text-anchor', 'middle');
