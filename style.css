@@ -437,3 +437,18 @@ body.snap-open { overflow: hidden; }
   /* With a saved snapshot showing, Hint and Mic shrink to icons so the score keeps its room. */
   #practice .quiz-bar:has(#snap-reopen:not([hidden])) :is(.hint-btn, .mic-toggle) { font-size: 0; gap: 0; padding: 8px; }
 }
+
+/* ---------- Reference: note-reading shortcuts ---------- */
+.ref { z-index: 55; }
+body.ref-open { overflow: hidden; }
+.ref-list { flex: 1; min-height: 0; overflow-y: auto; display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 290px), 1fr)); gap: 16px; align-content: start; padding-bottom: 16px; }
+.ref-card { background: #fff; color: #1b1a1f; border-radius: 16px; padding: 16px; display: flex; flex-direction: column; gap: 8px; box-shadow: 0 8px 32px rgba(0,0,0,0.25); border-top: 6px solid var(--ref); }
+.ref-card:last-child { grid-column: 1 / -1; }
+.ref-head { display: flex; align-items: flex-start; justify-content: space-between; gap: 8px; }
+.ref-tag { font-size: var(--t-label); font-weight: 800; text-transform: uppercase; letter-spacing: 0.06em; color: var(--ref); }
+.ref-title { margin: 0; font-size: var(--t-head); line-height: 1.2; letter-spacing: 0.08em; }
+.ref-draw { display: inline-flex; align-items: center; gap: 4px; min-height: 40px; padding: 8px 12px; background: #f1eff5; color: #1b1a1f; border: none; }
+.ref-sheet svg { display: block; max-height: 340px; margin: 0 auto; }
+.ref-sheet svg g[stroke="#999999"] { stroke: #3a3940; }
+.ref-sheet svg g[fill="#999999"] { fill: #3a3940; }
+.ref-text { margin: 0; color: #4a4852; font-size: var(--t-body); }

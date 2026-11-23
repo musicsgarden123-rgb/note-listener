@@ -1,6 +1,7 @@
 import { detectPitch, freqToMidi, midiToFreq, rms } from './pitch.js?v=4';
 import { initScreens, showScreen } from './screens.js?v=15';
-import { initSnapshot } from './snapshot.js?v=1';
+import { initSnapshot } from './snapshot.js?v=2';
+import { initReference } from './reference.js?v=1';
 
 // ======================================================================
 // Constants
@@ -186,6 +187,7 @@ $('practice-back').addEventListener('click', () => {
 });
 $('hint').addEventListener('click', showHint);
 initSnapshot({ staff: $('staff'), bar: document.querySelector('#practice .quiz-bar') });
+initReference({ before: $('settings-btn') });
 $('restart').addEventListener('click', () => { resetScore(); nextQuestion(); });
 $('show-accuracy').addEventListener('change', (e) => { remember('sr-accuracy', e.target.checked ? '1' : '0'); showScore(); });
 $('drill-select').addEventListener('change', (e) => selectDrill(e.target.value));
