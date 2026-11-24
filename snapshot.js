@@ -299,6 +299,14 @@ async function save() {
   if (!blob) return;
   const stamp = new Date().toISOString().slice(0, 16).replace('T', ' ').replace(':', '.');
   const file = new File([blob], `Sight Reader ${stamp}.png`, { type: 'image/png' });
+  // On the Claude preview page, saving goes through Claude (it asks the viewer first).
+  if (window.claude?.use) {
+    const downloads = await window.claude.use('downloads').catch(() => null);
+    if (downloads) {
+      try { await downloads.save({ filename: file.name, data: blob }); } catch { /* declined or unavailable */ }
+      return;
+    }
+  }
   try {
     if (navigator.canShare?.({ files: [file] })) {
       await navigator.share({ files: [file], title: 'Sight Reader snapshot' });
