@@ -20,7 +20,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@700;800&family=Cormorant+Garamond:ital,wght@0,700;1,700&family=DM+Serif+Display&family=Fraunces:ital,opsz,wght@0,9..144,600;0,9..144,700;1,9..144,600&family=Fredoka:wght@600;700&family=Nunito:wght@500;600;700;800&family=Playfair+Display:wght@700&display=swap">
-  <link rel="stylesheet" href="style.css?v=23">
+  <link rel="stylesheet" href="style.css?v=24">
 </head>
 <body>
   <!--APP-START-->
@@ -171,6 +171,10 @@
             <option value="square">Buzzy (square)</option>
           </select>
         </label>
+        <div class="setting-row"><label for="cue-select" class="row-text">Correct-answer sound<span class="row-hint">A quiet cue when a note is right.</span></label>
+          <span class="cue-pick"><select id="cue-select"><option value="off">Off</option></select>
+          <button type="button" id="cue-play" class="icon-btn small" aria-label="Play this sound" title="Play this sound"><svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M8 5.5v13l10-6.5z"/></svg></button></span>
+        </div>
         <label class="setting-row">Key size <span class="slider-wrap"><input type="range" id="key-size" min="0" max="100" value="50"> <span id="key-size-val" class="pct">50%</span></span></label>
         <label class="setting-row">Show accuracy <input type="checkbox" id="show-accuracy"></label>
         <label class="setting-row">Scroll the keyboard to the note I play <input type="checkbox" id="follow" checked></label>
@@ -278,6 +282,6 @@
   <!--APP-END-->
 
   <script src="vendor/vexflow-4.2.5-bravura.js"></script>
-  <script type="module" src="main.js?v=33"></script>
+  <script type="module" src="main.js?v=34"></script>
 </body>
 </html>

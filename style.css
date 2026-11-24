@@ -461,3 +461,6 @@ body.ref-open { overflow: hidden; }
 .snap-zoom { display: inline-flex; align-items: center; gap: 4px; padding: 4px; border-radius: 999px; background: var(--card); border: 1px solid var(--line); }
 .snap-zoom .icon-btn { background: none; }
 .snap-zoom-level { min-width: 64px; min-height: 36px; padding: 4px 8px; background: none; font-weight: 800; font-variant-numeric: tabular-nums; }
+
+/* Correct-answer sound picker */
+.cue-pick { display: inline-flex; align-items: center; gap: 8px; flex: none; }

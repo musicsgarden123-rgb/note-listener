@@ -2,6 +2,7 @@ import { detectPitch, freqToMidi, midiToFreq, rms } from './pitch.js?v=4';
 import { initScreens, showScreen } from './screens.js?v=15';
 import { initSnapshot } from './snapshot.js?v=5';
 import { initReference } from './reference.js?v=4';
+import { CUES, playCue } from './cues.js?v=1';
 
 // ======================================================================
 // Constants
@@ -363,6 +364,23 @@ async function loadPiano(kind) {
   set.ready = set.buffers.size > 0;
   opt.textContent = set.ready ? info.label : `${info.label} (unavailable)`;
 }
+
+// Correct-answer sound: off by default; the choice is remembered.
+CUES.forEach((c, i) => $('cue-select').add(new Option(`${i + 1}. ${c.name}`, c.id)));
+{
+  const savedCue = recall('sr-cue');
+  if (savedCue && $('cue-select').querySelector(`option[value="${savedCue}"]`)) $('cue-select').value = savedCue;
+}
+function playCorrectCue(force = false) {
+  const id = $('cue-select').value;
+  if (id === 'off') return;
+  ensureAudio();
+  const quietMs = playCue(ctx, id);
+  // The mic ignores this little sound, the same as the app's own notes.
+  if (!force) playingUntil = Math.max(playingUntil, performance.now() + quietMs);
+}
+$('cue-select').addEventListener('change', (e) => { remember('sr-cue', e.target.value); playCorrectCue(true); });
+$('cue-play').addEventListener('click', () => playCorrectCue(true));
 
 $('waveform').addEventListener('change', (e) => {
   remember('sr-sound', e.target.value);
@@ -885,7 +903,7 @@ function answer(midi) {
   $('feedback').className = 'feedback good';
   clearTimeout(answer._fb);
   answer._fb = setTimeout(() => { $('feedback').textContent = ''; }, 600);
-  if (mode === 'practice') nextQuestion();
+  if (mode === 'practice') { playCorrectCue(); nextQuestion(); }
 }
 
 function showHint() {
