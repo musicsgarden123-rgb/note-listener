@@ -452,3 +452,12 @@ body.ref-open { overflow: hidden; }
 .ref-sheet svg g[stroke="#999999"] { stroke: #3a3940; }
 .ref-sheet svg g[fill="#999999"] { fill: #3a3940; }
 .ref-text { margin: 0; color: #4a4852; font-size: var(--t-body); }
+
+/* Snapshot zoom: pinch with two fingers, or the − / + buttons; Move tool or one finger (after Pencil) drags. */
+.snap-stage { position: relative; overflow: hidden; touch-action: none; justify-content: flex-start; align-items: flex-start; }
+.snap-sheet { transform-origin: 0 0; flex: none; }
+.snap-stage.is-hand, .snap-stage.is-hand .snap-ink { cursor: grab; }
+.snap-stage.is-panning, .snap-stage.is-panning .snap-ink { cursor: grabbing; }
+.snap-zoom { display: inline-flex; align-items: center; gap: 4px; padding: 4px; border-radius: 999px; background: var(--card); border: 1px solid var(--line); }
+.snap-zoom .icon-btn { background: none; }
+.snap-zoom-level { min-width: 64px; min-height: 36px; padding: 4px 8px; background: none; font-weight: 800; font-variant-numeric: tabular-nums; }

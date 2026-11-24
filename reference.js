@@ -1,6 +1,6 @@
 // Reference: clean pictures of the note-reading shortcuts from the method book (Unit 18).
 // ABCDE around Middle C, FACE in the spaces, EGBDF on the lines, and all three together.
-import { snapshotFrom } from './snapshot.js?v=4';
+import { snapshotFrom } from './snapshot.js?v=5';
 
 const C = { middle: '#7c3aed', spaces: '#2563eb', lines: '#e5484d' };
 const MIDDLE = [['a', 3], ['b', 3], ['c', 4], ['d', 4], ['e', 4]];

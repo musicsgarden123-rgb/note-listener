@@ -1,7 +1,7 @@
 import { detectPitch, freqToMidi, midiToFreq, rms } from './pitch.js?v=4';
 import { initScreens, showScreen } from './screens.js?v=15';
-import { initSnapshot } from './snapshot.js?v=4';
-import { initReference } from './reference.js?v=3';
+import { initSnapshot } from './snapshot.js?v=5';
+import { initReference } from './reference.js?v=4';
 
 // ======================================================================
 // Constants
